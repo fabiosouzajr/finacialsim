@@ -164,3 +164,71 @@
 | 13:27 | Edited docs/superpowers/plans/2026-05-23-phase-1-core.md | added 1 import(s) | ~69 |
 | 13:27 | Edited docs/superpowers/plans/2026-05-23-phase-1-core.md | ValueError() → assert_never() | ~115 |
 | 13:27 | Session end: 32 writes across 6 files (CLAUDE.md, issue-tracker.md, triage-labels.md, domain.md, 2026-05-23-phase-1-core.md) | 5 reads | ~16826 tok |
+
+## Session: 2026-05-23 14:19
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-23 14:45
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-23 14:46
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-23 14:46
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:48 | Created .claude/worktrees/phase-1-core/pyproject.toml | — | ~234 |
+| 14:48 | Created .claude/worktrees/phase-1-core/ruff.toml | — | ~40 |
+| 14:48 | Created .claude/worktrees/phase-1-core/mypy.ini | — | ~63 |
+| 14:48 | Created .claude/worktrees/phase-1-core/pytest.ini | — | ~40 |
+| 14:53 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_money.py | — | ~241 |
+| 14:53 | Created .claude/worktrees/phase-1-core/app/core/money.py | — | ~221 |
+| 14:55 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_price_table.py | — | ~206 |
+| 14:55 | Created .claude/worktrees/phase-1-core/app/core/price_table.py | — | ~1213 |
+| 14:56 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_price_table.py | modified test_compute_pmt_zero_rate() | ~326 |
+| 14:56 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_price_table.py | inline fix | ~14 |
+| 14:58 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_price_table.py | modified test_build_schedule_first_row_juros_uses_d1() | ~341 |
+| 14:59 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_iof.py | — | ~583 |
+| 14:59 | Created .claude/worktrees/phase-1-core/app/core/iof.py | — | ~854 |
+| 15:01 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_cet.py | — | ~268 |
+| 15:01 | Created .claude/worktrees/phase-1-core/app/core/cet.py | — | ~559 |
+| 15:02 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_extras.py | — | ~797 |
+| 15:02 | Created .claude/worktrees/phase-1-core/app/core/extras.py | — | ~614 |
+| 15:03 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_rate_suggestions.py | — | ~244 |
+| 15:04 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_validators.py | — | ~782 |
+| 15:04 | Created .claude/worktrees/phase-1-core/app/core/rate_suggestions.py | — | ~242 |
+| 15:04 | Created .claude/worktrees/phase-1-core/app/core/validators.py | — | ~1021 |
+| 15:05 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_amortization.py | — | ~719 |
+| 15:05 | Created .claude/worktrees/phase-1-core/app/core/amortization.py | — | ~1093 |
+| 15:06 | Edited .claude/worktrees/phase-1-core/app/core/amortization.py | 8→8 lines | ~101 |
+| 15:07 | Edited .claude/worktrees/phase-1-core/app/core/amortization.py | modified apply_extraordinary_amortizations() | ~43 |
+| 15:07 | Edited .claude/worktrees/phase-1-core/app/core/amortization.py | modified Strategy() | ~145 |
+| 15:07 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_amortization.py | 6→5 lines | ~44 |
+| 15:07 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_amortization.py | modified test_schedule_pmt_is_uniform_pmt_not_last_row() | ~280 |
+| 15:09 | Edited .claude/worktrees/phase-1-core/tests/unit/core/test_amortization.py | 3→3 lines | ~44 |
+| 15:11 | Created .claude/worktrees/phase-1-core/tests/integration/test_simulation_flow.py | — | ~610 |
+| 15:15 | Edited .claude/worktrees/phase-1-core/mypy.ini | 5→2 lines | ~12 |
+| 15:15 | Edited .claude/worktrees/phase-1-core/mypy.ini | 2→5 lines | ~25 |
+| 15:16 | Edited .claude/worktrees/phase-1-core/mypy.ini | 5→8 lines | ~38 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/amortization.py | inline fix | ~7 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/amortization.py | inline fix | ~10 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/extras.py | inline fix | ~7 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/extras.py | inline fix | ~9 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/validators.py | inline fix | ~7 |
+| 15:23 | Edited .claude/worktrees/phase-1-core/app/core/validators.py | inline fix | ~9 |
+| 15:24 | Edited .claude/worktrees/phase-1-core/app/core/price_table.py | 5→2 lines | ~33 |
+| 15:24 | Edited .claude/worktrees/phase-1-core/tests/integration/test_simulation_flow.py | 5→6 lines | ~96 |
+| 15:24 | Created .claude/worktrees/phase-1-core/tests/unit/core/test_price_table.py | — | ~713 |
+
+## Session: 2026-05-23 Phase-1 complete
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:25 | Phase 1 core complete: 9 modules, 35 tests, 96% coverage | app/core/*.py, tests/ | 0 mypy errors, 0 ruff errors, branch worktree-phase-1-core ready for PR | ~25k |

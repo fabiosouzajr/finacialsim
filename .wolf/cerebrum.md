@@ -20,3 +20,12 @@
 ## Decision Log
 
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
+- [2026-05-23] **CET root finder**: Replace `scipy.optimize.brentq` + `numpy` with a pure-Python bisection loop. Rationale: only one call site, function is smooth, avoids ~35MB C-extension deps. If curve fitting or matrix ops are needed in Phase 4+, re-evaluate.
+- [2026-05-23] **CET timing model**: Use `meses = row.numero_parcela * (d1 / 30.0)` instead of `(row.data_vencimento - data_liberacao).days / 30.0`. Preserves the invariant that CET == taxa when no IOF/extras. `compute_cet` receives `d1: int = 30`; `data_liberacao` param can be removed as it becomes unused.
+- [2026-05-23] **All deps at install**: All pyproject.toml deps declared upfront (including weasyprint, nicegui, etc.). Environment is assumed pre-configured on Windows.
+- [2026-05-23] **Rate curve**: DB-backed (Phase 2). `suggest_rate` stays pure; service layer fetches from DB and passes the list in. Phase 1 tests use hardcoded fixture.
+- [2026-05-23] **`_rebuild_segment` d1**: Hardcoded at 30. Treat post-payment saldo as fresh 30-day loan anchored on next vencimento. Documented assumption, not a parameter.
+- [2026-05-23] **`tolerancia`/`max_iteracoes` in IOF iteration**: Removed from public signature. Hardcoded internally (0.01 and 10). Only public knob is `incluir_iof: bool`.
+- [2026-05-23] **`taxa_minima_mes` validation**: Demoted to WARNING (not ERROR). Hard ERROR reserved for mathematically broken inputs.
+- [2026-05-23] **`RATEIO_MESES` rounding**: Last installment absorbs rounding residual so total matches `valor_total` exactly.
+- [2026-05-23] **`Schedule.pmt` after extraordinary amortization**: Carries the correct uniform PMT (not last row's adjusted parcela). REDUZIR_PARCELA uses `new_pmt`; REDUZIR_PRAZO uses `pmt_original`.
