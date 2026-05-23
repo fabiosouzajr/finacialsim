@@ -1,12 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T15:35:12.525Z
-> Files: 13 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T16:01:38.374Z
+> Files: 16 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.gitignore` — Git ignore rules (~783 tok)
-- `CLAUDE.md` — OpenWolf (~57 tok)
+- `CLAUDE.md` — CLAUDE.md (~1480 tok)
 - `prompt.md` — OBJETIVO PRINCIPAL (~1688 tok)
 
 ## .claude/
@@ -16,6 +16,12 @@
 ## .claude/rules/
 
 - `openwolf.md` (~313 tok)
+
+## docs/agents/
+
+- `domain.md` — Domain Docs (~470 tok)
+- `issue-tracker.md` — Issue tracker: GitHub (~266 tok)
+- `triage-labels.md` — Triage Labels (~261 tok)
 
 ## docs/superpowers/plans/
 
