@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from app.core.rate_suggestions import RateCurvePoint, suggest_rate
 
-
 CURVA_DEFAULT = [
     RateCurvePoint(ate_meses=24, taxa_mensal=Decimal("0.0149")),
     RateCurvePoint(ate_meses=36, taxa_mensal=Decimal("0.0169")),

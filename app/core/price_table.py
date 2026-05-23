@@ -104,10 +104,7 @@ def build_schedule(
             dias_periodo = (data_venc - (data_venc_1 + relativedelta(months=k - 2))).days
 
         saldo_anterior = saldo
-        if k == 1:
-            juros_raw = pv * (carencia_factor - Decimal("1"))
-        else:
-            juros_raw = saldo * i_m
+        juros_raw = pv * (carencia_factor - Decimal("1")) if k == 1 else saldo * i_m
 
         juros = quantize_brl(juros_raw)
 

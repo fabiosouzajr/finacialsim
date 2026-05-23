@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import assert_never
 
 from app.core.money import quantize_brl
 
 
-class ExtraModalidade(str, Enum):
+class ExtraModalidade(StrEnum):
     MENSAL_CONTINUO = "mensal_continuo"
     RATEIO_MESES = "rateio_meses"
     UNICO_INICIAL = "unico_inicial"

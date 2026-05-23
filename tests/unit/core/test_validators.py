@@ -7,7 +7,6 @@ from app.core.validators import (
     validate_simulation,
 )
 
-
 RULES = DEFAULT_RULES
 
 

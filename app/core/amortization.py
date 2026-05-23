@@ -5,12 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from datetime import date
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 
 from app.core.price_table import Schedule, ScheduleRow, build_schedule, compute_pmt
 
 
-class AmortizationMode(str, Enum):
+class AmortizationMode(StrEnum):
     REDUZIR_PARCELA = "reduzir_parcela"
     REDUZIR_PRAZO = "reduzir_prazo"
 

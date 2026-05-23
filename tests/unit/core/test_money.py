@@ -4,7 +4,7 @@ from app.core.money import CENTAVO, PCT_DEC, TAXA_DEC, quantize_brl, to_decimal
 
 
 def test_centavo_constant() -> None:
-    assert CENTAVO == Decimal("0.01")
+    assert Decimal("0.01") == CENTAVO
 
 
 def test_quantize_brl_half_up() -> None:
@@ -24,5 +24,5 @@ def test_to_decimal_accepts_str_int_float() -> None:
 
 
 def test_pct_taxa_precisions() -> None:
-    assert PCT_DEC == Decimal("0.0001")
-    assert TAXA_DEC == Decimal("0.00000001")
+    assert Decimal("0.0001") == PCT_DEC
+    assert Decimal("0.00000001") == TAXA_DEC
