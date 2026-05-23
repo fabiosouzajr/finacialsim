@@ -6,7 +6,7 @@
 > **Data:** 2026-05-23
 > **Status:** Spec aprovado, pronto para `writing-plans`
 > **Idioma do produto:** PT-BR (R$, dd/mm/yyyy, separador decimal vírgula)
-> **Plataformas:** Windows 10+ e Linux (Ubuntu/Debian/Fedora) — instalação local
+> **Plataformas:** Windows 10+ e Linux (Ubuntu/Debian/Fedora) e macOS 12+ (Monterey+) — instalação local
 
 ---
 
@@ -27,9 +27,10 @@ Capacidades resumidas:
 - Consulta FIPE com filtros encadeados (tipo → marca → modelo → ano).
 - Atualização automática de SELIC, CDI, IPCA, taxa BACEN de veículos, IOF.
 - Simulação Tabela Price com dias corridos e primeiro vencimento variável.
-- IOF (0,38% fixo + 0,0082%/dia, teto 365 dias) iterado para convergência quando incorporado ao principal.
-- CET via TIR exata (Brent).
-- Cronograma de amortização completo, com gráficos interativos.
+- **IOF opcional por simulação** (default ligado): quando ativo, 0,38% fixo + 0,0082%/dia (teto 365 dias) iterado para convergência ao ser incorporado ao principal.
+- **Custos adicionais mensais acrescidos à parcela**: plano de proteção veicular (mensal contínuo), IPVA anual com rateio em N meses (default 12), emplacamento + licenciamento com rateio em N meses (default 12), e itens personalizados (rastreador, garantia, etc.).
+- CET via TIR exata (Brent) — calculado apenas sobre o fluxo do financiamento (convenção BCB; extras não compõem o CET).
+- Cronograma de amortização completo (com colunas de extras e parcela total), com gráficos interativos.
 - Comparação lado-a-lado de dois cenários.
 - Amortização extraordinária com escolha de modo (parcela ou prazo).
 - Geração de PDF de proposta com snapshot reproduzível.
@@ -44,7 +45,7 @@ Capacidades resumidas:
 | Decisão | Escolha | Justificativa |
 |---|---|---|
 | Modelo de uso | 1 PC compartilhado pela equipe, SQLite local | Atende a maioria das lojas pequenas/médias |
-| Stack de UI | **NiceGUI** (Quasar/Vue) em janela nativa via pywebview | Visual profissional, multiplataforma, alto reuso de componentes |
+| Stack de UI | **NiceGUI** (Quasar/Vue) em janela nativa via pywebview | Visual profissional, multiplataforma (Win/Linux/macOS), alto reuso de componentes |
 | Precisão financeira | IOF + tarifas + CET via TIR, modo "banco real" | Requisito explícito do cliente |
 | Autenticação | PIN numérico 4–6 dígitos por usuário (bcrypt) | Rápido para vendedor, ainda rastreável |
 | Arquitetura interna | Monolito modular em camadas (`core` / `data` / `integrations` / `services` / `ui`) | Permite trocar UI ou expor API REST no futuro sem reescrever o core |
@@ -161,6 +162,7 @@ finacialsim/
 ├── scripts/
 │   ├── install_windows.ps1
 │   ├── install_linux.sh
+│   ├── install_macos.sh
 │   ├── build_exe.py
 │   └── seed_demo.py
 │
@@ -239,7 +241,8 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `taxa_juros_ano` NUMERIC(10,8) — equivalente anual
 - `data_liberacao`, `data_primeiro_venc` DATE
 - `dias_carencia` INTEGER — derivado
-- `iof_total`, `tarifas_total`, `valor_financiado`, `valor_parcela`, `total_pago`, `total_juros` NUMERIC(18,2)
+- `incluir_iof` BOOLEAN DEFAULT TRUE — toggle por simulação (§6.3)
+- `iof_total`, `tarifas_total`, `extras_total_acumulado`, `valor_financiado`, `valor_parcela`, `total_pago`, `total_juros` NUMERIC(18,2)
 - `pct_juros` NUMERIC(7,4)
 - `cet_mes`, `cet_ano` NUMERIC(10,8)
 - `status` TEXT — `rascunho` | `finalizada` | `arquivada`
@@ -253,6 +256,17 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `valor` NUMERIC(18,2)
 - `incluir_no_principal` BOOLEAN
 
+**`simulation_extras`** — custos adicionais mensais acrescidos à parcela (§6.5)
+- `id` PK
+- `simulation_id` FK→`simulations.id`
+- `tipo` TEXT — `protecao_veicular` | `ipva` | `emplacamento` | `seguro` | `custom`
+- `nome` TEXT — descrição amigável exibida (ex.: "Plano de proteção veicular Mensal")
+- `valor_total` NUMERIC(18,2) — valor mensal (modalidade `mensal_continuo`) ou anual (modalidade `rateio_meses`)
+- `modalidade` TEXT — `mensal_continuo` (sempre durante todo o prazo) | `rateio_meses` (rateado em N primeiras parcelas) | `unico_inicial` (uma vez na 1ª parcela)
+- `duracao_meses` INTEGER — quantas parcelas recebem o lançamento (para `mensal_continuo` = prazo total; para `rateio_meses` = N; para `unico_inicial` = 1)
+- `valor_por_parcela` NUMERIC(18,4) — derivado: `valor_total / duracao_meses` (cached para evitar recálculo)
+- `ordem` INTEGER — ordem de exibição no PDF e UI
+
 **`amortization_rows`**
 - `id` PK
 - `simulation_id` FK→`simulations.id` (índice)
@@ -260,6 +274,8 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `data_vencimento` DATE
 - `dias_periodo` INTEGER
 - `saldo_anterior`, `juros`, `amortizacao`, `parcela`, `saldo_devedor` NUMERIC(18,4)
+- `extras_total` NUMERIC(18,4) — soma dos extras aplicáveis a esta parcela
+- `parcela_total` NUMERIC(18,4) — `parcela + extras_total` (valor que o cliente paga no mês)
 - `ajuste_arredondamento` NUMERIC(18,4) — resíduo na última parcela
 
 **`extraordinary_amortizations`**
@@ -305,7 +321,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 
 **`business_rules`**
 - `id` PK
-- `chave` TEXT UNIQUE — `entrada_minima_pct`, `taxa_por_prazo_curva`, `iof_fixo_pct`, `iof_diario_pct`, `dias_max_carencia`, `prazo_minimo_meses`, `prazo_maximo_meses`, `taxa_minima_mes`, `taxa_maxima_mes`, `valor_minimo_financiado`
+- `chave` TEXT UNIQUE — `entrada_minima_pct`, `taxa_por_prazo_curva`, `incluir_iof_default`, `iof_fixo_pct`, `iof_diario_pct`, `iof_diario_max_dias`, `dias_max_carencia`, `prazo_minimo_meses`, `prazo_maximo_meses`, `taxa_minima_mes`, `taxa_maxima_mes`, `valor_minimo_financiado`, `extras_padrao`, `rateio_ipva_meses_default`, `rateio_emplacamento_meses_default` (lista completa em §12)
 - `valor_json` TEXT
 - `descricao` TEXT
 - `atualizado_em`, `atualizado_por` FK→`users.id`
@@ -335,7 +351,8 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 ### 5.5 Decisões importantes do modelo
 
 - **Snapshot JSON em `vehicles`, `simulations.rules_snapshot_json`, `proposals.snapshot_json`** garante reproduzibilidade ao longo dos anos.
-- `amortization_rows` materializada (não recalculada) evita drift de arredondamento.
+- `amortization_rows` materializada (não recalculada) evita drift de arredondamento e carrega `extras_total` + `parcela_total` por parcela.
+- `simulation_extras` em tabela própria 1:N permite extensão para novos tipos (rastreador, seguros adicionais) sem alterar schema.
 - `indicators_history` com UNIQUE permite upsert idempotente diário.
 - `extraordinary_amortizations` em separado preserva cronograma original e permite reverter.
 - `audit_log.diff_json` cobre o requisito "logs de alterações" sem versionar cada tabela.
@@ -394,7 +411,9 @@ class Schedule:
     saldo_residual: Decimal     # 0 após ajuste
 ```
 
-### 6.3 IOF veículo — `iof.py`
+### 6.3 IOF veículo (opcional) — `iof.py`
+
+**O IOF é opcional por simulação**, controlado pela flag `simulations.incluir_iof`. Default `true` (cobrar IOF — comportamento padrão de bancos). Vendedor pode desligar para simulações em que o IOF é cobrado fora do principal ou em cenários hipotéticos.
 
 Regulamento: Decreto 6.306/2007. Percentuais ficam em `business_rules`.
 
@@ -402,7 +421,7 @@ Regulamento: Decreto 6.306/2007. Percentuais ficam em `business_rules`.
 - **Diário**: 0,0082% × min(dias até vencimento da parcela, 365), aplicado sobre a amortização daquela parcela
 - **Total** = fixo + Σ diário por parcela
 
-**Fórmula:**
+**Fórmula (quando `incluir_iof = true`):**
 ```
 IOF_fixo    = 0.0038 × valor_financiado
 IOF_diario  = Σ_k [ amortização_k × 0.000082 × min(dias_até_venc_k, 365) ]
@@ -417,12 +436,20 @@ parar quando |PV_{n+1} − PV_n| < R$ 0,01
 ```
 Converge em 2–3 iterações na prática.
 
+**Quando `incluir_iof = false`:**
+- IOF não é iterado nem somado ao principal
+- `PV = valor_veículo − entrada + tarifas_incluídas` (uma única passada)
+- `simulations.iof_total = 0`
+- UI mostra badge informativo "IOF não incluído nesta simulação"
+
+> **Importante:** desligar o IOF afasta a simulação do "modo banco real". Use apenas quando a loja sabe que o IOF será cobrado externamente. O CET (§6.4) continua sendo calculado normalmente sobre o fluxo resultante.
+
 ### 6.4 CET via TIR — `cet.py`
 
-CET é a TIR mensal do fluxo de caixa do ponto de vista do cliente:
+CET é a TIR mensal do fluxo de caixa do **financiamento** (do ponto de vista do cliente):
 
 - `t = 0`: cliente recebe (em seu favor) `valor_veículo − entrada`
-- `t = d1, d1+30, ...`: cliente paga `PMT`
+- `t = d1, d1+30, ...`: cliente paga `PMT` (parcela do financiamento, **sem incluir extras**)
 
 Encontrar `i_cet` tal que:
 
@@ -432,11 +459,58 @@ Encontrar `i_cet` tal que:
 
 Resolvido com `scipy.optimize.brentq` no intervalo `[1e-6, 1.0]`.
 
+> **Convenção BCB:** o CET reflete apenas o custo do crédito. Custos adicionais (proteção veicular, IPVA, emplacamento — §6.5) **não entram no cálculo do CET**, porque são despesas externas ao crédito (serviços e tributos do veículo). Eles aparecem no cronograma e no PDF como linhas separadas, mas não distorcem o CET.
+
 Saída:
 - `cet_mes` (Decimal, 8 casas)
 - `cet_ano = (1 + cet_mes)^12 − 1`
 
-### 6.5 Taxa sugerida por prazo — `rate_suggestions.py`
+### 6.5 Custos adicionais mensais (extras) — `extras.py`
+
+A parcela paga pelo cliente todo mês pode incluir **custos externos ao financiamento** que a loja embute no boleto/débito para facilitar a cobrança. Modelados na tabela `simulation_extras` (§5.2).
+
+**Tipos suportados de fábrica:**
+
+| Tipo | Modalidade típica | Significado |
+|---|---|---|
+| `protecao_veicular` | `mensal_continuo` | Plano de proteção/seguro mensal durante TODO o prazo do financiamento |
+| `ipva` | `rateio_meses` (default 12) | IPVA anual rateado em N primeiras parcelas |
+| `emplacamento` | `rateio_meses` (default 12) | Emplacamento + licenciamento rateados em N primeiras parcelas |
+| `seguro` / `custom` | livre | Outros itens (rastreador, garantia estendida, etc.) |
+
+**Modalidades:**
+
+- **`mensal_continuo`** — `valor_total` é mensal; aplicado em todas as `prazo_meses` parcelas → `valor_por_parcela = valor_total`
+- **`rateio_meses`** — `valor_total` é anual/global; rateado em `duracao_meses` (default 12) primeiras parcelas → `valor_por_parcela = valor_total / duracao_meses`
+- **`unico_inicial`** — `valor_total` adicionado integralmente à 1ª parcela → `duracao_meses = 1`
+
+**Composição da parcela exibida:**
+
+```
+parcela_total[k] = parcela_financiamento[k] + Σ_extras_aplicáveis_à_parcela_k
+
+extras_aplicáveis_à_parcela_k = { e ∈ simulation_extras
+                                  | k está dentro do intervalo de aplicação de e }
+```
+
+**Persistência:**
+- `amortization_rows.extras_total` materializa o somatório por parcela (auditável)
+- `amortization_rows.parcela_total` = `parcela + extras_total`
+- `simulations.extras_total_acumulado` = soma de todos os extras ao longo de todas as parcelas (informativo)
+
+**O que extras NÃO afetam:**
+- `PMT` (parcela do financiamento) — calculada apenas com `PV`, taxa e prazo
+- `valor_financiado` — extras não são financiados (não incidem juros)
+- `IOF` — não incide sobre extras
+- `CET` — extras são serviços externos ao crédito (§6.4)
+
+**O que extras afetam:**
+- `parcela_total` mostrada para o cliente
+- `total_pago_cliente` (informativo): `total_pago_financiamento + extras_total_acumulado`
+- Cronograma exibido no PDF e na UI
+- Comparativo entre cenários (mostra parcela total além da parcela do financiamento)
+
+### 6.6 Taxa sugerida por prazo — `rate_suggestions.py`
 
 Curva configurável em `business_rules.taxa_por_prazo_curva`:
 
@@ -452,18 +526,19 @@ Curva configurável em `business_rules.taxa_por_prazo_curva`:
 
 Comportamento: se taxa atual < sugerida, UI mostra badge amarelo com botão "usar sugerida". Não bloqueia.
 
-### 6.6 Validações — `validators.py`
+### 6.7 Validações — `validators.py`
 
 Regras configuráveis (todas em `business_rules`):
-- `entrada_minima_pct` (default 20%)
+- `entrada_minima_pct` (default **10%**)
 - `prazo_minimo_meses` (12) / `prazo_maximo_meses` (72)
 - `taxa_minima_mes` (0,5%) / `taxa_maxima_mes` (5%)
 - `dias_max_carencia` (90)
 - `valor_minimo_financiado` (R$ 5.000)
+- Validações específicas de extras: `valor_total ≥ 0`, `duracao_meses ≥ 1`, `duracao_meses ≤ prazo_meses` (não pode ratear além do prazo do financiamento)
 
 Cada violação retorna `ValidationIssue(level='error'|'warning', field, message)`. Errors bloqueiam; warnings exibem badge na UI.
 
-### 6.7 Amortização extraordinária — `amortization.py`
+### 6.8 Amortização extraordinária — `amortization.py`
 
 Entrada: simulação + lista de pagamentos extras `(data, valor, modo)`.
 
@@ -475,12 +550,19 @@ Algoritmo:
 
 Resultado é um **novo cronograma persistido em paralelo** (não destrói o original).
 
-### 6.8 Testes do core
+**Tratamento de extras na amortização extraordinária:**
+- Extras `mensal_continuo` reduzem proporcionalmente ao novo prazo (param de incidir após a quitação)
+- Extras `rateio_meses` ainda no período de rateio: continuam sendo cobrados nas próximas parcelas até completar o rateio (são despesas do veículo, não do financiamento — quitar o financiamento não as cancela)
+- Comportamento explícito documentado no `guia_usuario.md`
+
+### 6.9 Testes do core
 
 Indispensáveis:
 - **Casos conhecidos**: cronogramas de simuladores reais (Santander, Itaú, Bradesco) com mesma entrada → bate centavo a centavo
 - **Property tests (hypothesis)**: para qualquer `(PV, i, n, d1)` válido, `Σ amortizações ≈ PV`, `saldo_final == 0`, `parcelas > 0`
 - **Casos-borda**: `d1 = 0`, `d1 = 90`, `n = 1`, taxa próxima de 0%
+- **IOF opcional**: comparação `incluir_iof=true` vs `incluir_iof=false` no mesmo cenário; diferença bate com cálculo manual do IOF
+- **Extras**: rateio 12x do IPVA bate com `valor_anual / 12`; proteção veicular mensal incide em todas as parcelas; extras NÃO alteram PMT/CET
 
 ---
 
@@ -714,18 +796,31 @@ Layout em 3 colunas.
 7. Data de liberação (default hoje)
 8. Data 1° vencimento (default +30d; mostra dias de carência)
 9. Tarifas (expansível): cadastro, avaliação, registro — toggle "incluir no principal"
+10. **IOF** (expansível): toggle "Incluir IOF nesta simulação" (default ligado). Quando desligado, exibe badge informativo.
+11. **Custos adicionais mensais** (expansível): cada linha permite adicionar/remover/editar:
+    - **Plano de proteção veicular** — valor R$/mês, modalidade "mensal contínuo" (preenchido em todas as parcelas)
+    - **IPVA anual** — valor R$ anual, modalidade "rateio em N meses" (default N=12)
+    - **Emplacamento + licenciamento** — valor R$ total, modalidade "rateio em N meses" (default N=12)
+    - **+ Adicionar custo personalizado** (rastreador, garantia estendida, etc.)
+    - Cada linha mostra preview "= R$ X,XX por parcela"
 
 Botão "Simular" + recálculo em tempo real ao alterar campos (debounced 400ms).
 
 **Central — Resultado (cards)**
-- Valor da parcela (destaque)
-- Valor financiado / Total pago / Total de juros / % juros / CET a.m. e a.a.
+- **Parcela do financiamento** (PMT — valor fixo das parcelas do banco)
+- **Parcela total — 1º ano** (PMT + extras_total no período de rateio, ex.: meses 1–12)
+- **Parcela total — após rateio** (PMT + apenas extras mensais contínuos, ex.: meses 13+)
+- Valor financiado / Total pago no financiamento / Total de juros / % juros / CET a.m. e a.a.
+- **Total pago pelo cliente** (informativo: financiamento + extras acumulados)
 - Cada card tem ícone "👁" para ocultar
 
+> Se não houver extras com `rateio_meses < prazo_total`, mostra apenas um card "Parcela total" único.
+
 **Direita — Visualizações**
-- Composição da parcela (barras empilhadas juros vs amortização)
+- Composição da parcela (barras empilhadas: juros + amortização + extras por categoria)
 - Saldo devedor (linha decrescente)
-- Tabela de amortização completa (expand, exportável CSV)
+- **Curva de parcela total ao longo do tempo** (linha — mostra "degrau" quando rateios terminam)
+- Tabela de amortização completa com colunas extras (expand, exportável CSV)
 
 **Rodapé**
 - Salvar simulação
@@ -779,7 +874,8 @@ Salvar comparativo → grava em `comparisons`.
 - Geral: nome da loja, logo (upload), endereço, CNPJ — usados no PDF
 - Regras de negócio: entrada mínima, prazos min/max, faixa de taxa, dias máx carência, curva taxa-por-prazo
 - Tarifas: cadastro/avaliação/registro (default + habilitadas)
-- IOF: percentuais fixo e diário (histórico preservado)
+- IOF: percentuais fixo e diário (histórico preservado) + default da flag `incluir_iof`
+- **Custos adicionais padrão** (`extras_padrao`): editar lista pré-cadastrada de proteção veicular, IPVA, emplacamento e custom (valor default, duração default do rateio, habilitar/desabilitar). Tudo que estiver habilitado aparece automaticamente na tela de Simulação como sugestão.
 - Backup: trigger manual, lista de backups, restaurar de arquivo
 - Aparência: tema claro/escuro, cor primária
 - PDF: textos cabeçalho/rodapé, observações padrão
@@ -826,12 +922,13 @@ Pipeline: dados → template Jinja2 (HTML/CSS) → WeasyPrint → PDF.
 1. Cabeçalho — logo, razão social, CNPJ, endereço, telefone, código, data, validade
 2. Cliente — nome, CPF/CNPJ, contato, endereço
 3. Veículo — marca/modelo/ano/cor/placa (opc), valor FIPE, valor de venda, fonte FIPE + mês ref
-4. Condições — valor financiado, entrada (R$ e %), prazo, taxa (a.m. e a.a.), CET (a.m. e a.a.), IOF total, tarifas detalhadas, data 1º venc
-5. Resumo financeiro — parcela, total pago, total de juros, % juros (cards)
-6. Cronograma completo — nº, vencimento, juros, amortização, parcela, saldo
-7. Gráfico de composição da parcela — render server-side (Plotly → PNG embutido)
-8. Observações — configuráveis, suportam variáveis `{cliente}`, `{vendedor}`, `{prazo}`
-9. Rodapé — vendedor responsável, assinaturas, validade da proposta
+4. Condições — valor financiado, entrada (R$ e %), prazo, taxa (a.m. e a.a.), CET (a.m. e a.a.), IOF total (ou "não incluído"), tarifas detalhadas, data 1º venc
+5. **Custos adicionais mensais** (se houver) — tabela com tipo, modalidade, valor total, valor por parcela, parcelas afetadas (ex.: "IPVA — rateio 12x — R$ 1.800,00 → R$ 150,00/mês — parcelas 1 a 12")
+6. Resumo financeiro — parcela do financiamento, parcela total 1º ano, parcela total após rateio, total pago financiamento, total pago cliente, total de juros, % juros (cards)
+7. Cronograma completo — nº, vencimento, juros, amortização, parcela financiamento, **extras**, **parcela total**, saldo
+8. Gráfico de composição da parcela — render server-side (Plotly → PNG embutido; inclui faixas de extras)
+9. Observações — configuráveis, suportam variáveis `{cliente}`, `{vendedor}`, `{prazo}`
+10. Rodapé — vendedor responsável, assinaturas, validade da proposta. **Nota fixa**: "Custos adicionais (proteção veicular, IPVA, emplacamento) não compõem o CET por serem despesas externas ao crédito."
 
 CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-break inteligente.
 
@@ -886,6 +983,13 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 - Opcional: `.deb` via fpm em release futura
 - Dados em `~/.local/share/FinacialSim/data/`
 
+**macOS** (`FinacialSim.app`)
+- PyInstaller `--onedir` → `.app bundle` + `dmg` via `create-dmg`
+- Requer macOS 12+ (Monterey); Apple Silicon (arm64) e Intel (x86_64) suportados via fat binary
+- Inclui GTK+ runtime do WeasyPrint (via Homebrew bundled)
+- Dados em `~/Library/Application Support/FinacialSim/data/`
+- Assinatura ad-hoc (`codesign --deep --force --sign -`) para distribuição manual; notarização Apple opcional em release futura
+
 **Versionamento**
 - `pyproject.toml` define versão
 - Embutida no binário e no rodapé do app
@@ -905,6 +1009,13 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 - Baixa AppImage, marca como executável, move para `/opt/finacialsim/`
 - Cria `.desktop` em `~/.local/share/applications/`
 
+**macOS — `install_macos.sh`**
+- Verifica macOS 12+ e arquitetura (arm64/x86_64)
+- Verifica/instala Homebrew (com prompt de confirmação do usuário)
+- Instala dependências do WeasyPrint via Homebrew (`pango`, `gdk-pixbuf`, `libffi`)
+- Baixa DMG da última release, monta, copia `FinacialSim.app` para `/Applications/`
+- Cria atalho no Dock (opcional)
+
 **Documentação** em `docs/INSTALACAO.md` — pré-requisitos, passo-a-passo com screenshots, troubleshooting comum.
 
 ### 10.3 Atualizações
@@ -913,7 +1024,7 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 - Versão nova → badge no topbar → modal com changelog → "Baixar e instalar"
 - Desativável (lojas com internet instável)
 - Atualização preserva o banco; migrations rodam após update
-- Releases automatizadas via GitHub Actions (tag → build paralelo Win/Linux → publica artifacts)
+- Releases automatizadas via GitHub Actions (tag → build paralelo Win/Linux/macOS → publica artifacts)
 - Channels `beta` e `stable` (admin escolhe em Configurações)
 
 ---
@@ -939,22 +1050,42 @@ Todas configuráveis em `business_rules` por admin (versionadas em `audit_log`):
 
 | Chave | Default | Descrição |
 |---|---|---|
-| `entrada_minima_pct` | 0.20 | 20% mínimo de entrada |
+| `entrada_minima_pct` | **0.10** | 10% mínimo de entrada |
 | `prazo_minimo_meses` | 12 | |
 | `prazo_maximo_meses` | 72 | |
 | `taxa_minima_mes` | 0.005 | 0,5% a.m. |
 | `taxa_maxima_mes` | 0.05 | 5% a.m. |
 | `dias_max_carencia` | 90 | dias entre liberação e 1º vencimento |
 | `valor_minimo_financiado` | 5000 | R$ |
+| `incluir_iof_default` | true | default da flag por simulação (§6.3) |
 | `iof_fixo_pct` | 0.0038 | 0,38% |
 | `iof_diario_pct` | 0.000082 | 0,0082%/dia |
 | `iof_diario_max_dias` | 365 | teto por parcela |
-| `taxa_por_prazo_curva` | (ver §6.5) | curva crescente |
+| `taxa_por_prazo_curva` | (ver §6.6) | curva crescente |
+| `extras_padrao` | (ver abaixo) | lista de extras pré-cadastrados disponíveis ao vendedor |
+| `rateio_ipva_meses_default` | 12 | meses do rateio de IPVA |
+| `rateio_emplacamento_meses_default` | 12 | meses do rateio de emplacamento |
 | `backup_diario_horario` | "23:00" | |
 | `backup_retencao_dias` | 30 | |
 | `update_indicadores_horario` | "09:00" | |
 | `fipe_cache_listas_ttl_dias` | 30 | |
 | `fipe_cache_preco_ttl_horas` | 24 | |
+
+**`extras_padrao`** — lista de extras pré-cadastrados (admin edita em Configurações; vendedor seleciona com 1 clique na tela de Simulação):
+
+```json
+[
+  { "tipo": "protecao_veicular", "nome": "Plano de proteção veicular",
+    "modalidade": "mensal_continuo", "valor_total_default": 0,
+    "habilitado": true },
+  { "tipo": "ipva", "nome": "IPVA anual (rateio)",
+    "modalidade": "rateio_meses", "duracao_meses_default": 12,
+    "valor_total_default": 0, "habilitado": true },
+  { "tipo": "emplacamento", "nome": "Emplacamento + licenciamento (rateio)",
+    "modalidade": "rateio_meses", "duracao_meses_default": 12,
+    "valor_total_default": 0, "habilitado": true }
+]
+```
 
 ---
 
@@ -980,7 +1111,7 @@ Em `docs/`:
 - `guia_usuario.md` — voltado para vendedores: como cadastrar cliente, simular, gerar proposta, comparar
 - `matematica_price.md` — explicação detalhada da Tabela Price, IOF, CET, com derivações
 - `troubleshooting.md` — problemas comuns e soluções (firewall, antivírus, GTK runtime, banco corrompido)
-- `INSTALACAO.md` — instalação Windows e Linux passo-a-passo
+- `INSTALACAO.md` — instalação Windows, Linux e macOS passo-a-passo
 
 ---
 
@@ -1015,11 +1146,13 @@ Esses itens podem ser adicionados em releases futuras sem reescrita do core, gra
 
 - [ ] Vendedor consegue, em < 2 min, simular um financiamento partindo do veículo via FIPE e vinculando a cliente cadastrado
 - [ ] Cronograma gerado bate centavo a centavo com simulador de pelo menos 1 banco brasileiro de referência para 3 casos de teste
-- [ ] CET calculado bate com calculadora oficial do BCB em 5 casos de teste
-- [ ] PDF de proposta abre corretamente no Adobe Reader, Foxit, e leitor padrão do Windows/Linux
+- [ ] CET calculado bate com calculadora oficial do BCB em 5 casos de teste — **CET NÃO muda ao adicionar/remover extras** (regressão garantida)
+- [ ] IOF opcional: simulação com `incluir_iof=false` apresenta `iof_total=0` e `PV = valor_veículo − entrada + tarifas` (sem iteração)
+- [ ] Custos adicionais: cenário com IPVA R$ 1.800,00 rateado em 12x apresenta R$ 150,00 nas primeiras 12 parcelas e R$ 0,00 nas demais; plano de proteção R$ 80,00/mês incide em todas as parcelas
+- [ ] PDF de proposta abre corretamente no Adobe Reader, Foxit, e leitor padrão do Windows/Linux/macOS, com bloco de "Custos adicionais mensais" detalhado
 - [ ] Backup diário roda e arquivo `.sqlite.gz` é válido (restauração bem-sucedida)
 - [ ] Atualização de indicadores às 09:00 atualiza os 5 indicadores ou marca como `stale`
-- [ ] App roda em Windows 10 e Ubuntu 22.04 a partir do instalador, sem Python instalado no host
+- [ ] App roda em Windows 10, Ubuntu 22.04 e macOS 12 (Monterey) a partir do instalador, sem Python instalado no host
 - [ ] Vendedor com perfil "vendedor" não consegue ver as abas APIs/Configurações/Logs
 
 ---
