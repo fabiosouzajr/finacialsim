@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T16:01:38.374Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T16:27:47.337Z
 > Files: 16 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -25,8 +25,8 @@
 
 ## docs/superpowers/plans/
 
-- `2026-05-23-finacialsim-plan-index.md` — FinacialSim — Implementation Plan Index (~877 tok)
-- `2026-05-23-phase-1-core.md` — Phase 1 — Core Financeiro (~12497 tok)
+- `2026-05-23-finacialsim-plan-index.md` — FinacialSim — Implementation Plan Index (~878 tok)
+- `2026-05-23-phase-1-core.md` — Phase 1 — Core Financeiro (~12578 tok)
 - `2026-05-23-phase-2-data.md` — Phase 2 — Persistência (SQLAlchemy + Alembic) (~12607 tok)
 - `2026-05-23-phase-3-integrations.md` — Phase 3 — Integrações FIPE + BACEN (~10530 tok)
 - `2026-05-23-phase-4-services.md` — Phase 4 — Serviços (orquestração) (~14601 tok)

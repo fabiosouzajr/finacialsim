@@ -60,7 +60,7 @@ All phases follow these rules:
 
 ## Branch & commit conventions
 
-- `main` always green (CI must pass).
+- `master` always green (CI must pass).
 - Phase branches: `phase-1-core`, `phase-2-data`, ...
 - Conventional commits: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
 - Task-level commits encouraged. Squash before merge if needed.

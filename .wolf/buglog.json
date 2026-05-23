@@ -32,6 +32,102 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-23T15:34:51.507Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-23T16:14:52.743Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/plans/2026-05-23-finacialsim-plan-index.md",
+      "root_cause": "Had `main`",
+      "fix": "Changed to `master`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-23T16:14:52.743Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-23T16:14:57.030Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/plans/2026-05-23-phase-1-core.md",
+      "root_cause": "Had `main`",
+      "fix": "Changed to `master`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-23T16:14:57.030Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-23T16:19:04.754Z",
+      "error_message": "Wrong reference: rows should be rows_list",
+      "file": "docs/superpowers/plans/2026-05-23-phase-1-core.md",
+      "root_cause": "Used \"rows\" instead of \"rows_list\"",
+      "fix": "Changed rows → rows_list",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-23T16:23:04.663Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-05-23T16:19:23.326Z",
+      "error_message": "Wrong return value",
+      "file": "docs/superpowers/plans/2026-05-23-phase-1-core.md",
+      "root_cause": "Was returning: Schedule(rows=rows, pmt=new_pmt_out, total_pago=to",
+      "fix": "Now returns: Schedule(rows=rows_tuple, pmt=new_pmt_out, total_p",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-23T16:19:23.326Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-05-23T16:21:29.924Z",
+      "error_message": "Significant refactor of ",
+      "file": "docs/superpowers/plans/2026-05-23-phase-1-core.md",
+      "root_cause": "9 lines replaced/restructured",
+      "fix": "Rewrote 17→9 lines (9 removed) | Also: ValidationRules,; rules = ValidationRules( | Also: iof_config = IofConfig(; fixo_pct=Decimal(\"0.0038\"),",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-23T16:23:10.237Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-05-23T16:26:21.960Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/plans/2026-05-23-phase-1-core.md",
+      "root_cause": "Had \"0.001\"",
+      "fix": "Changed to \"), max_value=Decimal(\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-23T16:26:21.960Z"
     }
   ]
 }
