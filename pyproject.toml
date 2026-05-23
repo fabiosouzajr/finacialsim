@@ -1,0 +1,43 @@
+[project]
+name = "finacialsim"
+version = "0.1.0"
+description = "Simulador de financiamento de veiculos - bank-grade"
+requires-python = ">=3.12"
+dependencies = [
+    "nicegui>=2.0",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "httpx>=0.27",
+    "tenacity>=8.2",
+    "python-dateutil>=2.9",
+    "numpy>=1.26",
+    "babel>=2.15",
+    "bcrypt>=4.1",
+    "loguru>=0.7",
+    "weasyprint>=62",
+    "jinja2>=3.1",
+    "apscheduler>=3.10",
+    "pywebview>=5.0",
+    "plotly>=5.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.23",
+    "hypothesis>=6.100",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "respx>=0.21",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
