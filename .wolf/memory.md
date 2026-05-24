@@ -3,10 +3,13 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 17:00 | Task 9: wrote test_factory.py, factory.py with build_fipe_chain + build_bacen_chain | app/integrations/factory.py, tests/unit/integrations/test_factory.py | 2 tests pass, committed 95b915e | ~900 |
+
 | 15:12 | Phase 3 Task 1: created integrations base infra | app/integrations/base.py, app/integrations/http.py, tests/unit/integrations/ | 3/3 tests pass, committed 477f917 | ~400 tok |
 | 15:25 | Phase 3 Task 3: FIPE BrasilAPI fallback provider (TDD) | app/integrations/fipe/brasilapi.py, tests/unit/integrations/fipe/test_brasilapi.py | 6/6 fipe tests pass, committed 18045e1 | ~350 tok |
 | 15:40 | Phase 3 Task 5: ManualFipeProvider + CachedFipeProvider with read-through cache | app/integrations/fipe/manual.py, app/integrations/fipe/cache.py, tests/unit/integrations/fipe/test_manual.py, tests/unit/integrations/fipe/test_cache.py | 12/12 fipe tests pass, committed 5451437 | ~800 tok |
 | 16:00 | Phase 3 Task 6: BACEN SGS provider + IndicatorPoint schema (TDD) | app/integrations/bacen/schema.py, app/integrations/bacen/sgs.py, tests/unit/integrations/bacen/test_sgs.py | 3/3 tests pass | ~500 tok |
+| 16:15 | Phase 3 Task 8: BACEN cache layer (TTL read-through + write-through) | app/integrations/bacen/cached.py, tests/unit/integrations/bacen/test_cached.py | 9/9 tests pass, committed 21e0464 | ~600 tok |
 
 ## Session: 2026-05-23 11:00
 
@@ -426,3 +429,8 @@
 | 12:51 | Created tests/unit/integrations/bacen/test_conversions.py | — | ~127 |
 | 12:51 | Created tests/unit/integrations/bacen/test_brasilapi.py | — | ~209 |
 | 12:52 | Phase 3 Task 7: BACEN BrasilAPI fallback + conversions | app/integrations/bacen/brasilapi.py, app/integrations/bacen/conversions.py, tests/unit/integrations/bacen/test_brasilapi.py, tests/unit/integrations/bacen/test_conversions.py | 7/7 tests pass, committed 980d941 | ~600 tok |
+| 13:29 | Created app/integrations/bacen/cached.py | — | ~914 |
+| 13:29 | Created tests/unit/integrations/bacen/test_cached.py | — | ~556 |
+| 13:31 | Created tests/unit/integrations/test_factory.py | — | ~214 |
+| 13:32 | Created app/integrations/factory.py | — | ~432 |
+| 13:33 | Edited tests/unit/integrations/test_factory.py | modified session_factory() | ~86 |

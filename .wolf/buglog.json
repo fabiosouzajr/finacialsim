@@ -240,6 +240,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-24T12:24:33.107Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-05-24T15:11:32.969Z",
+      "error_message": "Wrong reference: markers should be asyncio_mode",
+      "file": "pytest.ini",
+      "root_cause": "Used \"markers\" instead of \"asyncio_mode\"",
+      "fix": "Changed markers → asyncio_mode",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "ini"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-24T15:11:32.969Z"
     }
   ]
 }

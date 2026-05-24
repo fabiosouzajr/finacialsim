@@ -12,7 +12,10 @@ def session_factory():
     with tempfile.TemporaryDirectory() as tmp:
         engine = create_engine_for_sqlite(Path(tmp) / "test.db")
         Base.metadata.create_all(engine)
-        yield get_session_factory(engine)
+        try:
+            yield get_session_factory(engine)
+        finally:
+            engine.dispose()
 
 
 def test_build_fipe_chain_has_two_providers(session_factory):

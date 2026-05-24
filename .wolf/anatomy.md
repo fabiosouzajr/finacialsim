@@ -1,13 +1,14 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T15:04:37.254Z
-> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T16:33:13.009Z
+> Files: 72 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.gitignore` — Git ignore rules (~866 tok)
 - `alembic.ini` (~177 tok)
 - `pyproject.toml` — Simulador de financiamento de veiculos - bank-grade (~240 tok)
+- `pytest.ini` (~47 tok)
 
 ## .claude/
 
@@ -32,7 +33,7 @@
 - `__init__.py` (~0 tok)
 - `backup.py` — backup_sqlite, restore_sqlite, list_backups, prune_backups (~590 tok)
 - `database.py` — Base: create_engine_for_sqlite, get_session_factory (~264 tok)
-- `models.py` — Declares User (~3880 tok)
+- `models.py` — Declares User (~3905 tok)
 - `repositories.py` — UserRepository: create, get, list_active, deactivate + 10 more (~1630 tok)
 
 ## app/data/migrations/
@@ -41,8 +42,34 @@
 
 ## app/data/migrations/versions/
 
+- `20260524_20d4cc8a430e_add_fipe_cache_acao_column.py` — add fipe_cache acao column (~411 tok)
 - `20260524_85a5039acfca_seed_initial_data.py` — seed initial data (~1075 tok)
 - `20260524_f7c4f92f22d2_initial_schema.py` — initial schema (~3886 tok)
+
+## app/integrations/
+
+- `__init__.py` (~0 tok)
+- `base.py` — Provider protocol, Result type, and ProviderChain. (~357 tok)
+- `factory.py` — Composition helpers — build default provider chains. (~432 tok)
+- `http.py` — Shared HTTP helper and tenacity callback for all providers. (~211 tok)
+
+## app/integrations/bacen/
+
+- `__init__.py` (~0 tok)
+- `brasilapi.py` — BACEN fallback — BrasilAPI rates endpoint (single latest value). (~555 tok)
+- `cached.py` — BACEN cache — persists fetched points to indicators_history; read-through with TTL. (~914 tok)
+- `conversions.py` — Conversions between rate periodicities. (~225 tok)
+- `schema.py` — BACEN normalized indicator schema. (~113 tok)
+- `sgs.py` — BACEN SGS primary provider for SELIC, CDI, IPCA, Tx BACEN veículos. (~745 tok)
+
+## app/integrations/fipe/
+
+- `__init__.py` (~0 tok)
+- `brasilapi.py` — FIPE BrasilAPI fallback provider. (~726 tok)
+- `cache.py` — Cache layer for FIPE providers using the fipe_cache table. (~1379 tok)
+- `manual.py` — Manual FIPE provider — constructs a VehicleQuote from operator-supplied input. (~453 tok)
+- `parallelum.py` — FIPE Parallelum primary provider. (~959 tok)
+- `schema.py` — FIPE normalized schemas. (~206 tok)
 
 ## docs/agents/
 
@@ -50,7 +77,6 @@
 ## docs/superpowers/plans/
 
 - `2026-05-23-phase-2-data.md` — Phase 2 — Persistência (SQLAlchemy + Alembic) (~13269 tok)
-- `2026-05-23-phase-3-integrations.md` — Phase 3 — Integrações FIPE + BACEN (revised: 10 tasks, retry_error_callback on fetch, FipeCache.acao migration, BACEN TTL read-through) (~15k tok)
 
 ## docs/superpowers/specs/
 
@@ -82,3 +108,26 @@
 - `test_models_users_clients.py` — test_create_user, test_create_client_with_creator (~200 tok)
 - `test_repositories_misc.py` — test_client_create_and_find_by_cpf, test_indicator_upsert, test_business_rule_get, test_simulation_c (~1251 tok)
 - `test_repositories_users.py` — test_create_and_get, test_list_active_only (~193 tok)
+
+## tests/unit/integrations/
+
+- `__init__.py` (~0 tok)
+- `conftest.py` — Shared test helpers for integration provider tests. (~91 tok)
+- `test_base.py` — FakeProvider: fetch, test_chain_first_provider_wins, test_chain_falls_back_to_second, test_chain_all (~377 tok)
+- `test_factory.py` — session_factory, test_build_fipe_chain_has_two_providers, test_build_bacen_chain_has_two_providers (~232 tok)
+
+## tests/unit/integrations/bacen/
+
+- `__init__.py` (~0 tok)
+- `test_brasilapi.py` — test_brasilapi_selic_returns_point, test_returns_err_on_connect_error (~209 tok)
+- `test_cached.py` — FakeBacen: fetch, session_factory, test_cached_writes_to_indicators_history, test_cached_read_throug (~556 tok)
+- `test_conversions.py` — test_mensal_to_anual_roundtrip, test_one_pct_mensal_approx_12_68_pct_anual (~127 tok)
+- `test_sgs.py` — test_fetch_selic_meta_normalized_to_fraction, test_unknown_codigo_returns_err, test_returns_err_on_c (~394 tok)
+
+## tests/unit/integrations/fipe/
+
+- `__init__.py` (~0 tok)
+- `test_brasilapi.py` — test_brasilapi_get_brands, test_brasilapi_get_price, test_returns_err_on_connect_error (~446 tok)
+- `test_cache.py` — FakeListProvider: fetch, fetch, session_factory, test_list_cache_hits_after_first_call + 1 more (~608 tok)
+- `test_manual.py` — test_manual_constructs_quote, test_manual_missing_field_returns_err, test_manual_invalid_tipo_return (~298 tok)
+- `test_parallelum.py` — test_get_brands_for_cars, test_get_price_parses_to_vehicle_quote, test_returns_err_on_connect_error (~514 tok)
