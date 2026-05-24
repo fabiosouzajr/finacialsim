@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T12:25:27.559Z
-> Files: 40 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T15:04:37.254Z
+> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -50,6 +50,7 @@
 ## docs/superpowers/plans/
 
 - `2026-05-23-phase-2-data.md` — Phase 2 — Persistência (SQLAlchemy + Alembic) (~13269 tok)
+- `2026-05-23-phase-3-integrations.md` — Phase 3 — Integrações FIPE + BACEN (revised: 10 tasks, retry_error_callback on fetch, FipeCache.acao migration, BACEN TTL read-through) (~15k tok)
 
 ## docs/superpowers/specs/
 
