@@ -5,31 +5,32 @@ Revises: f7c4f92f22d2
 Create Date: 2026-05-24 09:16:20.239561
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
+from datetime import UTC
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '85a5039acfca'
-down_revision: Union[str, Sequence[str], None] = 'f7c4f92f22d2'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = 'f7c4f92f22d2'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    import bcrypt
     import json
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    def _utcnow():
-        return datetime.now(timezone.utc).replace(tzinfo=None)
+    import bcrypt
+
+    def _utcnow() -> datetime:
+        return datetime.now(UTC).replace(tzinfo=None)
 
     conn = op.get_bind()
 
     # Admin user — PIN '123456' (must be changed on first login)
-    pin_hash = bcrypt.hashpw("123456".encode(), bcrypt.gensalt()).decode()
+    pin_hash = bcrypt.hashpw(b"123456", bcrypt.gensalt()).decode()
     conn.execute(
         sa.text(
             "INSERT INTO users (nome, pin_hash, perfil, ativo, criado_em, atualizado_em) "

@@ -1,8 +1,6 @@
 from datetime import date
 from decimal import Decimal
 
-import pytest
-
 from app.data.models import (
     AmortizationRow,
     Client,
@@ -78,7 +76,10 @@ def test_create_simulation_with_extras_and_fees(session) -> None:
 def test_amortization_row_persists(session) -> None:
     u = User(nome="x", pin_hash="x", perfil="vendedor")
     session.add(u)
-    v = Vehicle(fonte="manual", tipo="carro", marca="m", modelo="m", ano_modelo=2024, combustivel="G", valor_referencia=Decimal("1"))
+    v = Vehicle(
+        fonte="manual", tipo="carro", marca="m", modelo="m",
+        ano_modelo=2024, combustivel="G", valor_referencia=Decimal("1"),
+    )
     session.add(v)
     session.commit()
     sim = Simulation(

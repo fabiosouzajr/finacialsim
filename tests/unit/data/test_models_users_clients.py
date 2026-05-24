@@ -1,6 +1,4 @@
-from datetime import datetime
 
-import pytest
 
 from app.data.models import Client, User
 

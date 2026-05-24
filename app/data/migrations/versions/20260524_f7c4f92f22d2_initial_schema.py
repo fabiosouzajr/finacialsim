@@ -5,17 +5,16 @@ Revises:
 Create Date: 2026-05-24 09:08:43.353966
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'f7c4f92f22d2'
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -176,7 +175,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('amortization_rows', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_amortization_rows_simulation_id'), ['simulation_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_amortization_rows_simulation_id'), ['simulation_id'], unique=False)  # noqa: E501
 
     op.create_table('comparisons',
     sa.Column('id', sa.Integer(), nullable=False),

@@ -1,8 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-import pytest
-
+from app.data.models import AmortizationRow, Simulation, SimulationFee, Vehicle
 from app.data.repositories import (
     BusinessRuleRepository,
     ClientRepository,
@@ -10,7 +9,6 @@ from app.data.repositories import (
     SimulationRepository,
     UserRepository,
 )
-from app.data.models import AmortizationRow, Simulation, SimulationFee, Vehicle
 
 
 def test_client_create_and_find_by_cpf(session) -> None:
@@ -82,7 +80,9 @@ def test_simulation_create_and_get(session) -> None:
     assert loaded is not None
     assert len(loaded.rows) == 1
 
-    c = ClientRepository(session).create(nome="Maria", cpf_cnpj="99988877766", tipo="PF", criado_por=u.id)
+    c = ClientRepository(session).create(
+        nome="Maria", cpf_cnpj="99988877766", tipo="PF", criado_por=u.id,
+    )
     sim2 = Simulation(
         codigo="SIM-TEST-002", cliente_id=c.id, veiculo_id=v.id, criado_por=u.id,
         valor_veiculo=Decimal("50000"), valor_entrada=Decimal("10000"),

@@ -1,7 +1,5 @@
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
-
-import pytest
 
 from app.data.models import (
     AppSetting,

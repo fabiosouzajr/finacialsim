@@ -2,9 +2,7 @@ import gzip
 import tempfile
 from pathlib import Path
 
-import pytest
-
-from app.data.backup import backup_sqlite, restore_sqlite, list_backups
+from app.data.backup import backup_sqlite, list_backups, restore_sqlite
 from app.data.database import Base, create_engine_for_sqlite
 
 
@@ -32,8 +30,8 @@ def test_list_backups_returns_chronological() -> None:
         engine.dispose()
 
         backup_dir = Path(tmp) / "backups"
-        b1 = backup_sqlite(db_path, backup_dir)
-        b2 = backup_sqlite(db_path, backup_dir)
+        backup_sqlite(db_path, backup_dir)
+        backup_sqlite(db_path, backup_dir)
         backups = list_backups(backup_dir)
         assert len(backups) == 2
         # Newest first
