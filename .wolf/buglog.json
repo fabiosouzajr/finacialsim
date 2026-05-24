@@ -176,6 +176,70 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-05-23T18:23:53.451Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-05-24T11:51:27.248Z",
+      "error_message": "Incorrect value in code",
+      "file": "pyproject.toml",
+      "root_cause": "Had \"numpy>=1.26\"",
+      "fix": "Changed to \"babel>=2.15\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "toml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-24T11:51:27.248Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-05-24T12:13:28.374Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/settings.json",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 10→8 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-24T12:13:28.374Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-05-24T12:20:23.424Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/data/backup.py",
+      "root_cause": "Had \"%Y-%m-%d_%H%M%S\"",
+      "fix": "Changed to \"%Y-%m-%d_%H%M%S_%f\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-24T12:20:23.424Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-05-24T12:24:33.107Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/data/models.py",
+      "root_cause": "Had \"), nullable=False)\n    parcela_total: Mapped[Deci",
+      "fix": "Changed to \"), nullable=False)  # noqa: E501\n    parcela_tota",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-24T12:24:33.107Z"
     }
   ]
 }
