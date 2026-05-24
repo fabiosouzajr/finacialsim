@@ -158,3 +158,88 @@ class Simulation(Base):
         cascade="all, delete-orphan",
         order_by="AmortizationRow.numero_parcela",
     )
+
+
+class Proposal(Base):
+    __tablename__ = "proposals"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    codigo: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
+    simulation_id: Mapped[int] = mapped_column(ForeignKey("simulations.id"), nullable=False)
+    cliente_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
+    gerado_por: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    snapshot_json: Mapped[str] = mapped_column(String, nullable=False)
+    pdf_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    validade_dias: Mapped[int] = mapped_column(Integer, default=7, nullable=False)
+    gerado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+
+
+class Comparison(Base):
+    __tablename__ = "comparisons"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    simulation_a_id: Mapped[int] = mapped_column(ForeignKey("simulations.id"), nullable=False)
+    simulation_b_id: Mapped[int] = mapped_column(ForeignKey("simulations.id"), nullable=False)
+    criado_por: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    criado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+
+
+class IndicatorHistory(Base):
+    __tablename__ = "indicators_history"
+    __table_args__ = (UniqueConstraint("codigo", "data_referencia", name="uq_indicator_codigo_data"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    codigo: Mapped[str] = mapped_column(String(40), nullable=False)
+    data_referencia: Mapped[date] = mapped_column(Date, nullable=False)
+    valor: Mapped[Decimal] = mapped_column(Numeric(12, 8), nullable=False)
+    unidade: Mapped[str] = mapped_column(String(10), nullable=False)
+    fonte: Mapped[str] = mapped_column(String(40), nullable=False)
+    payload_json: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    coletado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+
+
+class BusinessRule(Base):
+    __tablename__ = "business_rules"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    chave: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
+    valor_json: Mapped[str] = mapped_column(String, nullable=False)
+    descricao: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    atualizado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
+    atualizado_por: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+    usuario_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    acao: Mapped[str] = mapped_column(String(80), nullable=False)
+    entidade: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    entidade_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    diff_json: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    hostname: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+
+
+class AppSetting(Base):
+    __tablename__ = "app_settings"
+
+    chave: Mapped[str] = mapped_column(String(80), primary_key=True)
+    valor_json: Mapped[str] = mapped_column(String, nullable=False)
+    atualizado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
+
+
+class FipeCache(Base):
+    __tablename__ = "fipe_cache"
+    __table_args__ = (UniqueConstraint("tipo", "marca_id", "modelo_id", "ano_id", name="uq_fipe_cache_query"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tipo: Mapped[str] = mapped_column(String(20), nullable=False)
+    marca_id: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    modelo_id: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    ano_id: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    payload_json: Mapped[str] = mapped_column(String, nullable=False)
+    coletado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+    ttl_horas: Mapped[int] = mapped_column(Integer, default=720, nullable=False)
