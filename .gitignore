@@ -100,8 +100,10 @@ data/
 # Allow source code directories named 'data'
 !app/data/
 !app/data/**
+app/data/**/__pycache__/
 !tests/unit/data/
 !tests/unit/data/**
+tests/unit/data/**/__pycache__/
 
 # Logs
 logs/
