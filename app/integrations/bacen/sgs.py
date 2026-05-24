@@ -70,5 +70,5 @@ class BcbSgsProvider:
             return Ok(points)
         except httpx.HTTPError:
             raise  # tenacity retries this
-        except (KeyError, ValueError) as e:
+        except (KeyError, ValueError, IndexError) as e:
             return Err(f"parse_error: {e}")
