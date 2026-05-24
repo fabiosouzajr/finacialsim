@@ -97,6 +97,11 @@ ehthumbs.db
 # Banco SQLite e backups (gerados em runtime)
 data/
 !data/.gitkeep
+# Allow source code directories named 'data'
+!app/data/
+!app/data/**
+!tests/unit/data/
+!tests/unit/data/**
 
 # Logs
 logs/
