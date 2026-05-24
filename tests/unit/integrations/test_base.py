@@ -1,5 +1,3 @@
-import pytest
-
 from app.integrations.base import Err, Ok, Provider, ProviderChain
 
 
