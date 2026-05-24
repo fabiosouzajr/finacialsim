@@ -3,6 +3,11 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 15:12 | Phase 3 Task 1: created integrations base infra | app/integrations/base.py, app/integrations/http.py, tests/unit/integrations/ | 3/3 tests pass, committed 477f917 | ~400 tok |
+| 15:25 | Phase 3 Task 3: FIPE BrasilAPI fallback provider (TDD) | app/integrations/fipe/brasilapi.py, tests/unit/integrations/fipe/test_brasilapi.py | 6/6 fipe tests pass, committed 18045e1 | ~350 tok |
+| 15:40 | Phase 3 Task 5: ManualFipeProvider + CachedFipeProvider with read-through cache | app/integrations/fipe/manual.py, app/integrations/fipe/cache.py, tests/unit/integrations/fipe/test_manual.py, tests/unit/integrations/fipe/test_cache.py | 12/12 fipe tests pass, committed 5451437 | ~800 tok |
+| 16:00 | Phase 3 Task 6: BACEN SGS provider + IndicatorPoint schema (TDD) | app/integrations/bacen/schema.py, app/integrations/bacen/sgs.py, tests/unit/integrations/bacen/test_sgs.py | 3/3 tests pass | ~500 tok |
+
 ## Session: 2026-05-23 11:00
 
 | Time | Action | File(s) | Outcome | ~Tokens |
@@ -349,3 +354,63 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 12:25 | grill-me Phase 3 plan — 12 design issues resolved, plan rewritten | docs/superpowers/plans/2026-05-23-phase-3-integrations.md | Fixed: retry on fetch+retry_error_callback, Portuguese tipo vocab, cache NULL→"" sentinel+upsert, FipeCache acao column+migration, VehicleQuote cache reconstruction, list normalization, ManualFipeProvider removed from chain, BACEN TTL read-through, asyncio_mode=auto, shared get_json helper | ~20k |
+
+## Session: 2026-05-24 12:07
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-24 12:07
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-24 12:07
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-24 12:08
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 12:11 | Edited pytest.ini | 2→3 lines | ~16 |
+| 12:11 | Created app/integrations/__init__.py | — | ~0 |
+| 12:11 | Created tests/unit/integrations/__init__.py | — | ~0 |
+| 12:11 | Created app/integrations/base.py | — | ~357 |
+| 12:11 | Created app/integrations/http.py | — | ~211 |
+| 12:11 | Created tests/unit/integrations/conftest.py | — | ~91 |
+| 12:11 | Created tests/unit/integrations/test_base.py | — | ~381 |
+| 12:15 | Edited tests/unit/integrations/test_base.py | 3→1 lines | ~19 |
+| 12:18 | Created app/integrations/fipe/__init__.py | — | ~0 |
+| 12:18 | Created tests/unit/integrations/fipe/__init__.py | — | ~0 |
+| 12:18 | Created tests/unit/integrations/fipe/test_parallelum.py | — | ~514 |
+| 12:18 | Created app/integrations/fipe/schema.py | — | ~206 |
+| 12:18 | Created app/integrations/fipe/parallelum.py | — | ~959 |
+| 12:22 | Created tests/unit/integrations/fipe/test_brasilapi.py | — | ~446 |
+| 12:22 | Created app/integrations/fipe/brasilapi.py | — | ~726 |
+| 12:26 | Edited app/data/models.py | modified FipeCache() | ~246 |
+| 12:27 | Edited app/data/migrations/versions/20260524_20d4cc8a430e_add_fipe_cache_acao_column.py | inline fix | ~30 |
+| 12:30 | Task 4 Phase 3: added acao column to FipeCache, migration applied, 22 tests pass, committed cb3f970 | app/data/models.py, migrations/versions/ | done | ~800 |
+| 12:33 | Created app/integrations/fipe/manual.py | — | ~453 |
+| 12:33 | Created app/integrations/fipe/cache.py | — | ~1321 |
+| 12:33 | Created tests/unit/integrations/fipe/test_manual.py | — | ~298 |
+| 12:33 | Created tests/unit/integrations/fipe/test_cache.py | — | ~578 |
+| 12:34 | Edited tests/unit/integrations/fipe/test_cache.py | modified session_factory() | ~86 |
+| 12:34 | Edited tests/unit/integrations/fipe/test_cache.py | 3→3 lines | ~32 |
+| 12:34 | Edited tests/unit/integrations/fipe/test_cache.py | 4→4 lines | ~50 |
+| 12:37 | Edited app/integrations/fipe/cache.py | added 1 import(s) | ~71 |
+| 12:37 | Edited app/integrations/fipe/cache.py | 8→12 lines | ~146 |
+| 12:37 | Edited app/integrations/fipe/cache.py | 20→20 lines | ~269 |
+
+## Session: 2026-05-24 (IntegrityError guard)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:50 | Added IntegrityError guard to FIPE cache insert path | app/integrations/fipe/cache.py | 12/12 tests pass, committed e9c64c4 | ~1200 |
+| 15:52 | Re-verified commit e9c64c4: IntegrityError import + try/except on insert + session.commit() on update | app/integrations/fipe/cache.py | ✅ All 3 checks pass, 12/12 tests pass | ~200 |
+| 12:42 | Created app/integrations/bacen/__init__.py | — | ~0 |
+| 12:42 | Created tests/unit/integrations/bacen/__init__.py | — | ~0 |
+| 12:42 | Created tests/unit/integrations/bacen/test_sgs.py | — | ~394 |
+| 12:42 | Created app/integrations/bacen/schema.py | — | ~113 |
+| 12:43 | Created app/integrations/bacen/sgs.py | — | ~742 |
