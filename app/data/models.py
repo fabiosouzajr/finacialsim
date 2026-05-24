@@ -241,10 +241,13 @@ class AppSetting(Base):
 
 class FipeCache(Base):
     __tablename__ = "fipe_cache"
-    __table_args__ = (UniqueConstraint("tipo", "marca_id", "modelo_id", "ano_id", name="uq_fipe_cache_query"),)  # noqa: E501
+    __table_args__ = (
+        UniqueConstraint("tipo", "acao", "marca_id", "modelo_id", "ano_id", name="uq_fipe_cache_query"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     tipo: Mapped[str] = mapped_column(String(20), nullable=False)
+    acao: Mapped[str] = mapped_column(String(40), nullable=False, default="")
     marca_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     modelo_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     ano_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
