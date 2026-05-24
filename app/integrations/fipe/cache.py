@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.data.models import FipeCache
@@ -108,12 +109,16 @@ class CachedFipeProvider:
                     row.payload_json = serialized
                     row.coletado_em = datetime.utcnow()
                     row.ttl_horas = self._ttl(query)
+                    session.commit()
                 else:
                     row = FipeCache(
                         tipo=tipo, acao=acao, marca_id=marca_id,
                         modelo_id=modelo_id, ano_id=ano_id,
                         payload_json=serialized, ttl_horas=self._ttl(query),
                     )
-                    session.add(row)
-                session.commit()
+                    try:
+                        session.add(row)
+                        session.commit()
+                    except IntegrityError:
+                        session.rollback()
         return result
