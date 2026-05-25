@@ -3,6 +3,15 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 10:00 | Fixed CI: quoted .[dev] on Windows runner, dynamic DMG version from git tag, pinned appimagetool to release 13 | .github/workflows/release.yml, scripts/build_macos.sh | committed e5f1e84 | ~800 |
+
+| 15:35 | Created .github/workflows/release.yml — GitHub Actions release CI | .github/workflows/release.yml | committed edd3da5 | ~150 tok |
+| 15:36 | Fixed duplicate .github/workflows/ heading in anatomy.md (auto-scanner had pre-added it) | .wolf/anatomy.md | warning resolved | ~50 tok |
+
+| 2026-05-25 | Fixed macOS installer scripts: EXIT trap + sudo cp in install_macos.sh; ERR trap + create-dmg guard in build_macos.sh | scripts/install_macos.sh, scripts/build_macos.sh | committed 6a80219 | ~200 tok |
+
+| 2026-05-25 | fix(build): curl --fail, quoted AppRun dirname, icon fallback | scripts/install_linux.sh, scripts/build_appimage.sh | committed 43fb535 | ~800 |
+
 | 2026-05-25 | fix: single ProposalService instance in _proposal_helper.py + try/except in gerar_pdf | app/ui/pages/_proposal_helper.py, app/ui/pages/simulacao.py | committed b6a871a, 117 tests pass | ~500 |
 
 | 15:00 | Task 1: add render_pdf to ProposalService, fix pct_juros in snapshot, fix test fixture engine.dispose() | app/services/proposal_service.py, tests/unit/services/test_proposal_render.py | PASS 1/1, committed b9dd8dd | ~3500 |
@@ -586,3 +595,31 @@
 | 12:19 | Created scripts/installer.nsi | — | ~487 |
 
 | 15:30 | created NSIS Windows installer script with GTK3 runtime bundling | scripts/installer.nsi | done | ~150 |
+| 12:21 | Edited scripts/installer.nsi | "..\dist\${APPDIR}\*.*" → "..\dist\${APPDIR}\*" | ~9 |
+| 12:21 | Created scripts/finacialsim.desktop | — | ~47 |
+| 12:21 | Created scripts/build_appimage.sh | — | ~245 |
+| 12:22 | Created scripts/install_linux.sh | — | ~214 |
+
+## Session: 2026-05-25 12:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 12:25 | Edited scripts/install_linux.sh | inline fix | ~19 |
+| 12:25 | Edited scripts/install_linux.sh | inline fix | ~7 |
+| 12:25 | Edited scripts/build_appimage.sh | "$0" → "$(readlink -f " | ~10 |
+| 12:27 | Created scripts/build_macos.sh | — | ~399 |
+| 12:27 | Created scripts/install_macos.sh | — | ~188 |
+| 12:29 | Edited scripts/install_macos.sh | 4→5 lines | ~73 |
+| 12:29 | Edited scripts/build_macos.sh | 2→3 lines | ~16 |
+| 12:29 | Edited scripts/build_macos.sh | 2→3 lines | ~50 |
+| 12:30 | Created .github/workflows/release.yml | — | ~693 |
+| 12:32 | Edited .github/workflows/release.yml | 3→3 lines | ~32 |
+| 12:33 | Edited .github/workflows/release.yml | inline fix | ~35 |
+| 12:33 | Edited scripts/build_macos.sh | 3→4 lines | ~45 |
+| 12:33 | Edited scripts/build_macos.sh | 4→4 lines | ~26 |
+| 12:35 | Created docs/INSTALACAO.md | — | ~398 |
+| 12:35 | Created docs/guia_usuario.md | — | ~430 |
+| 12:35 | Created docs/troubleshooting.md | — | ~341 |
+| 12:35 | Created docs/matematica_price.md | — | ~460 |
+| 12:35 | Created docs/ARQUITETURA.md | — | ~205 |
+| 12:37 | Session end: 18 writes across 10 files (install_linux.sh, build_appimage.sh, build_macos.sh, install_macos.sh, release.yml) | 11 reads | ~5501 tok |

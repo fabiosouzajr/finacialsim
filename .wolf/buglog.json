@@ -344,10 +344,95 @@
       "file": "app/main.py",
       "root_cause": "alembic migrations use subprocess([sys.executable, '-m', 'alembic', ...]) which is invalid in a frozen binary",
       "fix": "Not yet fixed. Need to replace subprocess call with alembic.config.Config/command.upgrade in-process before shipping binary",
-      "tags": ["pyinstaller", "alembic", "frozen-binary", "migrations"],
+      "tags": [
+        "pyinstaller",
+        "alembic",
+        "frozen-binary",
+        "migrations"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-25"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-05-25T15:21:04.819Z",
+      "error_message": "Incorrect value in code",
+      "file": "scripts/installer.nsi",
+      "root_cause": "Had \"..\\dist\\${APPDIR}\\*.*\"",
+      "fix": "Changed to \"..\\dist\\${APPDIR}\\*\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "nsi"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:21:04.819Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-05-25T15:25:58.510Z",
+      "error_message": "Incorrect value in code",
+      "file": "scripts/build_appimage.sh",
+      "root_cause": "Had \"$0\"",
+      "fix": "Changed to \"$(readlink -f \"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:25:58.510Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-05-25T15:29:14.883Z",
+      "error_message": "Incorrect value in code",
+      "file": "scripts/build_macos.sh",
+      "root_cause": "Had \"$APP\"",
+      "fix": "Changed to 'rm -rf \"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:29:14.883Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-05-25T15:32:54.441Z",
+      "error_message": "Incorrect value in code",
+      "file": ".github/workflows/release.yml",
+      "root_cause": "Had \".[build]\"",
+      "fix": "Changed to \".[dev]\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "yml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:32:54.441Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-05-25T15:33:04.665Z",
+      "error_message": "Wrong reference: continuous should be 13",
+      "file": ".github/workflows/release.yml",
+      "root_cause": "Used \"continuous\" instead of \"13\"",
+      "fix": "Changed continuous → 13",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "yml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:33:04.665Z"
     }
   ]
 }

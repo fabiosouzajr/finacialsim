@@ -1,0 +1,49 @@
+{
+  "skills": [
+    {
+      "source": "anthropics/skills",
+      "skills": [
+        "frontend-design",
+        "pdf"
+      ]
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skills": [
+        "caveman"
+      ]
+    },
+    {
+      "source": "mattpocock/skills",
+      "skills": [
+        "grill-me",
+        "grill-me",
+        "improve-codebase-architecture",
+        "improve-codebase-architecture",
+        "setup-matt-pocock-skills",
+        "setup-matt-pocock-skills",
+        "to-issues",
+        "to-issues"
+      ]
+    },
+    {
+      "source": "obra/superpowers",
+      "skills": [
+        "brainstorming"
+      ]
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skills": [
+        "vercel-react-best-practices",
+        "web-design-guidelines"
+      ]
+    },
+    {
+      "source": "vercel-labs/skills",
+      "skills": [
+        "find-skills"
+      ]
+    }
+  ]
+}
