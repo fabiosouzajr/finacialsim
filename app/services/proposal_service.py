@@ -1,12 +1,15 @@
-"""ProposalService - builds Proposal record + snapshot JSON. PDF in Phase 6."""
+"""ProposalService - builds Proposal record + snapshot JSON + PDF rendering."""
 
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
 
+from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import Session
+from weasyprint import CSS, HTML
 
 from app.data.models import (
     AmortizationRow,
@@ -18,6 +21,98 @@ from app.data.models import (
     Vehicle,
 )
 from app.services.audit_service import AuditService
+from app.utils.br_format import format_brl, format_date_br, format_pct
+
+_REPORTS_DIR = Path(__file__).resolve().parents[1] / "reports"
+_jinja_env = Environment(loader=FileSystemLoader(str(_REPORTS_DIR)), autoescape=True)
+
+_MODALIDADE_LABEL = {
+    "mensal_continuo": "Mensal contínuo",
+    "rateio_meses": "Rateio em meses",
+    "unico_inicial": "Único (1ª parcela)",
+}
+
+
+def _format_cpf_cnpj(s: str, tipo: str) -> str:
+    if tipo == "PF" and len(s) == 11:
+        return f"{s[:3]}.{s[3:6]}.{s[6:9]}-{s[9:]}"
+    if tipo == "PJ" and len(s) == 14:
+        return f"{s[:2]}.{s[2:5]}.{s[5:8]}/{s[8:12]}-{s[12:]}"
+    return s
+
+
+def _build_template_context(snap: dict, loja: dict, vendedor: dict, gerado_em: datetime, validade: int) -> dict:
+    sim = snap["simulation"]
+    rows = snap["cronograma"]
+    extras = snap["extras"]
+    cliente = snap["cliente"]
+    veiculo = snap["veiculo"]
+
+    parcela_total_1ano = rows[0]["parcela_total"] if rows else "0"
+    last_idx = min(12, len(rows) - 1) if rows else 0
+    parcela_total_apos = rows[last_idx]["parcela_total"] if rows else "0"
+
+    def _D(s):
+        return Decimal(s)
+
+    return {
+        "loja": loja,
+        "vendedor": vendedor,
+        "proposal": {
+            "codigo": snap.get("proposta", {}).get("codigo", "PROP-XXX"),
+            "gerado_em_br": format_date_br(gerado_em.date()),
+            "validade_dias": validade,
+        },
+        "cliente": {
+            **(cliente or {}),
+            "cpf_cnpj_fmt": _format_cpf_cnpj(cliente["cpf_cnpj"], cliente["tipo"]) if cliente else "",
+        },
+        "veiculo": veiculo,
+        "sim": {
+            **sim,
+            "valor_veiculo_brl": format_brl(_D(sim["valor_veiculo"])),
+            "valor_entrada_brl": format_brl(_D(sim["valor_entrada"])),
+            "pct_entrada_pct": format_pct(_D(sim["pct_entrada"])),
+            "valor_financiado_brl": format_brl(_D(sim["valor_financiado"])),
+            "valor_parcela_brl": format_brl(_D(sim["valor_parcela"])),
+            "total_pago_brl": format_brl(_D(sim["total_pago"])),
+            "total_juros_brl": format_brl(_D(sim["total_juros"])),
+            "iof_total_brl": format_brl(_D(sim["iof_total"])),
+            "tarifas_total_brl": format_brl(_D(sim["tarifas_total"])),
+            "taxa_juros_mes_pct": format_pct(_D(sim["taxa_juros_mes"]), 4),
+            "taxa_juros_ano_pct": format_pct(_D(sim["taxa_juros_ano"]), 2),
+            "cet_mes_pct": format_pct(_D(sim["cet_mes"]), 4),
+            "cet_ano_pct": format_pct(_D(sim["cet_ano"]), 2),
+            "pct_juros_pct": format_pct(_D(sim["pct_juros"]), 2),
+            "parcela_total_1ano_brl": format_brl(_D(parcela_total_1ano)),
+            "parcela_total_apos_brl": format_brl(_D(parcela_total_apos)),
+            "total_pago_cliente_brl": format_brl(
+                _D(sim["total_pago"]) + _D(sim["extras_total_acumulado"])
+            ),
+        },
+        "extras": [
+            {
+                **e,
+                "modalidade_label": _MODALIDADE_LABEL.get(e["modalidade"], e["modalidade"]),
+                "valor_total_brl": format_brl(_D(e["valor_total"])),
+                "valor_por_parcela_brl": format_brl(_D(e["valor_por_parcela"])),
+            }
+            for e in extras
+        ],
+        "cronograma": [
+            {
+                "numero": r["numero"],
+                "venc": format_date_br(date.fromisoformat(r["venc"])),
+                "juros_brl": format_brl(_D(r["juros"])),
+                "amortizacao_brl": format_brl(_D(r["amortizacao"])),
+                "parcela_brl": format_brl(_D(r["parcela"])),
+                "extras_brl": format_brl(_D(r["extras"])),
+                "parcela_total_brl": format_brl(_D(r["parcela_total"])),
+                "saldo_brl": format_brl(_D(r["saldo"])),
+            }
+            for r in rows
+        ],
+    }
 
 
 def _next_codigo(session: Session) -> str:
@@ -78,6 +173,7 @@ class ProposalService:
                 "valor_parcela": _decimal_to_str(sim.valor_parcela),
                 "total_pago": _decimal_to_str(sim.total_pago),
                 "total_juros": _decimal_to_str(sim.total_juros),
+                "pct_juros": _decimal_to_str(sim.pct_juros),
                 "cet_mes": _decimal_to_str(sim.cet_mes),
                 "cet_ano": _decimal_to_str(sim.cet_ano),
             },
@@ -129,3 +225,29 @@ class ProposalService:
             entidade_id=proposal.id,
         )
         return proposal
+
+    def render_pdf(self, proposal_id: int, output_path: Path,
+                   loja: dict | None = None, vendedor: dict | None = None) -> Path:
+        proposal = self.session.get(Proposal, proposal_id)
+        if proposal is None:
+            raise ValueError("proposal not found")
+        snap = json.loads(proposal.snapshot_json)
+        snap.setdefault("proposta", {})["codigo"] = proposal.codigo
+
+        ctx = _build_template_context(
+            snap,
+            loja=loja or {"nome": "Loja"},
+            vendedor=vendedor or {"nome": "Vendedor"},
+            gerado_em=proposal.gerado_em,
+            validade=proposal.validade_dias,
+        )
+        template = _jinja_env.get_template("proposta.html")
+        html_str = template.render(**ctx)
+        css = CSS(filename=str(_REPORTS_DIR / "proposta.css"))
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        HTML(string=html_str).write_pdf(str(output_path), stylesheets=[css])
+
+        proposal.pdf_path = str(output_path)
+        self.session.commit()
+        return output_path
