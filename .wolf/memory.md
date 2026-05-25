@@ -3,6 +3,8 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 2026-05-25 | Task 8: fix Proposal.cliente_id nullable, create ProposalService + tests | app/data/models.py, app/services/proposal_service.py, tests/unit/services/test_proposal_service.py | 2 tests pass, 44 total pass | ~800 tok |
+
 | 17:00 | Task 9: wrote test_factory.py, factory.py with build_fipe_chain + build_bacen_chain | app/integrations/factory.py, tests/unit/integrations/test_factory.py | 2 tests pass, committed 95b915e | ~900 |
 | 14:30 | Phase 4 Task 4: SimulationService - orchestration, validation, IOF, CET, extras, persistence | app/services/simulation_service.py, tests/unit/services/test_simulation_service.py | 3/3 tests pass, committed 99b4c8f | ~1800 |
 
@@ -505,3 +507,4 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 14:55 | Phase 4 Task 9: RulesService — TDD (test first, then impl), 3 tests pass, RulesService provides typed accessors (get_decimal, get_bool, get_int, get_json, set) with audit logging | app/services/rules_service.py, tests/unit/services/test_rules_service.py | 3/3 tests pass, fixture includes engine.dispose() for Windows cleanup | ~600 tok |
+| 10:23 | Session end: 37 writes across 24 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 30 reads | ~43776 tok |
