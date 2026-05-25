@@ -7,6 +7,7 @@
 
 | 17:00 | Task 9: wrote test_factory.py, factory.py with build_fipe_chain + build_bacen_chain | app/integrations/factory.py, tests/unit/integrations/test_factory.py | 2 tests pass, committed 95b915e | ~900 |
 | 14:30 | Phase 4 Task 4: SimulationService - orchestration, validation, IOF, CET, extras, persistence | app/services/simulation_service.py, tests/unit/services/test_simulation_service.py | 3/3 tests pass, committed 99b4c8f | ~1800 |
+| 2026-05-25 | Phase 5 verify+proceed: smoke test fixed (user_simulation() direct use + Windows SQLite engine.dispose()), 113/113 unit tests pass | tests/unit/integrations/test_ui_smoke.py | committed 6b8d37f | ~600 |
 
 | 15:12 | Phase 3 Task 1: created integrations base infra | app/integrations/base.py, app/integrations/http.py, tests/unit/integrations/ | 3/3 tests pass, committed 477f917 | ~400 tok |
 | 15:25 | Phase 3 Task 3: FIPE BrasilAPI fallback provider (TDD) | app/integrations/fipe/brasilapi.py, tests/unit/integrations/fipe/test_brasilapi.py | 6/6 fipe tests pass, committed 18045e1 | ~350 tok |
@@ -536,3 +537,7 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 11:01 | Created tests/unit/integrations/test_ui_smoke.py | — | ~411 |
+| 11:06 | Created tests/unit/integrations/test_ui_smoke.py | — | ~398 |
+| 11:06 | Edited tests/unit/integrations/test_ui_smoke.py | modified db_engine() | ~24 |
+| 11:06 | Edited tests/unit/integrations/test_ui_smoke.py | 3→2 lines | ~22 |

@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T13:25:59.618Z
-> Files: 31 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T14:06:24.625Z
+> Files: 32 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -49,10 +49,47 @@
 - `scheduler.py` — Scheduler - APScheduler wiring for background jobs (indicators + backup). (~746 tok)
 - `simulation_service.py` — SimulationService - orchestrates calculation + persistence. (~2482 tok)
 
+## app/
+
+- `main.py` — Entry point: boots NiceGUI in pywebview; registers all 11 pages; runs alembic migrations on startup. (~700 tok)
+
+## app/ui/
+
+- `__init__.py` — empty
+- `layout.py` — Shell (topbar + tabs nav) used by all pages except /login. (~300 tok)
+- `router.py` — Role guards, login_user/logout, navigate(), app.storage.user helpers. (~250 tok)
+- `theme.py` — Color palette, font sizes, CSS variables, apply_global_styles(). (~400 tok)
+
+## app/ui/components/
+
+- `__init__.py` — empty
+- `amortization_table.py` — NiceGUI table component rendering AmortizationRow list. (~200 tok)
+- `charts.py` — Plotly factories: composition_chart, saldo_devedor_chart, parcela_total_chart, comparison_saldo_chart. (~300 tok)
+- `currency_input.py` — CurrencyInput: R$ formatting, blur normalization. (~200 tok)
+- `kpi_card.py` — KpiCard: big-value card with visibility toggle. (~150 tok)
+- `percent_input.py` — PercentInput: display as % → Decimal fraction model. (~150 tok)
+
+## app/ui/pages/
+
+- `__init__.py` — empty
+- `amortizacao.py` — Amortizacao extraordinaria page. (~250 tok)
+- `apis.py` — APIs page: BACEN indicators manual refresh. (~200 tok)
+- `cadastro.py` — Cadastro page: clientes + usuarios sub-tabs. (~350 tok)
+- `comparativo.py` — Comparativo page: diff two saved simulations. (~250 tok)
+- `configuracoes.py` — Configuracoes page: edit business_rules. (~200 tok)
+- `dashboard.py` — Dashboard page: KPI cards + recent simulations table. (~250 tok)
+- `docs.py` — Documentacao page: renders docs/*.md inline. (~150 tok)
+- `indicadores.py` — Indicadores page: SELIC/CDI/IPCA/TX_BACEN_VEIC KPI cards. (~150 tok)
+- `login.py` — Login page: PIN-based auth with user select. (~200 tok)
+- `logs.py` — Logs page: audit_log viewer (last 200 rows). (~150 tok)
+- `simulacao.py` — Simulacao page: central tab; IOF, extras, 3 charts, 6 KPI cards. (~600 tok)
+
 ## app/utils/
 
 - `__init__.py` (~0 tok)
+- `br_format.py` — Brazilian formatters: format_brl/parse_brl, format_pct, format_date_br. (~200 tok)
 - `document_validation.py` — CPF and CNPJ validation (modulo-11 checks). (~303 tok)
+- `logger.py` — Centralized loguru setup: file rotation, gzip, optional Sentry. (~300 tok)
 
 ## docs/agents/
 
@@ -76,6 +113,7 @@
 
 ## tests/unit/integrations/
 
+- `test_ui_smoke.py` — db_engine, test_login_page_renders, test_login_redirects_to_dashboard (~376 tok)
 
 ## tests/unit/integrations/bacen/
 

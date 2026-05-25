@@ -14,8 +14,16 @@
 - **Windows SQLite test cleanup:** On Windows, temp databases remain locked after session ends. Always call `engine.dispose()` in test fixtures AFTER the session is closed to release the connection pool and allow directory cleanup.
 - **CPF/CNPJ validation:** Modulo-11 checks handle both CPF (11 digits) and CNPJ (14 digits). Algorithm: compute weighted sum, mod 11, then map 10→0. All-same-digit (11111111111, etc.) are always invalid.
 
+- **Virtual environment:** Always use `.venv/Scripts/python.exe` (Windows) or `.venv/bin/python` (Linux/Mac) instead  
+    of the system `python` when running commands in this project. The system Python lacks project dependencies (nicegui,  
+    loguru, etc.). Check for `.venv/` at the repo root before running any `python` or `pytest` command, and prefix all
+    such commands with the venv interpreter path.
+
 ## Do-Not-Repeat
 
+- [2026-05-25] Running `python` or `pytest` directly fails with `ModuleNotFoundError` because project deps are in
+    `.venv`. Always use `.venv/Scripts/python.exe -m pytest` (Windows) or `.venv/bin/python -m pytest` (Linux/Mac).
+- [2026-05-25] **NiceGUI smoke tests**: Do NOT use the `user` fixture from `nicegui.testing.user_plugin` — it requires `main.py` at project root. Instead, use `user_simulation()` async context manager directly. Also, `apply_global_styles()` uses `ui.add_head_html()` which requires an active page context — cannot be called outside a `@ui.page` handler in tests.
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 
