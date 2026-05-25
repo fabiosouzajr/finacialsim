@@ -40,7 +40,7 @@ class ParallelumFipeProvider:
                 data = await get_json(
                     f"{BASE_URL}/{tipo_url}/brands/{brand_id}/models", self._client
                 )
-                models = data.get("models", data)
+                models = data if isinstance(data, list) else data.get("models", data)
                 return Ok([{"id": str(d["code"]), "nome": d["name"]} for d in models])
             if action == "years":
                 brand_id = query["brand_id"]

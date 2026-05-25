@@ -433,6 +433,273 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-25T15:33:04.665Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-05-25T17:39:01.807Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 7→7 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "spec"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T17:39:01.807Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-05-25T17:55:47.685Z",
+      "error_message": "Wrong reference: False should be True",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "Used \"False\" instead of \"True\"",
+      "fix": "Changed False → True",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "spec"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T17:55:47.685Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-05-25T18:00:59.649Z",
+      "error_message": "Wrong reference: False should be True",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "Used \"False\" instead of \"True\"",
+      "fix": "Changed False → True",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "spec"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T18:00:59.649Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-05-25T18:04:33.804Z",
+      "error_message": "Wrong reference: import should be build_app",
+      "file": "app/main.py",
+      "root_cause": "Used \"import\" instead of \"build_app\"",
+      "fix": "Changed import → build_app",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T18:04:33.804Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-05-25T18:07:39.499Z",
+      "error_message": "Wrong reference: True should be False",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "Used \"True\" instead of \"False\"",
+      "fix": "Changed True → False",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "spec"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-25T18:07:54.816Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-05-25T18:10:57.073Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/main.py",
+      "root_cause": "9 lines replaced/restructured",
+      "fix": "Rewrote 16→28 lines (9 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T18:10:57.073Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-05-25T15:10:00.000Z",
+      "error_message": "PyInstaller: 'script not found' / 'Unable to find file' for app/main.py, datas, and icon",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "All relative paths in the spec (script entry, datas, icon) were resolved relative to the spec file directory (scripts/) instead of the project root",
+      "fix": "Changed all relative paths to use str(project_root / '...') where project_root = Path(SPECPATH).parent",
+      "tags": [
+        "pyinstaller",
+        "build",
+        "spec",
+        "windows"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:10:00.000Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-05-25T15:20:00.000Z",
+      "error_message": "EXE exits immediately with code 0 — app never starts",
+      "file": "app/main.py",
+      "root_cause": "main() function defined but never called; PyInstaller runs top-level module code which only imports modules and exits",
+      "fix": "Added 'if __name__ == \"__main__\": multiprocessing.freeze_support(); main()' at bottom of main.py",
+      "tags": [
+        "pyinstaller",
+        "build",
+        "entrypoint",
+        "windows"
+      ],
+      "related_bugs": [
+        "bug-034"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:20:00.000Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-05-25T15:25:00.000Z",
+      "error_message": "RuntimeError: ui.add_head_html called inside global scope while using ui.page",
+      "file": "app/ui/theme.py",
+      "root_cause": "apply_global_styles() calls ui.add_head_html() outside a @ui.page handler without shared=True",
+      "fix": "Added shared=True to ui.add_head_html() call in apply_global_styles()",
+      "tags": [
+        "nicegui",
+        "theme",
+        "startup"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:25:00.000Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-05-25T00:00:00.000Z",
+      "error_message": "TX_BACEN_VEIC always shows 'n/d' on /indicadores page",
+      "file": "app/services/scheduler.py",
+      "root_cause": "_BACEN_CODES used 'TX_BACEN_VEICULOS' but BcbSgsProvider.CODIGOS only knows 'TX_BACEN_VEIC'; daily scheduled fetch silently returned Err, nothing was persisted",
+      "fix": "Changed 'TX_BACEN_VEICULOS' to 'TX_BACEN_VEIC' in _BACEN_CODES list (line 19)",
+      "tags": [
+        "scheduler",
+        "bacen",
+        "indicator",
+        "typo"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-05-25T15:30:00.000Z",
+      "error_message": "alembic.ini not found — skipping migrations (frozen app)",
+      "file": "app/main.py",
+      "root_cause": "_run_migrations used subprocess [sys.executable, '-m', 'alembic'] and Path(__file__).parents[1] for paths — both wrong in a frozen PyInstaller app where sys.executable is the EXE and __file__ resolves inside _internal/",
+      "fix": "Replaced subprocess call with alembic Python API (Config + alembic_command.upgrade). Path detection now uses sys._MEIPASS when frozen, Path(__file__).parents[1] otherwise.",
+      "tags": [
+        "alembic",
+        "migrations",
+        "pyinstaller",
+        "frozen",
+        "windows"
+      ],
+      "related_bugs": [
+        "bug-035"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T15:30:00.000Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-05-25T18:30:23.689Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/services/scheduler.py",
+      "root_cause": "Had \"TX_BACEN_VEICULOS\"",
+      "fix": "Changed to \"TX_BACEN_VEIC\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T18:30:23.689Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-05-25T18:31:16.050Z",
+      "error_message": "Wrong reference: build_configuracoes_page should be build_fipe_page",
+      "file": "app/main.py",
+      "root_cause": "Used \"build_configuracoes_page\" instead of \"build_fipe_page\"",
+      "fix": "Changed build_configuracoes_page → build_fipe_page",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T18:31:16.050Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-05-25T18:41:34.997Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/finacialsim.spec",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 26→47 lines (2 removed) | Also: # WeasyPrint on Windows requires GTK3 DLLs + fontc; # returns None when the GTK3 bin dir is not in PAT",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "spec"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-25T18:43:46.684Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-05-25T00:00:00.000Z",
+      "error_message": "unsupported_action_for_brasilapi: models",
+      "file": "app/integrations/fipe/parallelum.py",
+      "root_cause": "Parallelum v2 /models endpoint returns a plain list, not a dict. `data.get('models', data)` on a list raises AttributeError, caught as Err('unexpected: ...'). Parallelum fails, BrasilAPI fallback doesn't support 'models', final error is misleading.",
+      "fix": "Changed `data.get('models', data)` to `data if isinstance(data, list) else data.get('models', data)` on line 43",
+      "tags": [
+        "fipe",
+        "parallelum",
+        "models",
+        "type-error",
+        "attribute-error"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-05-25T19:24:26.807Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/ui/pages/fipe.py",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 7→7 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T19:24:26.807Z"
     }
   ]
 }

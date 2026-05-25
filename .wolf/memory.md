@@ -3,10 +3,13 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 00:00 | Fixed FIPE models bug: Parallelum v2 returns plain list for /models; data.get() raised AttributeError causing misleading BrasilAPI fallback error | app/integrations/fipe/parallelum.py | fixed | ~300 |
+
 | 10:00 | Fixed CI: quoted .[dev] on Windows runner, dynamic DMG version from git tag, pinned appimagetool to release 13 | .github/workflows/release.yml, scripts/build_macos.sh | committed e5f1e84 | ~800 |
 
 | 15:35 | Created .github/workflows/release.yml — GitHub Actions release CI | .github/workflows/release.yml | committed edd3da5 | ~150 tok |
 | 15:36 | Fixed duplicate .github/workflows/ heading in anatomy.md (auto-scanner had pre-added it) | .wolf/anatomy.md | warning resolved | ~50 tok |
+| 17:30 | Fixed 3 relative path bugs in finacialsim.spec (script, datas, icon resolved relative to scripts/ instead of project root). Windows EXE build now succeeds. | scripts/finacialsim.spec | dist/FinacialSim produced | ~400 tok |
 
 | 2026-05-25 | Fixed macOS installer scripts: EXIT trap + sudo cp in install_macos.sh; ERR trap + create-dmg guard in build_macos.sh | scripts/install_macos.sh, scripts/build_macos.sh | committed 6a80219 | ~200 tok |
 
@@ -623,3 +626,92 @@
 | 12:35 | Created docs/matematica_price.md | — | ~460 |
 | 12:35 | Created docs/ARQUITETURA.md | — | ~205 |
 | 12:37 | Session end: 18 writes across 10 files (install_linux.sh, build_appimage.sh, build_macos.sh, install_macos.sh, release.yml) | 11 reads | ~5501 tok |
+
+## Session: 2026-05-25 14:35
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-25 14:35
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:38 | Edited scripts/finacialsim.spec | 3→3 lines | ~23 |
+| 14:39 | Edited scripts/finacialsim.spec | 7→7 lines | ~90 |
+| 14:41 | Edited scripts/finacialsim.spec | inline fix | ~29 |
+| 14:55 | Edited scripts/finacialsim.spec | inline fix | ~5 |
+| 15:00 | Edited scripts/finacialsim.spec | inline fix | ~4 |
+| 15:03 | Edited app/main.py | 3→8 lines | ~72 |
+| 15:04 | Edited app/main.py | modified main() | ~10 |
+| 15:07 | Edited app/ui/theme.py | 21→21 lines | ~251 |
+| 15:07 | Edited scripts/finacialsim.spec | inline fix | ~5 |
+| 15:07 | Edited scripts/finacialsim.spec | inline fix | ~5 |
+| 15:10 | Edited app/main.py | 3→2 lines | ~10 |
+| 15:10 | Edited app/main.py | modified _run_migrations() | ~308 |
+| 15:11 | Edited app/main.py | removed 5 lines | ~4 |
+| 15:35 | Fixed 4 frozen-app bugs: spec paths, missing main() entrypoint, theme shared=True, alembic subprocess→API. App starts and runs migrations. | scripts/finacialsim.spec, app/main.py, app/ui/theme.py | dist_new/FinacialSim running OK | ~600 tok |
+
+## Session: 2026-05-25 15:18
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:30 | Edited app/services/scheduler.py | inline fix | ~18 |
+| 15:30 | Created app/ui/pages/fipe.py | — | ~1519 |
+| 15:30 | Edited app/main.py | added 1 import(s) | ~44 |
+| 15:31 | Edited app/main.py | 2→3 lines | ~29 |
+| 15:31 | Edited app/ui/layout.py | 1→2 lines | ~37 |
+
+| 00:00 | Fixed TX_BACEN_VEIC typo in scheduler (_BACEN_CODES used VEICULOS) | app/services/scheduler.py | typo corrected, indicator will now fetch on schedule | ~50 tok |
+| 00:00 | Created FIPE lookup page with cascaded tipo/marca/modelo/ano/price UI | app/ui/pages/fipe.py, app/main.py, app/ui/layout.py | FIPE tab now available to all roles | ~200 tok |
+| 15:41 | Edited scripts/finacialsim.spec | added 1 condition(s) | ~444 |
+| 15:43 | Edited scripts/finacialsim.spec | reduced (-21 lines) | ~118 |
+| 15:43 | Edited scripts/build_exe.py | modified main() | ~312 |
+
+## Session: 2026-05-25 15:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:51 | Edited app/integrations/fipe/parallelum.py | inline fix | ~25 |
+
+## Session: 2026-05-25 15:58
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-25 15:58
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:09 | Created app/ui/theme.py | — | ~1751 |
+| 16:09 | Created app/ui/layout.py | — | ~1136 |
+| 16:10 | Edited app/ui/layout.py | modified classes() | ~68 |
+| 16:20 | Created app/ui/pages/fipe.py | — | ~1398 |
+| 16:21 | Created app/ui/pages/fipe.py | — | ~1560 |
+
+## Session: 2026-05-25 16:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:23 | Edited app/ui/pages/fipe.py | 2→6 lines | ~87 |
+| 16:24 | Edited app/ui/pages/fipe.py | 5→1 lines | ~19 |
+| 16:24 | Edited app/ui/pages/fipe.py | 7→7 lines | ~183 |
+
+## Session: 2026-05-25 16:26
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:44 | Created app/ui/components/kpi_card.py | — | ~491 |
+| 16:44 | Edited app/ui/theme.py | expanded (+26 lines) | ~273 |
+| 16:45 | Created app/ui/pages/simulacao.py | — | ~3234 |
+| 16:45 | Edited app/ui/pages/simulacao.py | 21→25 lines | ~472 |
+| 16:46 | Redesigned simulacao page: 2-col layout, compact grouped KPI cards, popup date pickers side-by-side, buttons top-right, fixed KpiCard hide/show eye toggle bug | app/ui/pages/simulacao.py, app/ui/components/kpi_card.py, app/ui/theme.py | done | ~600 |
+
+## Session: 2026-05-25 16:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-25 16:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

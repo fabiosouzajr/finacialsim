@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -17,6 +16,7 @@ from app.ui.pages.comparativo import build_comparativo_page
 from app.ui.pages.configuracoes import build_configuracoes_page
 from app.ui.pages.dashboard import build_dashboard_page
 from app.ui.pages.docs import build_docs_page
+from app.ui.pages.fipe import build_fipe_page
 from app.ui.pages.indicadores import build_indicadores_page
 from app.ui.pages.logs import build_logs_page
 from app.ui.pages.login import build_login_page
@@ -38,20 +38,32 @@ def _platform_data_dir() -> Path:
 
 def _run_migrations(db_path: Path) -> None:
     """Run alembic upgrade head on startup. Idempotent."""
-    project_root = Path(__file__).resolve().parents[1]
-    alembic_ini = project_root / "alembic.ini"
+    from alembic import command as alembic_command
+    from alembic.config import Config
+
+    # In a frozen PyInstaller app, files live under sys._MEIPASS (_internal/).
+    # When running from source, they live two levels above this file.
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        base = Path(meipass)
+    else:
+        base = Path(__file__).resolve().parents[1]
+
+    alembic_ini = base / "alembic.ini"
+    migrations_dir = base / "app" / "data" / "migrations"
+
     if not alembic_ini.exists():
         logger.warning("alembic.ini not found - skipping migrations")
         return
-    env = {"FINACIALSIM_DB_URL": f"sqlite:///{db_path}"}
-    cmd = [sys.executable, "-m", "alembic", "-c", str(alembic_ini),
-           "-x", f"db_url=sqlite:///{db_path}", "upgrade", "head"]
-    result = subprocess.run(cmd, cwd=project_root, env={**os.environ, **env},
-                            capture_output=True, text=True)
-    if result.returncode != 0:
-        logger.error(f"Alembic upgrade failed: {result.stderr}")
-    else:
+
+    cfg = Config(str(alembic_ini))
+    cfg.set_main_option("script_location", str(migrations_dir))
+    cfg.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
+    try:
+        alembic_command.upgrade(cfg, "head")
         logger.info("Migrations applied (alembic upgrade head)")
+    except Exception as exc:
+        logger.error(f"Alembic upgrade failed: {exc}")
 
 
 def build_app() -> None:
@@ -72,6 +84,7 @@ def build_app() -> None:
     build_comparativo_page(engine)
     build_amortizacao_page(engine)
     build_indicadores_page(engine)
+    build_fipe_page(engine)
     build_configuracoes_page(engine)
     build_apis_page(engine)
     build_logs_page(engine)
@@ -83,7 +96,6 @@ def build_app() -> None:
 
 
 def main() -> None:
-    import os  # noqa: F401 - used inside build_app via _run_migrations
     build_app()
     ui.run(
         title="FinacialSim",
@@ -96,6 +108,7 @@ def main() -> None:
     )
 
 
-# Make `os` available to _run_migrations (imported lazily above to avoid
-# UnboundLocalError when invoked outside of main())
-import os  # noqa: E402
+if __name__ == "__main__":
+    import multiprocessing
+    multiprocessing.freeze_support()
+    main()

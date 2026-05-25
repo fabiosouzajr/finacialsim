@@ -13,7 +13,6 @@ from app.data.models import Vehicle
 from app.services.simulation_service import (
     SimulationInputDTO,
     SimulationService,
-    Tarifa,
 )
 from app.ui.components.charts import (
     composition_chart,
@@ -36,38 +35,104 @@ def build_simulacao_page(engine) -> None:
         def content() -> None:
             user_id = get_logged_user_id() or 0
             last_sim_id: dict[str, int | None] = {"id": None}
+            _actions: dict = {}
 
-            with ui.row().classes("w-full"):
-                with ui.column().classes("w-1/3"):
-                    ui.label("Entrada").classes("text-lg font-bold")
-                    valor_veiculo = CurrencyInput("Valor do veiculo", Decimal("50000"))
+            # ── Header: title left, action buttons right ─────────────────
+            with ui.row().classes("w-full items-center justify-between mb-2"):
+                ui.label("Simulação").classes("text-xl font-bold text-slate-800")
+                with ui.row().classes("gap-2"):
+                    ui.button("Simular", icon="play_arrow",
+                              on_click=lambda: _actions["simular"]()
+                              ).props("color=primary")
+                    ui.button("Gerar PDF", icon="picture_as_pdf",
+                              on_click=lambda: _actions["gerar_pdf"]()
+                              ).props("color=primary outline")
+
+            # ── Main layout: narrow form | wide results ───────────────────
+            with ui.row().classes("w-full gap-4 items-start"):
+
+                # ── Left: Entrada form ────────────────────────────────────
+                with ui.column().classes("gap-3").style("width: 290px; flex-shrink: 0"):
+                    ui.label("Entrada").classes(
+                        "text-xs font-semibold text-slate-500 uppercase tracking-widest"
+                    )
+
+                    valor_veiculo = CurrencyInput("Valor do veículo", Decimal("50000"))
                     valor_entrada = CurrencyInput("Entrada (R$)", Decimal("10000"))
-                    prazo = ui.number(label="Prazo (meses)", value=48, min=12, max=72)
+                    prazo = ui.number(label="Prazo (meses)", value=48, min=12, max=72).classes("w-full")
                     taxa = PercentInput("Taxa mensal", Decimal("0.0189"))
-                    data_lib = ui.date(value=date.today().isoformat())
-                    data_venc = ui.date(value=(date.today() + timedelta(days=30)).isoformat())
                     incluir_iof = ui.checkbox("Incluir IOF", value=True)
 
-                    with ui.expansion("Custos adicionais mensais"):
-                        protecao = CurrencyInput("Plano de protecao (R$/mes)", Decimal("0"))
+                    # Custos adicionais above calendars
+                    with ui.expansion("Custos adicionais").classes("w-full"):
+                        protecao = CurrencyInput("Proteção veicular (R$/mês)", Decimal("0"))
                         ipva_total = CurrencyInput("IPVA anual (R$)", Decimal("0"))
                         empl_total = CurrencyInput("Emplacamento (R$ total)", Decimal("0"))
-                        rateio = ui.number(label="Rateio (meses)", value=12, min=1, max=72)
+                        rateio = ui.number(label="Rateio (meses)", value=12, min=1, max=72).classes("w-full")
 
-                with ui.column().classes("w-1/3"):
-                    ui.label("Resultado").classes("text-lg font-bold")
-                    card_parcela = KpiCard("Parcela financiamento", "R$ 0,00")
-                    card_total_1ano = KpiCard("Parcela total (1o ano)", "R$ 0,00")
-                    card_total_apos = KpiCard("Parcela total (apos rateio)", "R$ 0,00")
-                    card_financiado = KpiCard("Valor financiado", "R$ 0,00")
-                    card_total_pago = KpiCard("Total pago financiamento", "R$ 0,00")
-                    card_cet = KpiCard("CET", "0,00% a.m.")
+                    # Date pickers side by side (popup style)
+                    ui.label("Datas").classes(
+                        "text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1"
+                    )
+                    with ui.row().classes("gap-2 w-full"):
+                        with ui.column().classes("flex-1 gap-1"):
+                            ui.label("Início").classes("text-xs text-slate-400 font-medium")
+                            with ui.input(value=date.today().isoformat()).classes("w-full") as inp_lib:
+                                with inp_lib.add_slot("append"):
+                                    ui.icon("edit_calendar").on(
+                                        "click", lambda: menu_lib.open()
+                                    ).classes("cursor-pointer text-slate-400")
+                                with ui.menu() as menu_lib:
+                                    _lib_date = ui.date(
+                                        mask="YYYY-MM-DD", value=date.today().isoformat()
+                                    )
+                                    _lib_date.bind_value(inp_lib)
 
-                with ui.column().classes("w-1/3"):
-                    chart_comp = ui.plotly(composition_chart([], [], []))
-                    chart_saldo = ui.plotly(saldo_devedor_chart([]))
-                    chart_total = ui.plotly(parcela_total_chart([]))
+                        with ui.column().classes("flex-1 gap-1"):
+                            _venc_def = (date.today() + timedelta(days=30)).isoformat()
+                            ui.label("Término").classes("text-xs text-slate-400 font-medium")
+                            with ui.input(value=_venc_def).classes("w-full") as inp_venc:
+                                with inp_venc.add_slot("append"):
+                                    ui.icon("edit_calendar").on(
+                                        "click", lambda: menu_venc.open()
+                                    ).classes("cursor-pointer text-slate-400")
+                                with ui.menu() as menu_venc:
+                                    _venc_date = ui.date(mask="YYYY-MM-DD", value=_venc_def)
+                                    _venc_date.bind_value(inp_venc)
 
+                # ── Right: Resultado KPIs + Charts ────────────────────────
+                with ui.column().classes("flex-1 gap-3 min-w-0"):
+
+                    # KPI cards — grouped, compact
+                    ui.label("Resultado").classes(
+                        "text-xs font-semibold text-slate-500 uppercase tracking-widest"
+                    )
+
+                    ui.label("Parcelas").classes("kpi-group-label")
+                    with ui.row().classes("gap-2 w-full"):
+                        with ui.element("div").classes("flex-1"):
+                            card_parcela = KpiCard("Parcela financiamento", "R$ 0,00", compact=True)
+                        with ui.element("div").classes("flex-1"):
+                            card_total_1ano = KpiCard("Total 1º ano", "R$ 0,00", compact=True)
+                        with ui.element("div").classes("flex-1"):
+                            card_total_apos = KpiCard("Total pós rateio", "R$ 0,00", compact=True)
+
+                    ui.label("Financiamento").classes("kpi-group-label mt-1")
+                    with ui.row().classes("gap-2 w-full"):
+                        with ui.element("div").classes("flex-1"):
+                            card_financiado = KpiCard("Valor financiado", "R$ 0,00", compact=True)
+                        with ui.element("div").classes("flex-1"):
+                            card_total_pago = KpiCard("Total pago", "R$ 0,00", compact=True)
+                        with ui.element("div").classes("flex-1"):
+                            card_cet = KpiCard("CET", "0,00% a.m.", compact=True)
+
+                    # Charts — composition + saldo side by side, parcela_total full width
+                    with ui.row().classes("gap-2 w-full"):
+                        chart_comp = ui.plotly(composition_chart([], [], [])).classes("flex-1")
+                        chart_saldo = ui.plotly(saldo_devedor_chart([])).classes("flex-1")
+                    chart_total = ui.plotly(parcela_total_chart([])).classes("w-full")
+
+            # ── Callbacks (bound after UI built via _actions) ─────────────
             def simular() -> None:
                 with SessionLocal() as session:
                     v = Vehicle(
@@ -78,26 +143,30 @@ def build_simulacao_page(engine) -> None:
                     session.add(v); session.commit()
 
                     extras = []
+                    prazo_int = int(prazo.value or 48)
+                    rateio_int = int(rateio.value or 12)
                     if protecao.value > 0:
                         extras.append(Extra("protecao_veicular", "Plano de protecao",
                                             protecao.value, ExtraModalidade.MENSAL_CONTINUO,
-                                            int(prazo.value), 1))
+                                            prazo_int, 1))
                     if ipva_total.value > 0:
                         extras.append(Extra("ipva", "IPVA", ipva_total.value,
                                             ExtraModalidade.RATEIO_MESES,
-                                            int(rateio.value), 2))
+                                            rateio_int, 2))
                     if empl_total.value > 0:
                         extras.append(Extra("emplacamento", "Emplacamento", empl_total.value,
                                             ExtraModalidade.RATEIO_MESES,
-                                            int(rateio.value), 3))
+                                            rateio_int, 3))
 
                     sim = SimulationService(session).run_and_save(SimulationInputDTO(
                         criado_por=user_id, cliente_id=None, veiculo_id=v.id,
                         valor_veiculo=valor_veiculo.value, valor_entrada=valor_entrada.value,
-                        prazo_meses=int(prazo.value), taxa_mensal=taxa.value,
-                        data_liberacao=date.fromisoformat(data_lib.value),
-                        data_primeiro_venc=date.fromisoformat(data_venc.value),
-                        incluir_iof=incluir_iof.value, tarifas=[], extras=extras,
+                        prazo_meses=prazo_int, taxa_mensal=taxa.value,
+                        data_liberacao=date.fromisoformat(inp_lib.value or date.today().isoformat()),
+                        data_primeiro_venc=date.fromisoformat(
+                            inp_venc.value or (date.today() + timedelta(days=30)).isoformat()
+                        ),
+                        incluir_iof=bool(incluir_iof.value), tarifas=[], extras=extras,
                     ))
                     last_sim_id["id"] = sim.id
 
@@ -107,7 +176,6 @@ def build_simulacao_page(engine) -> None:
                         .order_by(AmortizationRow.numero_parcela).all()
                     )
 
-                # Update KPIs
                 card_parcela.set(format_brl(sim.valor_parcela))
                 if rows:
                     card_total_1ano.set(format_brl(rows[0].parcela_total))
@@ -117,7 +185,6 @@ def build_simulacao_page(engine) -> None:
                 card_total_pago.set(format_brl(sim.total_pago))
                 card_cet.set(f"{format_pct(sim.cet_mes)} a.m.", f"{format_pct(sim.cet_ano)} a.a.")
 
-                # Update charts
                 juros = [Decimal(str(r.juros)) for r in rows]
                 amort = [Decimal(str(r.amortizacao)) for r in rows]
                 extras_arr = [Decimal(str(r.extras_total)) for r in rows]
@@ -139,7 +206,7 @@ def build_simulacao_page(engine) -> None:
                 except Exception as exc:
                     ui.notify(f"Erro ao gerar PDF: {exc}", type="negative")
 
-            ui.button("Simular", on_click=simular).classes("mt-4")
-            ui.button("Gerar PDF", on_click=gerar_pdf).classes("ml-2")
+            _actions["simular"] = simular
+            _actions["gerar_pdf"] = gerar_pdf
 
         shell(content)

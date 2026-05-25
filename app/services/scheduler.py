@@ -16,7 +16,7 @@ from app.data.repositories import BusinessRuleRepository
 from app.services.backup_service import BackupService
 from app.services.indicators_service import IndicatorsService
 
-_BACEN_CODES = ["SELIC_META", "CDI", "IPCA", "TX_BACEN_VEICULOS"]
+_BACEN_CODES = ["SELIC_META", "CDI", "IPCA", "TX_BACEN_VEIC"]
 
 _scheduler: BackgroundScheduler | None = None
 

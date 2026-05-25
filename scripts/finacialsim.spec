@@ -6,20 +6,20 @@ from pathlib import Path
 project_root = Path(SPECPATH).parent
 
 a = Analysis(
-    ["app/main.py"],
+    [str(project_root / "app/main.py")],
     pathex=[str(project_root)],
     binaries=[],
     datas=[
-        ("app/reports/proposta.html", "app/reports"),
-        ("app/reports/proposta.css", "app/reports"),
-        ("docs/*.md", "docs"),
-        ("alembic.ini", "."),
-        ("app/data/migrations", "app/data/migrations"),
+        (str(project_root / "app/reports/proposta.html"), "app/reports"),
+        (str(project_root / "app/reports/proposta.css"), "app/reports"),
+        (str(project_root / "docs"), "docs"),
+        (str(project_root / "alembic.ini"), "."),
+        (str(project_root / "app/data/migrations"), "app/data/migrations"),
     ],
     hiddenimports=[
         "weasyprint", "apscheduler", "bcrypt",
         "plotly.graph_objects", "nicegui",
-        "pywebview",
+        "webview",
         "sqlalchemy.dialects.sqlite",
         "jinja2",
         "loguru",
@@ -33,7 +33,7 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data)
 
-icon_path = "assets/icon.ico" if sys.platform.startswith("win") else "assets/icon.png"
+icon_path = str(project_root / ("assets/icon.ico" if sys.platform.startswith("win") else "assets/icon.png"))
 
 exe = EXE(
     pyz,

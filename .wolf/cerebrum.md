@@ -21,6 +21,11 @@
 
 ## Do-Not-Repeat
 
+- [2026-05-25] **PyInstaller spec paths**: All paths in finacialsim.spec (script entry, datas, icon) must use `str(project_root / "...")` where `project_root = Path(SPECPATH).parent`. Bare relative paths resolve relative to the spec file directory, not the project root.
+- [2026-05-25] **PyInstaller entrypoint**: `app/main.py` defines `main()` but must call it via `if __name__ == "__main__": multiprocessing.freeze_support(); main()`. Without this, the frozen EXE silently exits with code 0.
+- [2026-05-25] **NiceGUI global scope CSS**: `ui.add_head_html()` called outside a `@ui.page` handler requires `shared=True`. Without it, NiceGUI raises RuntimeError at startup when native mode is used.
+- [2026-05-25] **Alembic in frozen apps**: Never use `subprocess [sys.executable, "-m", "alembic"]` in a frozen app — `sys.executable` is the EXE, not Python. Use the alembic Python API (`Config` + `alembic_command.upgrade`). Detect frozen context with `getattr(sys, "_MEIPASS", None)` for path resolution.
+
 - [2026-05-25] Running `python` or `pytest` directly fails with `ModuleNotFoundError` because project deps are in
     `.venv`. Always use `.venv/Scripts/python.exe -m pytest` (Windows) or `.venv/bin/python -m pytest` (Linux/Mac).
 - [2026-05-25] **NiceGUI smoke tests**: Do NOT use the `user` fixture from `nicegui.testing.user_plugin` — it requires `main.py` at project root. Instead, use `user_simulation()` async context manager directly. Also, `apply_global_styles()` uses `ui.add_head_html()` which requires an active page context — cannot be called outside a `@ui.page` handler in tests.

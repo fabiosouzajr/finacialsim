@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -18,9 +19,17 @@ def main() -> int:
         if path.exists():
             shutil.rmtree(path)
 
+    env = os.environ.copy()
+    # On Windows, prepend GTK3-Runtime bin to PATH so the PyInstaller weasyprint hook
+    # can discover libfontconfig, libpango, etc. via ctypes.util.find_library.
+    if sys.platform.startswith("win"):
+        gtk3_bin = Path("C:/Program Files/GTK3-Runtime Win64/bin")
+        if gtk3_bin.exists():
+            env["PATH"] = str(gtk3_bin) + os.pathsep + env.get("PATH", "")
+
     cmd = ["pyinstaller", "scripts/finacialsim.spec", "--clean", "--noconfirm"]
     print(">>", " ".join(cmd))
-    proc = subprocess.run(cmd, cwd=project_root)
+    proc = subprocess.run(cmd, cwd=project_root, env=env)
     if proc.returncode != 0:
         return proc.returncode
 
