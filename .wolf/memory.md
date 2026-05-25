@@ -508,3 +508,23 @@
 |------|--------|---------|---------|--------|
 | 14:55 | Phase 4 Task 9: RulesService — TDD (test first, then impl), 3 tests pass, RulesService provides typed accessors (get_decimal, get_bool, get_int, get_json, set) with audit logging | app/services/rules_service.py, tests/unit/services/test_rules_service.py | 3/3 tests pass, fixture includes engine.dispose() for Windows cleanup | ~600 tok |
 | 10:23 | Session end: 37 writes across 24 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 30 reads | ~43776 tok |
+| 10:23 | Session end: 37 writes across 24 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 33 reads | ~44559 tok |
+
+## Session: 2026-05-25 Task 10 (BackupService)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:22 | Phase 4 Task 10: BackupService — verified already created, test passes, facade over app.data.backup (backup_now, list, prune, restore) | app/services/backup_service.py, tests/unit/services/test_backup_service.py | 1/1 test passes (test_backup_now_creates_file), all 18 service tests pass | ~300 tok |
+| 10:24 | Session end: 37 writes across 24 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 33 reads | ~44559 tok |
+| 10:25 | Session end: 37 writes across 24 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 36 reads | ~50885 tok |
+| 10:25 | Created tests/integration/test_full_flow.py | — | ~853 |
+| 10:25 | Created tests/unit/services/test_scheduler.py | — | ~505 |
+| 10:25 | Created app/services/scheduler.py | — | ~746 |
+| 10:25 | Edited tests/unit/services/test_scheduler.py | modified test_run_backup_creates_file() | ~135 |
+| 10:26 | Session end: 41 writes across 27 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 36 reads | ~53124 tok |
+
+## Session: 2026-05-25 Task 12 (Scheduler)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:26 | Phase 4 Task 12: Scheduler — TDD (test first, then impl), APScheduler installed, 2/2 tests pass, Windows SQLite lock fixed with engine.dispose(), committed 4864590 | app/services/scheduler.py, tests/unit/services/test_scheduler.py | scheduler service complete: _run_indicators_update (async), _run_backup (sync), start_scheduler (APScheduler cron wiring), stop_scheduler, time config from BusinessRuleRepository | ~400 tok |
