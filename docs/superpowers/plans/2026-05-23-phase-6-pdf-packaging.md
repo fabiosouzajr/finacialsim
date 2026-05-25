@@ -15,6 +15,7 @@
 ## Task 1: PDF template and `proposal_service.render_pdf`
 
 **Files:**
+
 - Create: `app/reports/__init__.py` (empty)
 - Create: `app/reports/proposta.html`
 - Create: `app/reports/proposta.css`
@@ -24,6 +25,7 @@
 - [ ] **Step 1: Write `proposta.css`**
 
 `app/reports/proposta.css`:
+
 ```css
 @page { size: A4; margin: 1.5cm; }
 body { font-family: Inter, "Segoe UI", sans-serif; color: #1A2233; font-size: 11pt; }
@@ -48,6 +50,7 @@ tr.subtotal td { font-weight: 700; }
 - [ ] **Step 2: Write `proposta.html` (Jinja2)**
 
 `app/reports/proposta.html`:
+
 ```html
 <!doctype html>
 <html lang="pt-br">
@@ -154,6 +157,7 @@ tr.subtotal td { font-weight: 700; }
 - [ ] **Step 3: Write the failing test**
 
 `tests/unit/services/test_proposal_render.py`:
+
 ```python
 import json
 import tempfile
@@ -217,6 +221,7 @@ Expected: FAIL — `render_pdf` not defined.
 - [ ] **Step 5: Add `render_pdf` to `proposal_service.py`**
 
 Append to `app/services/proposal_service.py`:
+
 ```python
 from datetime import datetime
 from pathlib import Path
@@ -383,12 +388,14 @@ git commit -m "feat(reports): PDF proposta with WeasyPrint + extras block"
 ## Task 2: Add "Gerar PDF" button to Simulação and Comparativo
 
 **Files:**
+
 - Modify: `app/ui/pages/simulacao.py` (add PDF button after saving simulation)
 - Create: `app/ui/pages/_proposal_helper.py` (small helper used by simulacao)
 
 - [ ] **Step 1: Write helper**
 
 `app/ui/pages/_proposal_helper.py`:
+
 ```python
 """Helper to generate PDF from a simulation in UI context."""
 
@@ -467,6 +474,7 @@ git commit -m "feat(ui): PDF generation button on simulacao page"
 ## Task 3: PyInstaller build script
 
 **Files:**
+
 - Create: `scripts/__init__.py` (empty)
 - Create: `scripts/build_exe.py`
 - Create: `scripts/finacialsim.spec`
@@ -475,6 +483,7 @@ git commit -m "feat(ui): PDF generation button on simulacao page"
 - [ ] **Step 1: Write the PyInstaller spec**
 
 `scripts/finacialsim.spec`:
+
 ```python
 # -*- mode: python ; coding: utf-8 -*-
 import sys
@@ -532,6 +541,7 @@ coll = COLLECT(
 - [ ] **Step 2: Write `build_exe.py`**
 
 `scripts/build_exe.py`:
+
 ```python
 """Cross-platform PyInstaller builder."""
 
@@ -570,6 +580,7 @@ if __name__ == "__main__":
 - [ ] **Step 3: Generate placeholder icons**
 
 Run (creates a placeholder PNG you can later replace with a real icon):
+
 ```bash
 python -c "from PIL import Image; img=Image.new('RGBA',(256,256),(21,101,192,255)); img.save('assets/icon.png')"
 python -c "from PIL import Image; img=Image.new('RGBA',(256,256),(21,101,192,255)); img.save('assets/icon.ico')"
@@ -580,6 +591,7 @@ python -c "from PIL import Image; img=Image.new('RGBA',(256,256),(21,101,192,255
 - [ ] **Step 4: Build and verify (current platform)**
 
 Run:
+
 ```bash
 pip install pyinstaller pillow
 python scripts/build_exe.py
@@ -607,11 +619,13 @@ git commit -m "feat(build): PyInstaller spec + builder script"
 ## Task 4: Windows NSIS installer
 
 **Files:**
+
 - Create: `scripts/installer.nsi`
 
 - [ ] **Step 1: Write NSIS script**
 
 `scripts/installer.nsi`:
+
 ```nsi
 !define APPNAME "FinacialSim"
 !define APPVERSION "1.0.0"
@@ -650,6 +664,7 @@ SectionEnd
 - [ ] **Step 2: Build installer (on Windows host with NSIS installed)**
 
 Run (Windows only):
+
 ```bash
 makensis scripts/installer.nsi
 ```
@@ -672,6 +687,7 @@ git commit -m "feat(build): NSIS installer for Windows"
 ## Task 5: Linux AppImage + install script
 
 **Files:**
+
 - Create: `scripts/build_appimage.sh`
 - Create: `scripts/install_linux.sh`
 - Create: `scripts/finacialsim.desktop`
@@ -679,6 +695,7 @@ git commit -m "feat(build): NSIS installer for Windows"
 - [ ] **Step 1: Write desktop entry**
 
 `scripts/finacialsim.desktop`:
+
 ```ini
 [Desktop Entry]
 Name=FinacialSim
@@ -693,6 +710,7 @@ Categories=Office;Finance;
 - [ ] **Step 2: Write `build_appimage.sh`**
 
 `scripts/build_appimage.sh`:
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -731,6 +749,7 @@ echo "AppImage created at $DIST/FinacialSim-x86_64.AppImage"
 - [ ] **Step 3: Make executable and run**
 
 Run:
+
 ```bash
 chmod +x scripts/build_appimage.sh
 # Download appimagetool first if needed:
@@ -743,6 +762,7 @@ Expected: `dist/FinacialSim-x86_64.AppImage`.
 - [ ] **Step 4: Write `install_linux.sh`**
 
 `scripts/install_linux.sh`:
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -787,12 +807,14 @@ git commit -m "feat(build): Linux AppImage builder + install script"
 ## Task 6: macOS .app bundle + DMG + install script
 
 **Files:**
+
 - Create: `scripts/build_macos.sh`
 - Create: `scripts/install_macos.sh`
 
 - [ ] **Step 1: Write `build_macos.sh`**
 
 `scripts/build_macos.sh`:
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -848,6 +870,7 @@ echo "DMG at $DIST/FinacialSim-1.0.0.dmg"
 - [ ] **Step 2: Write `install_macos.sh`**
 
 `scripts/install_macos.sh`:
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -875,6 +898,7 @@ echo "FinacialSim instalado em /Applications/FinacialSim.app"
 - [ ] **Step 3: Make executables**
 
 Run:
+
 ```bash
 chmod +x scripts/build_macos.sh scripts/install_macos.sh
 ```
@@ -895,11 +919,13 @@ git commit -m "feat(build): macOS .app bundle + DMG + install script"
 ## Task 7: GitHub Actions release workflow
 
 **Files:**
+
 - Create: `.github/workflows/release.yml`
 
 - [ ] **Step 1: Write workflow**
 
 `.github/workflows/release.yml`:
+
 ```yaml
 name: Release
 
@@ -987,6 +1013,7 @@ git commit -m "ci(release): build Windows/Linux/macOS on tag and publish to GitH
 - [ ] **Step 3: Test the workflow**
 
 Create a test tag:
+
 ```bash
 git tag v0.0.1-test
 git push origin v0.0.1-test
@@ -999,6 +1026,7 @@ Watch Actions tab. After success, verify a draft release exists with all three a
 ## Task 8: End-user docs (`docs/INSTALACAO.md`, `docs/guia_usuario.md`, `docs/troubleshooting.md`, `docs/matematica_price.md`)
 
 **Files:**
+
 - Create: `docs/INSTALACAO.md`
 - Create: `docs/guia_usuario.md`
 - Create: `docs/troubleshooting.md`
@@ -1008,6 +1036,7 @@ Watch Actions tab. After success, verify a draft release exists with all three a
 - [ ] **Step 1: Write `docs/INSTALACAO.md`**
 
 `docs/INSTALACAO.md`:
+
 ```markdown
 # Instalacao do FinacialSim
 
@@ -1038,6 +1067,7 @@ curl -fsSL https://raw.githubusercontent.com/your-org/finacialsim/main/scripts/i
 3. Na primeira execucao, va em System Settings > Privacy & Security se aparecer "App nao verificado" e clique em "Abrir mesmo assim".
 
 Ou via script:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/your-org/finacialsim/main/scripts/install_macos.sh | bash
 ```
@@ -1052,6 +1082,7 @@ curl -fsSL https://raw.githubusercontent.com/your-org/finacialsim/main/scripts/i
 - Atualizacoes de indicadores rodam diariamente as 09:00 (precisa de internet).
 
 Consulte `troubleshooting.md` para problemas comuns.
+
 ```
 
 - [ ] **Step 2: Write `docs/guia_usuario.md`** (high-level user manual)
@@ -1114,6 +1145,7 @@ Na simulacao, clique "Gerar PDF". O arquivo abre automaticamente no leitor padra
 - [ ] **Step 3: Write `docs/troubleshooting.md`**
 
 `docs/troubleshooting.md`:
+
 ```markdown
 # Troubleshooting
 
@@ -1128,26 +1160,32 @@ sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libgdk-pixbuf2.0-0 libf
 ```
 
 ## "App damaged" (macOS)
+
 Va em System Settings > Privacy & Security > "Open Anyway". Necessario na primeira execucao por nao ser notarizado.
 
 ## Indicadores desatualizados
+
 - Verifique conexao com internet.
 - Va em "APIs" e clique "Atualizar indicadores agora".
 - Se persistir, admin pode informar valores manuais em "Indicadores".
 
 ## FIPE nao retorna marcas
+
 - Cache de listas dura 30 dias.
 - Tente forcar atualizacao em "APIs".
 - Use entrada manual caso ambas APIs falhem.
 
 ## Banco corrompido
+
 - Backups automaticos diarios estao em `<data>/backups/`.
 - Em Configuracoes > Backup, clique "Restaurar de arquivo..." e selecione o backup mais recente.
 
 ## CET nao bate com calculadora do banco
+
 - Verifique se "Incluir IOF" esta ligado.
 - Confira se valor do veiculo e entrada batem com o contrato.
 - Lembre: custos adicionais (proteção, IPVA, emplacamento) NAO entram no CET por convencao BCB.
+
 ```
 
 - [ ] **Step 4: Write `docs/matematica_price.md`** (math explainer)
@@ -1170,13 +1208,17 @@ Seja:
 A parcela fixa e calculada por:
 
 ```
-PMT = PV * (1 + i_d)^d1 * (i_m * (1 + i_m)^(n-1)) / ((1 + i_m)^n - 1)
+
+PMT = PV *(1 + i_d)^d1* (i_m * (1 + i_m)^(n-1)) / ((1 + i_m)^n - 1)
+
 ```
 
 Quando `d1 = 30`, esta formula reduz a Tabela Price classica:
 
 ```
-PMT = PV * i_m * (1 + i_m)^n / ((1 + i_m)^n - 1)
+
+PMT = PV *i_m* (1 + i_m)^n / ((1 + i_m)^n - 1)
+
 ```
 
 ## Cronograma
@@ -1193,9 +1235,11 @@ Decreto 6.306/2007:
 
 Quando incorporado ao principal, ha iteracao:
 ```
+
 PV(0) = veiculo - entrada + tarifas
 PV(n+1) = PV(0) + IOF(PV(n), schedule(PV(n)))
 parar quando |PV(n+1) - PV(n)| < R$ 0,01
+
 ```
 Convergencia em 2-3 iteracoes.
 
@@ -1204,7 +1248,9 @@ Convergencia em 2-3 iteracoes.
 CET e a TIR (Taxa Interna de Retorno) mensal do fluxo de caixa:
 
 ```
+
 valor_liberado = sum_k PMT / (1 + i_cet)^(meses_t_k)
+
 ```
 
 Onde `meses_t_k = (d1 + 30*(k-1)) / 30`. Resolvido pelo metodo de Brent.
@@ -1224,6 +1270,7 @@ Modalidades:
 - [ ] **Step 5: Write slim `docs/ARQUITETURA.md`**
 
 `docs/ARQUITETURA.md`:
+
 ```markdown
 # Arquitetura
 

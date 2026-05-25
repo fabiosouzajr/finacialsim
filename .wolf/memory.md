@@ -528,3 +528,11 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 13:26 | Phase 4 Task 12: Scheduler — TDD (test first, then impl), APScheduler installed, 2/2 tests pass, Windows SQLite lock fixed with engine.dispose(), committed 4864590 | app/services/scheduler.py, tests/unit/services/test_scheduler.py | scheduler service complete: _run_indicators_update (async), _run_backup (sync), start_scheduler (APScheduler cron wiring), stop_scheduler, time config from BusinessRuleRepository | ~400 tok |
+| 10:27 | Session end: 41 writes across 27 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 38 reads | ~54375 tok |
+| 10:28 | Session end: 41 writes across 27 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 38 reads | ~54375 tok |
+| 10:32 | Session end: 41 writes across 27 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 38 reads | ~54375 tok |
+
+## Session: 2026-05-25 10:57
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T13:22:42.070Z
-> Files: 28 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T13:25:59.618Z
+> Files: 31 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -46,6 +46,7 @@
 - `indicators_service.py` — IndicatorsService - fetch + cache BACEN indicators. (~471 tok)
 - `proposal_service.py` — ProposalService - builds Proposal record + snapshot JSON. PDF in Phase 6. (~1517 tok)
 - `rules_service.py` — RulesService - typed access to business_rules. (~500 tok)
+- `scheduler.py` — Scheduler - APScheduler wiring for background jobs (indicators + backup). (~746 tok)
 - `simulation_service.py` — SimulationService - orchestrates calculation + persistence. (~2482 tok)
 
 ## app/utils/
@@ -65,6 +66,7 @@
 
 ## tests/integration/
 
+- `test_full_flow.py` — test_complete_flow_user_client_sim_proposal (~853 tok)
 
 ## tests/unit/core/
 
@@ -93,6 +95,7 @@
 - `test_indicators_service.py` — FakeChain: fetch, session_factory, test_update_indicator_persists (~456 tok)
 - `test_proposal_service.py` — session, test_create_proposal_persists_snapshot, test_create_clientless_proposal (~829 tok)
 - `test_rules_service.py` — session, test_decimal_default_value_when_missing, test_bool_value, test_decimal_value (~383 tok)
+- `test_scheduler.py` — FakeChain: fetch, session_factory, test_run_indicators_update_fetches_all_codes, test_run_backup_cre (~505 tok)
 - `test_simulation_service.py` — session, test_run_simulation_persists_and_returns, test_run_simulation_with_extras_persists_extras_t (~1176 tok)
 
 ## tests/unit/utils/
