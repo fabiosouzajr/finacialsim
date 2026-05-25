@@ -22,7 +22,7 @@ cp "$ROOT/assets/icon.png" "$APPDIR/.DirIcon"
 # 4. AppRun
 cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh
-HERE=$(dirname $(readlink -f "$0"))
+HERE=$(dirname "$(readlink -f "$0")")
 exec "$HERE/usr/bin/FinacialSim" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"

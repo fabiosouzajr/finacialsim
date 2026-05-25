@@ -6,7 +6,7 @@ INSTALL_DIR="/opt/finacialsim"
 DESKTOP_FILE="$HOME/.local/share/applications/finacialsim.desktop"
 
 sudo mkdir -p "$INSTALL_DIR"
-sudo curl -L "$APPIMAGE_URL" -o "$INSTALL_DIR/FinacialSim.AppImage"
+sudo curl -fL "$APPIMAGE_URL" -o "$INSTALL_DIR/FinacialSim.AppImage"
 sudo chmod +x "$INSTALL_DIR/FinacialSim.AppImage"
 
 mkdir -p "$(dirname "$DESKTOP_FILE")"
@@ -15,7 +15,7 @@ cat > "$DESKTOP_FILE" <<EOF
 Name=FinacialSim
 Comment=Simulador de financiamento de veiculos
 Exec=$INSTALL_DIR/FinacialSim.AppImage
-Icon=$INSTALL_DIR/icon.png
+Icon=utilities-terminal
 Terminal=false
 Type=Application
 Categories=Office;Finance;
