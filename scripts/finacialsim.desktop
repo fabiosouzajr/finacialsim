@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=FinacialSim
+Comment=Simulador de financiamento de veiculos
+Exec=FinacialSim
+Icon=finacialsim
+Terminal=false
+Type=Application
+Categories=Office;Finance;
