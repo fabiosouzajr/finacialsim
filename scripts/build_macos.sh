@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DIST="$ROOT/dist"
 APP_NAME="FinacialSim.app"
+VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0.0")
 
 # 1. PyInstaller produces a folder; we wrap it into .app
 python "$ROOT/scripts/build_exe.py"
@@ -45,7 +46,7 @@ create-dmg \
   --window-size 600 400 \
   --app-drop-link 425 185 \
   --icon "$APP_NAME" 175 185 \
-  "$DIST/FinacialSim-1.0.0.dmg" \
+  "$DIST/FinacialSim-${VERSION}.dmg" \
   "$APP"
 
-echo "DMG at $DIST/FinacialSim-1.0.0.dmg"
+echo "DMG at $DIST/FinacialSim-${VERSION}.dmg"

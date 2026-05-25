@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -e .[dev]
+      - run: pip install -e ".[dev]"
       - run: pip install -e ".[build]"
       - name: Install GTK3 runtime
         run: choco install gtk-runtime -y
@@ -36,7 +36,7 @@ jobs:
       - run: pip install -e .[dev]
       - run: pip install -e ".[build]"
       - run: |
-          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
           sudo mv appimagetool /usr/local/bin/appimagetool-x86_64.AppImage
       - run: chmod +x scripts/build_appimage.sh && APPIMAGE_TOOL=/usr/local/bin/appimagetool-x86_64.AppImage scripts/build_appimage.sh
