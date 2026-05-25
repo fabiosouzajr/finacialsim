@@ -27,7 +27,7 @@ def build_apis_page(engine) -> None:
                 status.update()
                 svc = IndicatorsService(SessionLocal, chain)
                 today = date.today()
-                inicio = today - timedelta(days=30)
+                inicio = today - timedelta(days=90)
                 for cod in ["SELIC_META", "CDI", "IPCA", "TX_BACEN_VEIC"]:
                     await svc.update_indicator(cod, inicio, today)
                 status.text = "Indicadores atualizados"

@@ -700,6 +700,56 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-25T19:24:26.807Z"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-05-25T00:00:00.000Z",
+      "error_message": "IPVA e emplacamento só apareciam nas primeiras 12 parcelas; meses 13+ ficavam com R$ 0,00",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "Extra criado com valor_total=valor_anual e duracao_meses=12 (rateio_int). RATEIO_MESES distribui o valor apenas nas primeiras N parcelas e para. Para impostos anuais recorrentes o valor total deveria cobrir todos os anos do prazo.",
+      "fix": "Calcular num_anos=ceil(prazo/12) e passar valor_total=valor_anual*num_anos com duracao_meses=prazo_int. Removido campo rateio da UI (desnecessário).",
+      "tags": [
+        "custos-adicionais",
+        "ipva",
+        "emplacamento",
+        "rateio",
+        "simulacao"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T00:00:00.000Z"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-05-25T20:13:45.363Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "Had \"{format_pct(sim.cet_mes)} a.m.\"",
+      "fix": "Changed to \"{format_pct(sim.cet_mes)} a.m. / {format_pct(sim.",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-25T20:16:50.561Z"
+    },
+    {
+      "id": "bug-046",
+      "timestamp": "2026-05-25T20:23:29.235Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/ui/layout.py",
+      "root_cause": "Had \"APIs\"",
+      "fix": "Changed to \"Logs\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-25T20:23:29.235Z"
     }
   ]
 }

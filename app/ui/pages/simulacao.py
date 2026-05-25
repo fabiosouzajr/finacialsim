@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -67,8 +68,7 @@ def build_simulacao_page(engine) -> None:
                     with ui.expansion("Custos adicionais").classes("w-full"):
                         protecao = CurrencyInput("Proteção veicular (R$/mês)", Decimal("0"))
                         ipva_total = CurrencyInput("IPVA anual (R$)", Decimal("0"))
-                        empl_total = CurrencyInput("Emplacamento (R$ total)", Decimal("0"))
-                        rateio = ui.number(label="Rateio (meses)", value=12, min=1, max=72).classes("w-full")
+                        empl_total = CurrencyInput("Emplacamento anual (R$)", Decimal("0"))
 
                     # Date pickers side by side (popup style)
                     ui.label("Datas").classes(
@@ -113,9 +113,7 @@ def build_simulacao_page(engine) -> None:
                         with ui.element("div").classes("flex-1"):
                             card_parcela = KpiCard("Parcela financiamento", "R$ 0,00", compact=True)
                         with ui.element("div").classes("flex-1"):
-                            card_total_1ano = KpiCard("Total 1º ano", "R$ 0,00", compact=True)
-                        with ui.element("div").classes("flex-1"):
-                            card_total_apos = KpiCard("Total pós rateio", "R$ 0,00", compact=True)
+                            card_total_apos = KpiCard("Valor da parcela", "R$ 0,00", compact=True)
 
                     ui.label("Financiamento").classes("kpi-group-label mt-1")
                     with ui.row().classes("gap-2 w-full"):
@@ -144,19 +142,19 @@ def build_simulacao_page(engine) -> None:
 
                     extras = []
                     prazo_int = int(prazo.value or 48)
-                    rateio_int = int(rateio.value or 12)
+                    num_anos = math.ceil(prazo_int / 12)
                     if protecao.value > 0:
                         extras.append(Extra("protecao_veicular", "Plano de protecao",
                                             protecao.value, ExtraModalidade.MENSAL_CONTINUO,
                                             prazo_int, 1))
                     if ipva_total.value > 0:
-                        extras.append(Extra("ipva", "IPVA", ipva_total.value,
+                        extras.append(Extra("ipva", "IPVA", ipva_total.value * num_anos,
                                             ExtraModalidade.RATEIO_MESES,
-                                            rateio_int, 2))
+                                            prazo_int, 2))
                     if empl_total.value > 0:
-                        extras.append(Extra("emplacamento", "Emplacamento", empl_total.value,
+                        extras.append(Extra("emplacamento", "Emplacamento", empl_total.value * num_anos,
                                             ExtraModalidade.RATEIO_MESES,
-                                            rateio_int, 3))
+                                            prazo_int, 3))
 
                     sim = SimulationService(session).run_and_save(SimulationInputDTO(
                         criado_por=user_id, cliente_id=None, veiculo_id=v.id,
@@ -178,11 +176,14 @@ def build_simulacao_page(engine) -> None:
 
                 card_parcela.set(format_brl(sim.valor_parcela))
                 if rows:
-                    card_total_1ano.set(format_brl(rows[0].parcela_total))
                     last_idx = min(12, len(rows) - 1)
                     card_total_apos.set(format_brl(rows[last_idx].parcela_total))
                 card_financiado.set(format_brl(sim.valor_financiado))
-                card_total_pago.set(format_brl(sim.total_pago))
+                total_pago_cliente = (
+                    sum((Decimal(str(r.parcela_total)) for r in rows), start=Decimal("0"))
+                    + valor_entrada.value
+                )
+                card_total_pago.set(format_brl(total_pago_cliente))
                 card_cet.set(f"{format_pct(sim.cet_mes)} a.m.", f"{format_pct(sim.cet_ano)} a.a.")
 
                 juros = [Decimal(str(r.juros)) for r in rows]

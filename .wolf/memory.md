@@ -3,6 +3,8 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 00:00 | fix bug-044: IPVA/emplacamento só cobriam o 1º ano | app/ui/pages/simulacao.py | corrigido: num_anos=ceil(prazo/12), valor_total*=num_anos, duracao_meses=prazo_int, removido campo rateio | ~150 tok |
+
 | 00:00 | Fixed FIPE models bug: Parallelum v2 returns plain list for /models; data.get() raised AttributeError causing misleading BrasilAPI fallback error | app/integrations/fipe/parallelum.py | fixed | ~300 |
 
 | 10:00 | Fixed CI: quoted .[dev] on Windows runner, dynamic DMG version from git tag, pinned appimagetool to release 13 | .github/workflows/release.yml, scripts/build_macos.sh | committed e5f1e84 | ~800 |
@@ -715,3 +717,18 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 17:04 | Edited app/ui/pages/simulacao.py | added 1 import(s) | ~32 |
+| 17:04 | Edited app/ui/pages/simulacao.py | modified classes() | ~99 |
+| 17:04 | Edited app/ui/pages/simulacao.py | 15→15 lines | ~279 |
+| 17:09 | Edited app/ui/pages/simulacao.py | 2→6 lines | ~94 |
+| 17:13 | Edited app/ui/pages/simulacao.py | modified classes() | ~131 |
+| 17:13 | Edited app/ui/pages/simulacao.py | 5→4 lines | ~64 |
+| 17:13 | Edited app/ui/pages/simulacao.py | "{format_pct(sim.cet_mes)}" → "{format_pct(sim.cet_mes)}" | ~28 |
+| 17:16 | Edited app/ui/pages/simulacao.py | "{format_pct(sim.cet_mes)}" → "{format_pct(sim.cet_mes)}" | ~28 |
+| 17:20 | Edited app/integrations/bacen/sgs.py | modified isinstance() | ~315 |
+| 17:21 | Edited app/ui/pages/apis.py | 30 → 90 | ~15 |
+| 17:23 | Edited app/ui/layout.py | 3→2 lines | ~50 |
+| 17:23 | Created app/ui/pages/indicadores.py | — | ~640 |
+| 17:23 | Edited app/ui/pages/indicadores.py | 2→1 lines | ~11 |
+| 17:23 | Edited app/main.py | — | ~0 |
+| 17:24 | Edited app/main.py | — | ~0 |

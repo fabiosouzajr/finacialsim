@@ -10,7 +10,6 @@ from nicegui import ui
 
 from app.data.database import create_engine_for_sqlite
 from app.ui.pages.amortizacao import build_amortizacao_page
-from app.ui.pages.apis import build_apis_page
 from app.ui.pages.cadastro import build_cadastro_page
 from app.ui.pages.comparativo import build_comparativo_page
 from app.ui.pages.configuracoes import build_configuracoes_page
@@ -86,7 +85,6 @@ def build_app() -> None:
     build_indicadores_page(engine)
     build_fipe_page(engine)
     build_configuracoes_page(engine)
-    build_apis_page(engine)
     build_logs_page(engine)
     build_docs_page(engine)
 

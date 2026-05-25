@@ -19,7 +19,6 @@ TABS = [
     ("Indicadores",  "/indicadores",  {"vendedor", "gerente", "admin"}, "trending_up"),
     ("FIPE",         "/fipe",         {"vendedor", "gerente", "admin"}, "directions_car"),
     ("Configurações", "/configuracoes", {"admin"},                      "settings"),
-    ("APIs",         "/apis",         {"gerente", "admin"},             "cloud"),
     ("Logs",         "/logs",         {"gerente", "admin"},             "receipt_long"),
     ("Documentação", "/docs",         {"vendedor", "gerente", "admin"}, "menu_book"),
 ]

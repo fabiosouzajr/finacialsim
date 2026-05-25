@@ -52,6 +52,8 @@ class BcbSgsProvider:
         )
         try:
             raw = await get_json(url, self._client)
+            if not isinstance(raw, list):
+                return Err(f"unexpected_response: {type(raw).__name__}")
             points: list[IndicatorPoint] = []
             for entry in raw:
                 d_parts = entry["data"].split("/")
@@ -70,5 +72,5 @@ class BcbSgsProvider:
             return Ok(points)
         except httpx.HTTPError:
             raise  # tenacity retries this
-        except (KeyError, ValueError, IndexError) as e:
+        except (KeyError, ValueError, IndexError, TypeError) as e:
             return Err(f"parse_error: {e}")

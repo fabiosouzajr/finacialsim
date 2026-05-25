@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T19:45:57.985Z
-> Files: 10 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T20:24:05.249Z
+> Files: 13 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -17,7 +17,7 @@
 
 ## app/
 
-- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1052 tok)
+- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1030 tok)
 
 ## app/core/
 
@@ -36,6 +36,7 @@
 
 ## app/integrations/bacen/
 
+- `sgs.py` — BACEN SGS primary provider for SELIC, CDI, IPCA, Tx BACEN veículos. (~781 tok)
 
 ## app/integrations/fipe/
 
@@ -47,7 +48,7 @@
 
 ## app/ui/
 
-- `layout.py` — Common layout - sidebar + header. Used by all pages except /login. (~1150 tok)
+- `layout.py` — Common layout - sidebar + header. Used by all pages except /login. (~1127 tok)
 - `theme.py` — Cores, tipografia, espaçamentos da UI. (~1956 tok)
 
 ## app/ui/components/
@@ -56,8 +57,10 @@
 
 ## app/ui/pages/
 
+- `apis.py` — APIs page - provider health + manual refresh. (~358 tok)
 - `fipe.py` — FIPE vehicle price lookup page. (~1607 tok)
-- `simulacao.py` — Simulacao page - the central tab. (~3298 tok)
+- `indicadores.py` — Indicadores economicos page. (~635 tok)
+- `simulacao.py` — Simulacao page - the central tab. (~3264 tok)
 
 ## app/utils/
 
