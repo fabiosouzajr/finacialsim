@@ -133,8 +133,11 @@ def build_simulacao_page(engine) -> None:
                     return
                 from app.main import _platform_data_dir
                 from app.ui.pages._proposal_helper import generate_and_open_pdf
-                with SessionLocal() as session:
-                    generate_and_open_pdf(session, last_sim_id["id"], user_id, _platform_data_dir())
+                try:
+                    with SessionLocal() as session:
+                        generate_and_open_pdf(session, last_sim_id["id"], user_id, _platform_data_dir())
+                except Exception as exc:
+                    ui.notify(f"Erro ao gerar PDF: {exc}", type="negative")
 
             ui.button("Simular", on_click=simular).classes("mt-4")
             ui.button("Gerar PDF", on_click=gerar_pdf).classes("ml-2")

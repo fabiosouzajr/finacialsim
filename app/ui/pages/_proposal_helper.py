@@ -14,10 +14,11 @@ from app.services.proposal_service import ProposalService
 
 def generate_and_open_pdf(session, simulation_id: int, user_id: int,
                           data_dir: Path) -> Path | None:
-    proposal = ProposalService(session).create(simulation_id, gerado_por=user_id)
+    svc = ProposalService(session)
+    proposal = svc.create(simulation_id, gerado_por=user_id)
     out_dir = data_dir / "propostas"
     out_path = out_dir / f"{proposal.codigo}.pdf"
-    ProposalService(session).render_pdf(
+    svc.render_pdf(
         proposal.id, out_path,
         loja={"nome": "FinacialSim Loja"},
         vendedor={"nome": "Vendedor"},
