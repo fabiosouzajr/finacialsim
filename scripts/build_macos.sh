@@ -10,6 +10,7 @@ python "$ROOT/scripts/build_exe.py"
 
 # 2. Create .app structure
 APP="$DIST/$APP_NAME"
+trap 'rm -rf "$APP"' ERR
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Resources"
@@ -38,6 +39,7 @@ EOF
 codesign --deep --force --sign - "$APP"
 
 # 5. DMG (requires create-dmg: brew install create-dmg)
+command -v create-dmg >/dev/null 2>&1 || { echo "create-dmg not found. Install: brew install create-dmg"; exit 1; }
 create-dmg \
   --volname "FinacialSim Installer" \
   --window-size 600 400 \

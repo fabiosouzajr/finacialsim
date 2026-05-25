@@ -12,9 +12,10 @@ fi
 brew install pango gdk-pixbuf libffi
 
 TMP=$(mktemp -d)
+trap 'hdiutil detach /Volumes/FinacialSim 2>/dev/null; rm -rf "$TMP"' EXIT
 curl -fL "$DMG_URL" -o "$TMP/finacialsim.dmg"
 hdiutil attach "$TMP/finacialsim.dmg" -mountpoint /Volumes/FinacialSim
-cp -R "/Volumes/FinacialSim/FinacialSim.app" /Applications/
+sudo cp -R "/Volumes/FinacialSim/FinacialSim.app" /Applications/
 hdiutil detach /Volumes/FinacialSim
 rm -rf "$TMP"
 
