@@ -3,6 +3,10 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 2026-05-25 | fix: single ProposalService instance in _proposal_helper.py + try/except in gerar_pdf | app/ui/pages/_proposal_helper.py, app/ui/pages/simulacao.py | committed b6a871a, 117 tests pass | ~500 |
+
+| 15:00 | Task 1: add render_pdf to ProposalService, fix pct_juros in snapshot, fix test fixture engine.dispose() | app/services/proposal_service.py, tests/unit/services/test_proposal_render.py | PASS 1/1, committed b9dd8dd | ~3500 |
+
 | 2026-05-25 | Task 8: fix Proposal.cliente_id nullable, create ProposalService + tests | app/data/models.py, app/services/proposal_service.py, tests/unit/services/test_proposal_service.py | 2 tests pass, 44 total pass | ~800 tok |
 
 | 17:00 | Task 9: wrote test_factory.py, factory.py with build_fipe_chain + build_bacen_chain | app/integrations/factory.py, tests/unit/integrations/test_factory.py | 2 tests pass, committed 95b915e | ~900 |
@@ -543,3 +547,42 @@
 | 11:06 | Edited tests/unit/integrations/test_ui_smoke.py | 3→2 lines | ~22 |
 | 11:20 | Session end: 4 writes across 1 files (test_ui_smoke.py) | 10 reads | ~855 tok |
 | 11:21 | Session end: 4 writes across 1 files (test_ui_smoke.py) | 10 reads | ~855 tok |
+| 11:23 | Edited docs/superpowers/plans/2026-05-23-phase-5-ui.md | inline fix | ~2 |
+| 11:23 | Edited docs/superpowers/plans/2026-05-23-phase-5-ui.md | expanded (+11 lines) | ~211 |
+| 11:23 | Session end: 6 writes across 2 files (test_ui_smoke.py, 2026-05-23-phase-5-ui.md) | 11 reads | ~14723 tok |
+
+## Session: 2026-05-25 11:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-25 11:35
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-25 11:35
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:54 | Edited app/services/proposal_service.py | modified _format_cpf_cnpj() | ~1258 |
+| 11:54 | Edited app/services/proposal_service.py | 2→3 lines | ~52 |
+| 11:54 | Edited app/services/proposal_service.py | modified render_pdf() | ~379 |
+| 11:54 | Edited tests/unit/services/test_proposal_render.py | modified session() | ~90 |
+| 11:59 | Created app/ui/pages/_proposal_helper.py | — | ~326 |
+| 11:59 | Edited app/ui/pages/simulacao.py | modified content() | ~40 |
+| 11:59 | Edited app/ui/pages/simulacao.py | 8→9 lines | ~184 |
+| 11:59 | Edited app/ui/pages/simulacao.py | modified gerar_pdf() | ~174 |
+| 12:00 | Task 2: added _proposal_helper.py + Gerar PDF button to simulacao.py | app/ui/pages/_proposal_helper.py, app/ui/pages/simulacao.py | 117/117 tests pass, committed 4d16f06 | ~300 |
+| 12:04 | Edited app/ui/pages/_proposal_helper.py | 4→5 lines | ~58 |
+| 12:04 | Edited app/ui/pages/simulacao.py | modified gerar_pdf() | ~176 |
+| 12:06 | Created scripts/__init__.py | — | ~0 |
+| 12:06 | Created scripts/finacialsim.spec | — | ~338 |
+| 12:06 | Created scripts/build_exe.py | — | ~214 |
+| 12:07 | Edited .gitignore | 3→4 lines | ~13 |
+| 12:16 | Created scripts/finacialsim.spec | — | ~397 |
+| 12:16 | Edited scripts/build_exe.py | 1→2 lines | ~31 |
+| 12:16 | Edited pyproject.toml | 10→11 lines | ~63 |
+| 12:19 | Created scripts/installer.nsi | — | ~487 |
+
+| 15:30 | created NSIS Windows installer script with GTK3 runtime bundling | scripts/installer.nsi | done | ~150 |
