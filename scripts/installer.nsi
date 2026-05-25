@@ -30,7 +30,7 @@ Section "Install"
   Call CheckGTK
 
   SetOutPath "$INSTDIR"
-  File /r "..\dist\${APPDIR}\*.*"
+  File /r "..\dist\${APPDIR}\*"
 
   CreateDirectory "$SMPROGRAMS\${APPDIR}"
   CreateShortcut "$SMPROGRAMS\${APPDIR}\${APPNAME}.lnk" "$INSTDIR\FinacialSim.exe"
