@@ -28,6 +28,7 @@ MANIFEST
 
 # PyInstaller
 *.spec
+!scripts/*.spec
 *.manifest
 
 # Virtual environments
