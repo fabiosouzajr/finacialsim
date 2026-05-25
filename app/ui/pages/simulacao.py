@@ -35,6 +35,7 @@ def build_simulacao_page(engine) -> None:
     def page() -> None:
         def content() -> None:
             user_id = get_logged_user_id() or 0
+            last_sim_id: dict[str, int | None] = {"id": None}
 
             with ui.row().classes("w-full"):
                 with ui.column().classes("w-1/3"):
@@ -98,6 +99,7 @@ def build_simulacao_page(engine) -> None:
                         data_primeiro_venc=date.fromisoformat(data_venc.value),
                         incluir_iof=incluir_iof.value, tarifas=[], extras=extras,
                     ))
+                    last_sim_id["id"] = sim.id
 
                     from app.data.models import AmortizationRow
                     rows = (
@@ -125,6 +127,16 @@ def build_simulacao_page(engine) -> None:
                 chart_saldo.update_figure(saldo_devedor_chart(saldos))
                 chart_total.update_figure(parcela_total_chart(totals))
 
+            def gerar_pdf() -> None:
+                if last_sim_id["id"] is None:
+                    ui.notify("Simule antes de gerar PDF", type="warning")
+                    return
+                from app.main import _platform_data_dir
+                from app.ui.pages._proposal_helper import generate_and_open_pdf
+                with SessionLocal() as session:
+                    generate_and_open_pdf(session, last_sim_id["id"], user_id, _platform_data_dir())
+
             ui.button("Simular", on_click=simular).classes("mt-4")
+            ui.button("Gerar PDF", on_click=gerar_pdf).classes("ml-2")
 
         shell(content)
