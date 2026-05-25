@@ -4,6 +4,7 @@
 > Old sessions are consolidated by the daemon weekly.
 
 | 17:00 | Task 9: wrote test_factory.py, factory.py with build_fipe_chain + build_bacen_chain | app/integrations/factory.py, tests/unit/integrations/test_factory.py | 2 tests pass, committed 95b915e | ~900 |
+| 14:30 | Phase 4 Task 4: SimulationService - orchestration, validation, IOF, CET, extras, persistence | app/services/simulation_service.py, tests/unit/services/test_simulation_service.py | 3/3 tests pass, committed 99b4c8f | ~1800 |
 
 | 15:12 | Phase 3 Task 1: created integrations base infra | app/integrations/base.py, app/integrations/http.py, tests/unit/integrations/ | 3/3 tests pass, committed 477f917 | ~400 tok |
 | 15:25 | Phase 3 Task 3: FIPE BrasilAPI fallback provider (TDD) | app/integrations/fipe/brasilapi.py, tests/unit/integrations/fipe/test_brasilapi.py | 6/6 fipe tests pass, committed 18045e1 | ~350 tok |
@@ -434,3 +435,56 @@
 | 13:31 | Created tests/unit/integrations/test_factory.py | — | ~214 |
 | 13:32 | Created app/integrations/factory.py | — | ~432 |
 | 13:33 | Edited tests/unit/integrations/test_factory.py | modified session_factory() | ~86 |
+
+## Session: 2026-05-25 08:45
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:14 | Created docs/superpowers/plans/2026-05-23-phase-4-services.md | — | ~18404 |
+
+| 09:14 | Phase 4 plan grilled and rewritten with amendments | docs/superpowers/plans/2026-05-23-phase-4-services.md | 12 tasks (added scheduler Task 12), 5 design amendments applied | ~3000 tok |
+| 09:14 | Session end: 1 writes across 1 files (2026-05-23-phase-4-services.md) | 7 reads | ~19718 tok |
+
+## Session: 2026-05-25 09:35
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:58 | Created tests/unit/services/test_audit_service.py | — | ~313 |
+| 09:58 | Created tests/unit/services/__init__.py | — | ~0 |
+| 09:58 | Created app/services/__init__.py | — | ~0 |
+| 10:01 | Created app/services/audit_service.py | — | ~289 |
+| 10:02 | Edited app/services/audit_service.py | modified __init__() | ~296 |
+| 10:02 | Edited tests/unit/services/test_audit_service.py | modified session() | ~162 |
+| 10:02 | Edited tests/unit/services/test_audit_service.py | modified session() | ~170 |
+| 13:04 | Phase 4 Task 1: AuditService — TDD (test first, then impl), 2 tests pass, fixed datetime deprecation + engine.dispose() teardown, committed e187f3d | app/services/audit_service.py, tests/unit/services/test_audit_service.py | 2/2 tests pass | ~500 tok |
+| 10:05 | Created tests/unit/services/test_auth_service.py | — | ~478 |
+| 10:06 | Created app/services/auth_service.py | — | ~888 |
+| 10:06 | Edited app/services/auth_service.py | 12→12 lines | ~97 |
+| 10:06 | Edited app/services/auth_service.py | modified _check_lockout() | ~104 |
+| 10:06 | Edited app/services/auth_service.py | modified _record_failure() | ~36 |
+| 10:06 | Edited app/services/auth_service.py | modified login() | ~168 |
+| 10:07 | Edited tests/unit/services/test_auth_service.py | modified session() | ~90 |
+| 13:12 | Phase 4 Task 2: AuthService — TDD (test first, then impl), 4 tests pass, fixed utcnow deprecation + engine.dispose(), committed 0cee957 | app/services/auth_service.py, tests/unit/services/test_auth_service.py | 4/4 tests pass | ~600 tok |
+| 10:09 | Created tests/unit/utils/test_document_validation.py | — | ~129 |
+| 10:09 | Created app/utils/document_validation.py | — | ~303 |
+| 10:09 | Created app/utils/__init__.py | — | ~0 |
+| 10:09 | Created tests/unit/utils/__init__.py | — | ~0 |
+| 10:10 | Created tests/unit/utils/test_document_validation.py | — | ~129 |
+| 10:09 | Created app/utils/document_validation.py | — | ~303 |
+| 10:09 | Created app/utils/__init__.py | — | ~0 |
+| 10:09 | Created tests/unit/utils/__init__.py | — | ~0 |
+| 10:10 | Created tests/unit/services/test_client_service.py | — | ~327 |
+| 10:10 | Created app/services/client_service.py | — | ~736 |
+| 10:10 | Edited tests/unit/services/test_client_service.py | modified session() | ~90 |
+| 10:11 | Phase 4 Task 3: ClientService with CPF/CNPJ validation — TDD (test first, then impl), 6 tests pass, fixed engine.dispose() teardown for Windows, committed 8f549f6 | app/services/client_service.py, app/utils/document_validation.py, tests/unit/services/test_client_service.py, tests/unit/utils/test_document_validation.py | 6/6 tests pass | ~800 tok |
+| 10:14 | Created tests/unit/services/test_simulation_service.py | — | ~1169 |
+| 10:15 | Created app/services/simulation_service.py | — | ~2482 |
+| 10:15 | Edited tests/unit/services/test_simulation_service.py | modified session() | ~90 |
+| 10:18 | Created tests/unit/services/test_comparison_service.py | — | ~598 |
+| 10:18 | Created app/services/comparison_service.py | — | ~452 |
+| 10:18 | Session end: 26 writes across 13 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 21 reads | ~33969 tok |
+| 10:18 | Created tests/unit/services/test_amortization_service.py | — | ~533 |
+| 10:19 | Created app/services/amortization_service.py | — | ~841 |
+| 10:19 | Created tests/unit/services/test_indicators_service.py | — | ~456 |
+| 13:25 | Phase 4 Task 5: ComparisonService - TDD (test first, then impl) | app/services/comparison_service.py, tests/unit/services/test_comparison_service.py | 1/1 test pass, committed a77e7ca, verified existing tests still pass | ~450 tok |
+| 13:25 | Phase 4 Task 6: AmortizationService - TDD (test first, then impl), test written and service implemented | app/services/amortization_service.py, tests/unit/services/test_amortization_service.py | service created, awaiting test execution | ~800 tok |
