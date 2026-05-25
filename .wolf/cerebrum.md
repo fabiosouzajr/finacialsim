@@ -11,6 +11,8 @@
 ## Key Learnings
 
 - **Project:** finacialsim
+- **Windows SQLite test cleanup:** On Windows, temp databases remain locked after session ends. Always call `engine.dispose()` in test fixtures AFTER the session is closed to release the connection pool and allow directory cleanup.
+- **CPF/CNPJ validation:** Modulo-11 checks handle both CPF (11 digits) and CNPJ (14 digits). Algorithm: compute weighted sum, mod 11, then map 10→0. All-same-digit (11111111111, etc.) are always invalid.
 
 ## Do-Not-Repeat
 

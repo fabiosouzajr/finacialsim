@@ -11,6 +11,7 @@
 **Dependencies:** Phase 1 (for `Decimal`) + Phase 2 (for `fipe_cache` table and `IndicatorRepository`).
 
 **Design decisions from grill session:**
+
 - `@retry` with `retry_error_callback` on `fetch` (not on internal helpers); `httpx.HTTPError` re-raised for tenacity, logic errors return `Err` immediately without retry
 - Portuguese canonical `tipo` vocabulary (`"carro"`, `"moto"`, `"caminhao"`) at chain level; each provider translates internally via `TIPO_MAP`
 - Cache key absent fields use `""` not `None`; upsert (check-then-update) not blind `session.add()`
@@ -27,6 +28,7 @@
 ## Task 1: pytest.ini + `http.py` + `Result` + `Provider` + `ProviderChain`
 
 **Files:**
+
 - Modify: `pytest.ini`
 - Create: `app/integrations/__init__.py` (empty)
 - Create: `app/integrations/http.py`
@@ -81,6 +83,7 @@ def http_err_callback(retry_state) -> Err:
 - [ ] **Step 3: Write failing test**
 
 `tests/unit/integrations/test_base.py`:
+
 ```python
 import pytest
 
@@ -226,6 +229,7 @@ git commit -m "feat(integrations): Provider protocol + Result + ProviderChain + 
 ## Task 2: FIPE `VehicleQuote` schema + Parallelum provider
 
 **Files:**
+
 - Create: `app/integrations/fipe/__init__.py` (empty)
 - Create: `app/integrations/fipe/schema.py`
 - Create: `app/integrations/fipe/parallelum.py`
@@ -235,6 +239,7 @@ git commit -m "feat(integrations): Provider protocol + Result + ProviderChain + 
 - [ ] **Step 1: Write failing test**
 
 `tests/unit/integrations/fipe/test_parallelum.py`:
+
 ```python
 from decimal import Decimal
 
@@ -303,6 +308,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Write `schema.py`**
 
 `app/integrations/fipe/schema.py`:
+
 ```python
 """FIPE normalized schemas."""
 
@@ -338,6 +344,7 @@ def parse_brl_price(text: str) -> Decimal:
 - [ ] **Step 4: Write `parallelum.py`**
 
 `app/integrations/fipe/parallelum.py`:
+
 ```python
 """FIPE Parallelum primary provider."""
 
@@ -440,12 +447,14 @@ git commit -m "feat(integrations): FIPE Parallelum provider + normalized schema"
 ## Task 3: FIPE BrasilAPI fallback provider
 
 **Files:**
+
 - Create: `app/integrations/fipe/brasilapi.py`
 - Create: `tests/unit/integrations/fipe/test_brasilapi.py`
 
 - [ ] **Step 1: Write failing test**
 
 `tests/unit/integrations/fipe/test_brasilapi.py`:
+
 ```python
 from decimal import Decimal
 
@@ -508,6 +517,7 @@ Expected: FAIL.
 - [ ] **Step 3: Write `brasilapi.py`**
 
 `app/integrations/fipe/brasilapi.py`:
+
 ```python
 """FIPE BrasilAPI fallback provider."""
 
@@ -594,6 +604,7 @@ git commit -m "feat(integrations): FIPE BrasilAPI fallback provider"
 ## Task 4: Migration — add `acao` column to `FipeCache`
 
 **Files:**
+
 - Modify: `app/data/models.py`
 - Create: `app/data/migrations/versions/YYYYMMDD_XXXX_add_fipe_cache_acao.py`
 
@@ -624,6 +635,7 @@ class FipeCache(Base):
 Run: `alembic revision --autogenerate -m "add fipe_cache acao column"`
 
 Then verify the generated migration contains:
+
 - `op.add_column("fipe_cache", sa.Column("acao", sa.String(40), nullable=False, server_default=""))`
 - drop + recreate of `uq_fipe_cache_query` with new column list
 
@@ -673,6 +685,7 @@ git commit -m "feat(data): add acao column to fipe_cache + update unique constra
 ## Task 5: FIPE manual provider + FIPE cache layer
 
 **Files:**
+
 - Create: `app/integrations/fipe/manual.py`
 - Create: `app/integrations/fipe/cache.py`
 - Create: `tests/unit/integrations/fipe/test_manual.py`
@@ -681,6 +694,7 @@ git commit -m "feat(data): add acao column to fipe_cache + update unique constra
 - [ ] **Step 1: Write `manual.py`**
 
 `app/integrations/fipe/manual.py`:
+
 ```python
 """Manual FIPE provider — constructs a VehicleQuote from operator-supplied input."""
 
@@ -729,6 +743,7 @@ class ManualFipeProvider:
 - [ ] **Step 2: Write test for manual**
 
 `tests/unit/integrations/fipe/test_manual.py`:
+
 ```python
 from decimal import Decimal
 
@@ -771,6 +786,7 @@ async def test_manual_non_price_action_returns_err():
 - [ ] **Step 3: Write `cache.py`**
 
 `app/integrations/fipe/cache.py`:
+
 ```python
 """Cache layer for FIPE providers using the fipe_cache table."""
 
@@ -896,6 +912,7 @@ class CachedFipeProvider:
 - [ ] **Step 4: Write test for cache**
 
 `tests/unit/integrations/fipe/test_cache.py`:
+
 ```python
 import tempfile
 from decimal import Decimal
@@ -981,6 +998,7 @@ git commit -m "feat(integrations): FIPE manual provider + cache layer (acao key,
 ## Task 6: BACEN `IndicatorPoint` schema + SGS provider
 
 **Files:**
+
 - Create: `app/integrations/bacen/__init__.py` (empty)
 - Create: `app/integrations/bacen/schema.py`
 - Create: `app/integrations/bacen/sgs.py`
@@ -990,6 +1008,7 @@ git commit -m "feat(integrations): FIPE manual provider + cache layer (acao key,
 - [ ] **Step 1: Write failing test**
 
 `tests/unit/integrations/bacen/test_sgs.py`:
+
 ```python
 from datetime import date
 from decimal import Decimal
@@ -1050,6 +1069,7 @@ Expected: FAIL.
 - [ ] **Step 3: Write `schema.py`**
 
 `app/integrations/bacen/schema.py`:
+
 ```python
 """BACEN normalized indicator schema."""
 
@@ -1076,6 +1096,7 @@ class IndicatorPoint:
 - [ ] **Step 4: Write `sgs.py`**
 
 `app/integrations/bacen/sgs.py`:
+
 ```python
 """BACEN SGS primary provider for SELIC, CDI, IPCA, Tx BACEN veículos."""
 
@@ -1170,6 +1191,7 @@ git commit -m "feat(integrations): BACEN SGS provider with normalization"
 ## Task 7: BACEN BrasilAPI fallback + conversions
 
 **Files:**
+
 - Create: `app/integrations/bacen/brasilapi.py`
 - Create: `app/integrations/bacen/conversions.py`
 - Create: `tests/unit/integrations/bacen/test_brasilapi.py`
@@ -1178,6 +1200,7 @@ git commit -m "feat(integrations): BACEN SGS provider with normalization"
 - [ ] **Step 1: Write `conversions.py`**
 
 `app/integrations/bacen/conversions.py`:
+
 ```python
 """Conversions between rate periodicities."""
 
@@ -1209,6 +1232,7 @@ def diaria_252_para_mensal(taxa_diaria: Decimal) -> Decimal:
 - [ ] **Step 2: Write `brasilapi.py`**
 
 `app/integrations/bacen/brasilapi.py`:
+
 ```python
 """BACEN fallback — BrasilAPI rates endpoint (single latest value)."""
 
@@ -1269,6 +1293,7 @@ class BrasilApiBacenProvider:
 - [ ] **Step 3: Write tests**
 
 `tests/unit/integrations/bacen/test_conversions.py`:
+
 ```python
 from decimal import Decimal
 
@@ -1288,6 +1313,7 @@ def test_one_pct_mensal_approx_12_68_pct_anual():
 ```
 
 `tests/unit/integrations/bacen/test_brasilapi.py`:
+
 ```python
 from decimal import Decimal
 
@@ -1333,12 +1359,15 @@ git commit -m "feat(integrations): BACEN BrasilAPI fallback + conversions"
 ## Task 8: BACEN cache with TTL read-through
 
 **Files:**
+
 - Create: `app/integrations/bacen/cached.py`
+
 - Create: `tests/unit/integrations/bacen/test_cached.py`
 
 - [ ] **Step 1: Write `cached.py`**
 
 `app/integrations/bacen/cached.py`:
+
 ```python
 """BACEN cache — persists fetched points to indicators_history; read-through with TTL."""
 
@@ -1421,6 +1450,7 @@ class CachedBacenProvider:
 - [ ] **Step 2: Write test**
 
 `tests/unit/integrations/bacen/test_cached.py`:
+
 ```python
 import tempfile
 from datetime import date
@@ -1500,12 +1530,14 @@ git commit -m "feat(integrations): BACEN cache layer (TTL read-through + write-t
 ## Task 9: Chain composition helpers
 
 **Files:**
+
 - Create: `app/integrations/factory.py`
 - Create: `tests/unit/integrations/test_factory.py`
 
 - [ ] **Step 1: Write failing test**
 
 `tests/unit/integrations/test_factory.py`:
+
 ```python
 import tempfile
 from pathlib import Path
@@ -1537,6 +1569,7 @@ def test_build_bacen_chain_has_two_providers(session_factory):
 - [ ] **Step 2: Write `factory.py`**
 
 `app/integrations/factory.py`:
+
 ```python
 """Composition helpers — build default provider chains."""
 
@@ -1596,11 +1629,13 @@ git commit -m "feat(integrations): default chains factory (FIPE + BACEN)"
 ## Task 10: Integration smoke tests (real HTTP — marked slow)
 
 **Files:**
+
 - Create: `tests/integration/test_providers_live.py`
 
 - [ ] **Step 1: Write live tests**
 
 `tests/integration/test_providers_live.py`:
+
 ```python
 """Smoke tests against real APIs. Disabled by default; run with -m slow."""
 

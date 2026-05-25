@@ -21,7 +21,7 @@
 
 ## Phase order & dependencies
 
-```
+```text
 Phase 1 (Core)  ──┬──► Phase 2 (Data)  ──┐
                   │                       ├──► Phase 4 (Services) ──► Phase 5 (UI) ──► Phase 6 (PDF/Pkg)
                   └──► Phase 3 (Integ.) ──┘
@@ -34,7 +34,7 @@ Phase 1 (Core)  ──┬──► Phase 2 (Data)  ──┐
 ## Phase summary
 
 | # | File | Focus | Tasks |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | [`2026-05-23-phase-1-core.md`](2026-05-23-phase-1-core.md) | Pure financial domain (Decimal, Tabela Price, IOF, CET, extras, validators) | 16 |
 | 2 | [`2026-05-23-phase-2-data.md`](2026-05-23-phase-2-data.md) | SQLAlchemy models, Alembic migrations, repositories, backup | 10 |
 | 3 | [`2026-05-23-phase-3-integrations.md`](2026-05-23-phase-3-integrations.md) | ProviderChain, FIPE (Parallelum + BrasilAPI), BACEN SGS | 9 |

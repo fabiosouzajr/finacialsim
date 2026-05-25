@@ -174,7 +174,7 @@ class Proposal(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     codigo: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
     simulation_id: Mapped[int] = mapped_column(ForeignKey("simulations.id"), nullable=False)
-    cliente_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
+    cliente_id: Mapped[int | None] = mapped_column(ForeignKey("clients.id"), nullable=True)
     gerado_por: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     snapshot_json: Mapped[str] = mapped_column(String, nullable=False)
     pdf_path: Mapped[str | None] = mapped_column(String, nullable=True)

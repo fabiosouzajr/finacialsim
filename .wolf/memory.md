@@ -487,4 +487,21 @@
 | 10:19 | Created app/services/amortization_service.py | — | ~841 |
 | 10:19 | Created tests/unit/services/test_indicators_service.py | — | ~456 |
 | 13:25 | Phase 4 Task 5: ComparisonService - TDD (test first, then impl) | app/services/comparison_service.py, tests/unit/services/test_comparison_service.py | 1/1 test pass, committed a77e7ca, verified existing tests still pass | ~450 tok |
-| 13:25 | Phase 4 Task 6: AmortizationService - TDD (test first, then impl), test written and service implemented | app/services/amortization_service.py, tests/unit/services/test_amortization_service.py | service created, awaiting test execution | ~800 tok |
+| 13:25 | Phase 4 Task 6: AmortizationService - TDD (test first, then impl), committed 70afeef | app/services/amortization_service.py, tests/unit/services/test_amortization_service.py | service created with _load_schedule() + apply(), test verifies partial quitacao reduces pmt | ~800 tok |
+| 10:19 | Session end: 29 writes across 16 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 24 reads | ~36640 tok |
+| 10:20 | Phase 4 Task 7: IndicatorsService - TDD (test first, then impl), committed 7a28c26 | app/services/indicators_service.py, tests/unit/services/test_indicators_service.py | 1/1 test pass, 14/14 service tests pass | ~700 tok |
+| 13:30 | Task 6 VERIFICATION: AmortizationService spec review ✅ APPROVED | all 4 requirements verified | ExtraPaymentDTO (data/valor/modo), apply() loads schedule + applies extras + persists + audits, test_apply_partial_quitacao_reduces_pmt PASSING (1/1), commit 70afeef contains "AmortizationService" | ~200 tok |
+| 10:22 | Edited app/data/models.py | inline fix | ~26 |
+| 10:22 | Created tests/unit/services/test_proposal_service.py | — | ~829 |
+| 10:22 | Session end: 32 writes across 19 files (test_audit_service.py, __init__.py, audit_service.py, test_auth_service.py, auth_service.py) | 29 reads | ~40476 tok |
+| 10:22 | Created tests/unit/services/test_rules_service.py | — | ~383 |
+| 10:22 | Created tests/unit/services/test_backup_service.py | — | ~180 |
+| 10:22 | Created app/services/rules_service.py | — | ~500 |
+| 10:22 | Created app/services/backup_service.py | — | ~220 |
+| 10:22 | Created app/services/proposal_service.py | — | ~1517 |
+
+## Session: 2026-05-25 Task 9 (RulesService)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:55 | Phase 4 Task 9: RulesService — TDD (test first, then impl), 3 tests pass, RulesService provides typed accessors (get_decimal, get_bool, get_int, get_json, set) with audit logging | app/services/rules_service.py, tests/unit/services/test_rules_service.py | 3/3 tests pass, fixture includes engine.dispose() for Windows cleanup | ~600 tok |

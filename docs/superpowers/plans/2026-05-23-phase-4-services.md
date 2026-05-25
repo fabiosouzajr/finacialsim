@@ -10,6 +10,8 @@
 
 **Dependencies:** Phases 1, 2, 3 complete.
 
+**Login UX contract:** The UI presents a name picker (`AuthService.list_users()`) then a PIN entry. `login(user_id, pin)` takes the selected user's id — not a username string. First-login PIN change enforcement is deferred to Phase 5 (detect `ultimo_login is None` in UI).
+
 ---
 
 ## Task 1: `AuditService` and audit decorator
@@ -126,7 +128,7 @@ git commit -m "feat(services): AuditService"
 
 ---
 
-## Task 2: `AuthService` — login, lockout, PIN change
+## Task 2: `AuthService` — login, lockout, PIN change, user list
 
 **Files:**
 - Create: `app/services/auth_service.py`
@@ -175,6 +177,17 @@ def test_change_pin_works_with_old_pin(session):
     u = svc.create_user(nome="A", pin="111111", perfil="vendedor")
     svc.change_pin(user_id=u.id, old_pin="111111", new_pin="222222")
     svc.login(user_id=u.id, pin="222222")  # should not raise
+
+
+def test_list_users_returns_active_only(session):
+    svc = AuthService(session)
+    svc.create_user(nome="Ativo", pin="123456", perfil="vendedor")
+    u2 = svc.create_user(nome="Inativo", pin="123456", perfil="vendedor")
+    from app.data.repositories import UserRepository
+    UserRepository(session).deactivate(u2.id)
+    users = svc.list_users()
+    assert len(users) == 1
+    assert users[0].nome == "Ativo"
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -208,7 +221,7 @@ _LOCKOUT_ATTEMPTS = 5
 _LOCKOUT_MINUTES = 5
 
 # In-memory failed-attempts tracker (process-local).
-# For multi-process deployments, move to DB; single PC is fine.
+# Resets on restart — acceptable for single-PC kiosk threat model.
 _failed: dict[int, list[datetime]] = {}
 
 
@@ -242,6 +255,9 @@ class AuthService:
         self.session = session
         self.users = UserRepository(session)
         self.audit = AuditService(session)
+
+    def list_users(self) -> list[User]:
+        return self.users.list_active()
 
     def create_user(self, nome: str, pin: str, perfil: str) -> User:
         if perfil not in {"vendedor", "gerente", "admin"}:
@@ -279,13 +295,13 @@ class AuthService:
 - [ ] **Step 4: Run tests**
 
 Run: `pytest tests/unit/services/test_auth_service.py -v`
-Expected: 3 tests PASS.
+Expected: 4 tests PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add app/services/auth_service.py tests/unit/services/test_auth_service.py
-git commit -m "feat(services): AuthService with bcrypt PIN and lockout"
+git commit -m "feat(services): AuthService with bcrypt PIN, lockout, and list_users"
 ```
 
 ---
@@ -539,6 +555,7 @@ from app.services.auth_service import AuthService
 from app.services.simulation_service import (
     SimulationInputDTO,
     SimulationService,
+    SimulationServiceError,
 )
 
 
@@ -620,6 +637,24 @@ def test_run_simulation_with_extras_persists_extras_total(session):
     rows = session.query(AmortizationRow).filter_by(simulation_id=sim.id).order_by(AmortizationRow.numero_parcela).all()
     assert rows[0].extras_total == Decimal("100.0000")
     assert rows[12].extras_total == Decimal("0.0000")
+
+
+def test_validation_error_raises_simulation_service_error(session):
+    user = AuthService(session).create_user("vendedor", "123456", "vendedor")
+    v = _make_vehicle(session)
+    svc = SimulationService(session)
+    with pytest.raises(SimulationServiceError) as exc_info:
+        svc.run_and_save(
+            SimulationInputDTO(
+                criado_por=user.id, cliente_id=None, veiculo_id=v.id,
+                valor_veiculo=Decimal("50000"),
+                valor_entrada=Decimal("100"),   # below 10% minimum
+                prazo_meses=24, taxa_mensal=Decimal("0.015"),
+                data_liberacao=date(2026, 1, 1), data_primeiro_venc=date(2026, 1, 31),
+                incluir_iof=False, tarifas=[], extras=[],
+            )
+        )
+    assert exc_info.value.issues
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -646,6 +681,12 @@ from app.core.cet import compute_cet
 from app.core.extras import Extra, compute_extras_per_parcela
 from app.core.iof import IofConfig, compute_financed_amount_with_iof
 from app.core.money import quantize_brl
+from app.core.validators import (
+    ValidationLevel,
+    ValidationRules,
+    SimulationInput,
+    validate_simulation,
+)
 from app.data.models import (
     AmortizationRow,
     BusinessRule,
@@ -655,6 +696,12 @@ from app.data.models import (
     User,
 )
 from app.services.audit_service import AuditService
+
+
+class SimulationServiceError(Exception):
+    def __init__(self, issues: list) -> None:
+        self.issues = issues
+        super().__init__(str([i.message for i in issues]))
 
 
 @dataclass
@@ -706,10 +753,32 @@ class SimulationService:
         self.audit = AuditService(session)
 
     def run_and_save(self, dto: SimulationInputDTO) -> Simulation:
-        # 1. Compute carencia
+        # 1. Carencia
         dias_carencia = (dto.data_primeiro_venc - dto.data_liberacao).days
 
-        # 2. PV inicial = veiculo - entrada + tarifas incluidas no principal
+        # 2. Validate against business rules (ERROR-level blocks; WARNING passes)
+        rules = ValidationRules(
+            entrada_minima_pct=_get_decimal_rule(self.session, "entrada_minima_pct", Decimal("0.10")),
+            prazo_minimo_meses=_get_int_rule(self.session, "prazo_minimo_meses", 12),
+            prazo_maximo_meses=_get_int_rule(self.session, "prazo_maximo_meses", 72),
+            taxa_minima_mes=_get_decimal_rule(self.session, "taxa_minima_mes", Decimal("0.005")),
+            taxa_maxima_mes=_get_decimal_rule(self.session, "taxa_maxima_mes", Decimal("0.05")),
+            dias_max_carencia=_get_int_rule(self.session, "dias_max_carencia", 90),
+            valor_minimo_financiado=_get_decimal_rule(self.session, "valor_minimo_financiado", Decimal("5000")),
+        )
+        sim_input = SimulationInput(
+            valor_veiculo=dto.valor_veiculo,
+            valor_entrada=dto.valor_entrada,
+            prazo_meses=dto.prazo_meses,
+            taxa_mensal=dto.taxa_mensal,
+            dias_carencia=dias_carencia,
+        )
+        issues = validate_simulation(sim_input, rules)
+        errors = [i for i in issues if i.level == ValidationLevel.ERROR]
+        if errors:
+            raise SimulationServiceError(errors)
+
+        # 3. PV inicial = veiculo - entrada + tarifas incluidas no principal
         tarifas_no_principal = sum(
             (t.valor for t in dto.tarifas if t.incluir_no_principal),
             start=Decimal("0"),
@@ -717,14 +786,14 @@ class SimulationService:
         tarifas_total = sum((t.valor for t in dto.tarifas), start=Decimal("0"))
         pv_inicial = dto.valor_veiculo - dto.valor_entrada + tarifas_no_principal
 
-        # 3. IOF config from business_rules
+        # 4. IOF config from business_rules
         iof_config = IofConfig(
             fixo_pct=_get_decimal_rule(self.session, "iof_fixo_pct", Decimal("0.0038")),
             diario_pct=_get_decimal_rule(self.session, "iof_diario_pct", Decimal("0.000082")),
             max_dias=_get_int_rule(self.session, "iof_diario_max_dias", 365),
         )
 
-        # 4. Run core calculation
+        # 5. Run core calculation
         financed = compute_financed_amount_with_iof(
             pv_inicial=pv_inicial,
             taxa_mensal=dto.taxa_mensal,
@@ -735,18 +804,18 @@ class SimulationService:
             incluir_iof=dto.incluir_iof,
         )
 
-        # 5. CET
+        # 6. CET
         cet = compute_cet(
             valor_liberado=dto.valor_veiculo - dto.valor_entrada,
             schedule=financed.schedule,
             data_liberacao=dto.data_liberacao,
         )
 
-        # 6. Extras
+        # 7. Extras
         extras_per_parcela = compute_extras_per_parcela(dto.extras, dto.prazo_meses)
         extras_total_acumulado = quantize_brl(sum(extras_per_parcela, start=Decimal("0")))
 
-        # 7. Persist
+        # 8. Persist
         codigo = _next_codigo(self.session, "SIM")
         pct_entrada = (dto.valor_entrada / dto.valor_veiculo).quantize(Decimal("0.0001"))
         taxa_anual = ((Decimal("1") + dto.taxa_mensal) ** 12 - Decimal("1")).quantize(Decimal("0.00000001"))
@@ -754,7 +823,6 @@ class SimulationService:
         total_juros = quantize_brl(sum((r.juros for r in financed.schedule.rows), start=Decimal("0")))
         pct_juros = (total_juros / dto.valor_veiculo).quantize(Decimal("0.0001"))
 
-        # Rules snapshot
         rules_snapshot = {
             r.chave: r.valor_json for r in self.session.query(BusinessRule).all()
         }
@@ -790,14 +858,14 @@ class SimulationService:
         self.session.add(sim)
         self.session.commit()
 
-        # 8. Persist tarifas
+        # 9. Persist tarifas
         for t in dto.tarifas:
             self.session.add(SimulationFee(
                 simulation_id=sim.id, nome=t.nome, valor=t.valor,
                 incluir_no_principal=t.incluir_no_principal,
             ))
 
-        # 9. Persist extras
+        # 10. Persist extras
         for e in dto.extras:
             self.session.add(SimulationExtra(
                 simulation_id=sim.id,
@@ -808,7 +876,7 @@ class SimulationService:
                 ordem=e.ordem,
             ))
 
-        # 10. Persist amortization rows
+        # 11. Persist amortization rows
         for idx, row in enumerate(financed.schedule.rows):
             extras_total = extras_per_parcela[idx] if idx < len(extras_per_parcela) else Decimal("0")
             self.session.add(AmortizationRow(
@@ -837,13 +905,13 @@ class SimulationService:
 - [ ] **Step 4: Run tests**
 
 Run: `pytest tests/unit/services/test_simulation_service.py -v`
-Expected: 2 tests PASS.
+Expected: 3 tests PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add app/services/simulation_service.py tests/unit/services/test_simulation_service.py
-git commit -m "feat(services): SimulationService - run, IOF, extras, persistence"
+git commit -m "feat(services): SimulationService - run, validation, IOF, extras, persistence"
 ```
 
 ---
@@ -853,6 +921,8 @@ git commit -m "feat(services): SimulationService - run, IOF, extras, persistence
 **Files:**
 - Create: `app/services/comparison_service.py`
 - Create: `tests/unit/services/test_comparison_service.py`
+
+**Design note:** `diff()` is a read-only calculation the UI can call freely (e.g., while browsing). `save()` is a separate explicit action. They are intentionally independent.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -988,6 +1058,8 @@ git commit -m "feat(services): ComparisonService"
 **Files:**
 - Create: `app/services/amortization_service.py`
 - Create: `tests/unit/services/test_amortization_service.py`
+
+**Design note:** Simulations are immutable — the original record is never updated after creation. `ExtraordinaryAmortization` rows are annotations on top. The UI reconstructs the current state by calling `apply()` with all recorded payments.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1129,7 +1201,6 @@ class AmortizationService:
             data_liberacao=sim.data_liberacao,
         )
 
-        # Persist ExtraordinaryAmortization records
         for p in pagamentos:
             self.session.add(ExtraordinaryAmortization(
                 simulation_id=simulation_id,
@@ -1292,6 +1363,8 @@ git commit -m "feat(services): IndicatorsService - update + latest"
 - Create: `app/services/proposal_service.py`
 - Create: `tests/unit/services/test_proposal_service.py`
 
+**Design note:** Clientless proposals are allowed (walk-in quotes). When `sim.cliente_id is None`, the snapshot contains `"cliente": null`. A `Proposal` becomes a formal document once a client is attached in Phase 5 UI.
+
 - [ ] **Step 1: Write the failing test**
 
 `tests/unit/services/test_proposal_service.py`:
@@ -1343,6 +1416,26 @@ def test_create_proposal_persists_snapshot(session):
     snap = json.loads(proposal.snapshot_json)
     assert snap["simulation"]["codigo"] == sim.codigo
     assert snap["simulation"]["valor_parcela"] is not None
+    assert snap["cliente"]["nome"] == "Maria"
+
+
+def test_create_clientless_proposal(session):
+    user = AuthService(session).create_user("vendedor", "123456", "vendedor")
+    from app.data.models import Vehicle
+    v = Vehicle(fonte="manual", tipo="carro", marca="F", modelo="M",
+                ano_modelo=2024, combustivel="G", valor_referencia=Decimal("50000"))
+    session.add(v); session.commit()
+    sim = SimulationService(session).run_and_save(SimulationInputDTO(
+        criado_por=user.id, cliente_id=None, veiculo_id=v.id,
+        valor_veiculo=Decimal("50000"), valor_entrada=Decimal("10000"),
+        prazo_meses=24, taxa_mensal=Decimal("0.015"),
+        data_liberacao=date(2026, 1, 1), data_primeiro_venc=date(2026, 1, 31),
+        incluir_iof=False, tarifas=[], extras=[],
+    ))
+
+    proposal = ProposalService(session).create(sim.id, gerado_por=user.id)
+    snap = json.loads(proposal.snapshot_json)
+    assert snap["cliente"] is None
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1395,10 +1488,8 @@ class ProposalService:
         sim = self.session.get(Simulation, simulation_id)
         if sim is None:
             raise ValueError("simulation not found")
-        if sim.cliente_id is None:
-            raise ValueError("proposal requires a client linked to the simulation")
 
-        cliente = self.session.get(Client, sim.cliente_id)
+        cliente = self.session.get(Client, sim.cliente_id) if sim.cliente_id is not None else None
         veiculo = self.session.get(Vehicle, sim.veiculo_id)
         fees = self.session.query(SimulationFee).filter_by(simulation_id=sim.id).all()
         extras = self.session.query(SimulationExtra).filter_by(simulation_id=sim.id).order_by(SimulationExtra.ordem).all()
@@ -1408,6 +1499,14 @@ class ProposalService:
             .order_by(AmortizationRow.numero_parcela)
             .all()
         )
+
+        cliente_snap = None
+        if cliente is not None:
+            cliente_snap = {
+                "nome": cliente.nome, "cpf_cnpj": cliente.cpf_cnpj, "tipo": cliente.tipo,
+                "telefone": cliente.telefone, "email": cliente.email,
+                "endereco_json": cliente.endereco_json,
+            }
 
         snapshot = {
             "simulation": {
@@ -1431,11 +1530,7 @@ class ProposalService:
                 "cet_mes": _decimal_to_str(sim.cet_mes),
                 "cet_ano": _decimal_to_str(sim.cet_ano),
             },
-            "cliente": {
-                "nome": cliente.nome, "cpf_cnpj": cliente.cpf_cnpj, "tipo": cliente.tipo,
-                "telefone": cliente.telefone, "email": cliente.email,
-                "endereco_json": cliente.endereco_json,
-            },
+            "cliente": cliente_snap,
             "veiculo": {
                 "marca": veiculo.marca, "modelo": veiculo.modelo,
                 "ano_modelo": veiculo.ano_modelo, "combustivel": veiculo.combustivel,
@@ -1468,7 +1563,7 @@ class ProposalService:
         proposal = Proposal(
             codigo=_next_codigo(self.session),
             simulation_id=sim.id,
-            cliente_id=cliente.id,
+            cliente_id=cliente.id if cliente else None,
             gerado_por=gerado_por,
             snapshot_json=json.dumps(snapshot),
             pdf_path=None,
@@ -1486,13 +1581,13 @@ class ProposalService:
 - [ ] **Step 4: Run tests**
 
 Run: `pytest tests/unit/services/test_proposal_service.py -v`
-Expected: PASS.
+Expected: 2 tests PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add app/services/proposal_service.py tests/unit/services/test_proposal_service.py
-git commit -m "feat(services): ProposalService with snapshot JSON (PDF in phase 6)"
+git commit -m "feat(services): ProposalService with snapshot JSON, clientless support"
 ```
 
 ---
@@ -1795,6 +1890,7 @@ def test_complete_flow_user_client_sim_proposal():
             snap = json.loads(proposal.snapshot_json)
             assert len(snap["cronograma"]) == 48
             assert len(snap["extras"]) == 2
+            assert snap["cliente"]["nome"] == "Maria"
 ```
 
 - [ ] **Step 2: Run test**
@@ -1822,11 +1918,201 @@ git commit -m "test(services): full end-to-end flow integration test"
 
 ---
 
+## Task 12: `scheduler.py` — background jobs (indicators + backup)
+
+**Files:**
+- Create: `app/services/scheduler.py`
+- Create: `tests/unit/services/test_scheduler.py`
+
+**Design decisions:**
+- APScheduler `BackgroundScheduler` (sync); async indicator job wrapped with `asyncio.run()` in a background thread (safe since NiceGUI's event loop runs in the main thread).
+- Job times read from `business_rules` at startup only. Dynamic rescheduling deferred to Phase 5.
+- BACEN codes hardcoded: `SELIC_META`, `CDI`, `IPCA`, `TX_BACEN_VEICULOS`.
+- Date range for indicators: yesterday → today.
+- `_run_indicators_update` and `_run_backup` are module-level functions — testable without APScheduler.
+- `# TODO(Phase 5): centralize db_path/backup_dir in app/config.py`
+
+- [ ] **Step 1: Write the failing test**
+
+`tests/unit/services/test_scheduler.py`:
+```python
+import tempfile
+from datetime import date
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+from app.data.database import Base, create_engine_for_sqlite, get_session_factory
+from app.integrations.bacen.schema import IndicatorPoint
+from app.integrations.base import Ok
+from app.services.scheduler import _BACEN_CODES, _run_backup, _run_indicators_update
+
+
+class FakeChain:
+    def __init__(self):
+        self.fetched: list[str] = []
+
+    async def fetch(self, query):
+        self.fetched.append(query["codigo"])
+        return Ok([
+            IndicatorPoint(
+                codigo=query["codigo"],
+                data_referencia=date.today(),
+                valor_fracao=Decimal("0.1050"),
+                unidade="pct_aa",
+                fonte="fake",
+            )
+        ])
+
+
+@pytest.fixture()
+def session_factory():
+    with tempfile.TemporaryDirectory() as tmp:
+        engine = create_engine_for_sqlite(Path(tmp) / "test.db")
+        Base.metadata.create_all(engine)
+        yield get_session_factory(engine)
+
+
+@pytest.mark.asyncio
+async def test_run_indicators_update_fetches_all_codes(session_factory):
+    chain = FakeChain()
+    await _run_indicators_update(session_factory, chain)
+    assert set(chain.fetched) == set(_BACEN_CODES)
+
+
+def test_run_backup_creates_file(session_factory):
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        db = tmp_path / "app.db"
+        engine = create_engine_for_sqlite(db)
+        Base.metadata.create_all(engine)
+        engine.dispose()
+        sf = get_session_factory(engine)
+        backup_dir = tmp_path / "backups"
+        _run_backup(db, backup_dir, sf)
+        assert backup_dir.exists()
+        assert any(backup_dir.iterdir())
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `pytest tests/unit/services/test_scheduler.py -v`
+Expected: FAIL.
+
+- [ ] **Step 3: Write implementation**
+
+`app/services/scheduler.py`:
+```python
+"""Scheduler - APScheduler wiring for background jobs (indicators + backup).
+
+# TODO(Phase 5): centralize db_path/backup_dir in app/config.py
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+from datetime import date, timedelta
+from pathlib import Path
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from app.data.repositories import BusinessRuleRepository
+from app.services.backup_service import BackupService
+from app.services.indicators_service import IndicatorsService
+
+_BACEN_CODES = ["SELIC_META", "CDI", "IPCA", "TX_BACEN_VEICULOS"]
+
+_scheduler: BackgroundScheduler | None = None
+
+
+async def _run_indicators_update(session_factory, bacen_chain) -> None:
+    svc = IndicatorsService(session_factory, bacen_chain)
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    for codigo in _BACEN_CODES:
+        await svc.update_indicator(codigo, yesterday, today)
+
+
+def _run_backup(db_path: Path, backup_dir: Path, session_factory) -> None:
+    svc = BackupService(db_path=db_path, backup_dir=backup_dir)
+    svc.backup_now()
+    with session_factory() as s:
+        raw = BusinessRuleRepository(s).get("backup_retencao_dias")
+        keep_days = int(raw) if raw else 30
+    svc.prune(keep_days=keep_days)
+
+
+def _indicators_job(session_factory, bacen_chain) -> None:
+    asyncio.run(_run_indicators_update(session_factory, bacen_chain))
+
+
+def _read_time(session_factory, chave: str, fallback: str) -> tuple[int, int]:
+    with session_factory() as s:
+        raw = BusinessRuleRepository(s).get(chave)
+    time_str = json.loads(raw) if raw else fallback
+    hour, minute = (int(x) for x in time_str.split(":"))
+    return hour, minute
+
+
+def start_scheduler(
+    session_factory,
+    bacen_chain,
+    db_path: Path,
+    backup_dir: Path,
+) -> None:
+    global _scheduler
+    ind_hour, ind_min = _read_time(session_factory, "update_indicadores_horario", "09:00")
+    bak_hour, bak_min = _read_time(session_factory, "backup_diario_horario", "23:00")
+
+    _scheduler = BackgroundScheduler()
+    _scheduler.add_job(
+        _indicators_job,
+        trigger="cron",
+        hour=ind_hour,
+        minute=ind_min,
+        id="indicators_update",
+        args=[session_factory, bacen_chain],
+    )
+    _scheduler.add_job(
+        _run_backup,
+        trigger="cron",
+        hour=bak_hour,
+        minute=bak_min,
+        id="daily_backup",
+        args=[db_path, backup_dir, session_factory],
+    )
+    _scheduler.start()
+
+
+def stop_scheduler() -> None:
+    global _scheduler
+    if _scheduler is not None:
+        _scheduler.shutdown()
+        _scheduler = None
+```
+
+- [ ] **Step 4: Run tests**
+
+Run: `pytest tests/unit/services/test_scheduler.py -v`
+Expected: 2 tests PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app/services/scheduler.py tests/unit/services/test_scheduler.py
+git commit -m "feat(services): scheduler - daily indicators update + backup via APScheduler"
+```
+
+---
+
 ## Phase 4 — Definition of Done
 
-- [ ] All 11 tasks committed
+- [ ] All 12 tasks committed
 - [ ] `pytest tests/unit/services/ tests/integration/` all green
 - [ ] `mypy app/services/` 0 errors
 - [ ] `ruff check app/services/` clean
 - [ ] End-to-end test runs: user → client → simulation (with IOF + extras) → proposal
 - [ ] All AuditLog entries created at the right points (verifiable by querying)
+- [ ] Scheduler job functions (`_run_indicators_update`, `_run_backup`) tested with fakes
