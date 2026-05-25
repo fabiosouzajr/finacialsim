@@ -2,8 +2,8 @@
 import sys
 from pathlib import Path
 
-block_cipher = None
-project_root = Path.cwd()
+# SPECPATH is a PyInstaller built-in: dir containing this spec file (scripts/)
+project_root = Path(SPECPATH).parent
 
 a = Analysis(
     ["app/main.py"],
@@ -12,23 +12,26 @@ a = Analysis(
     datas=[
         ("app/reports/proposta.html", "app/reports"),
         ("app/reports/proposta.css", "app/reports"),
-        ("docs", "docs"),
+        ("docs/*.md", "docs"),
         ("alembic.ini", "."),
         ("app/data/migrations", "app/data/migrations"),
     ],
     hiddenimports=[
-        "weasyprint", "scipy.optimize", "apscheduler", "bcrypt",
+        "weasyprint", "apscheduler", "bcrypt",
         "plotly.graph_objects", "nicegui",
+        "pywebview",
+        "sqlalchemy.dialects.sqlite",
+        "jinja2",
+        "loguru",
     ],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data)
 
 icon_path = "assets/icon.ico" if sys.platform.startswith("win") else "assets/icon.png"
 
@@ -41,11 +44,12 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,
+    upx=False,  # disabled: UPX triggers AV false positives on Windows
     console=False,
     icon=icon_path if Path(icon_path).exists() else None,
 )
 coll = COLLECT(
     exe, a.binaries, a.zipfiles, a.datas,
-    strip=False, upx=False, name="FinacialSim",
+    strip=False, upx=False,  # disabled: UPX triggers AV false positives on Windows
+    name="FinacialSim",
 )

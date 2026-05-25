@@ -1,3 +1,4 @@
+# Usage: pip install -e ".[build]" && python scripts/build_exe.py
 """Cross-platform PyInstaller builder."""
 
 from __future__ import annotations
