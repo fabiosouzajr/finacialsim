@@ -28,6 +28,10 @@ def upgrade() -> None:
     op.add_column("vehicles", sa.Column("criado_por", sa.Integer(), nullable=True))
 
     # Seed existing records
+    # Business rule: all pre-existing manually-entered vehicles (fonte='manual') are
+    # legacy simulation placeholders, not real inventory. Mark them as sold so they
+    # don't appear in the active vehicle picker. New manual entries created after this
+    # migration go through VehicleService and default to status='disponivel'.
     op.execute("""
         UPDATE vehicles
         SET status = 'vendido',
