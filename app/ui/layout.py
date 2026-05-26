@@ -17,7 +17,7 @@ TABS = [
     ("Comparativo",  "/comparativo",  {"vendedor", "gerente", "admin"}, "compare_arrows"),
     ("Amortização",  "/amortizacao",  {"vendedor", "gerente", "admin"}, "account_balance"),
     ("Indicadores",  "/indicadores",  {"vendedor", "gerente", "admin"}, "trending_up"),
-    ("FIPE",         "/fipe",         {"vendedor", "gerente", "admin"}, "directions_car"),
+    ("Veículos",     "/veiculos",     {"vendedor", "gerente", "admin"}, "directions_car"),
     ("Configurações", "/configuracoes", {"admin"},                      "settings"),
     ("Logs",         "/logs",         {"gerente", "admin"},             "receipt_long"),
     ("Documentação", "/docs",         {"vendedor", "gerente", "admin"}, "menu_book"),

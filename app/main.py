@@ -15,7 +15,7 @@ from app.ui.pages.comparativo import build_comparativo_page
 from app.ui.pages.configuracoes import build_configuracoes_page
 from app.ui.pages.dashboard import build_dashboard_page
 from app.ui.pages.docs import build_docs_page
-from app.ui.pages.fipe import build_fipe_page
+from app.ui.pages.veiculos import build_veiculos_page
 from app.ui.pages.indicadores import build_indicadores_page
 from app.ui.pages.logs import build_logs_page
 from app.ui.pages.login import build_login_page
@@ -83,7 +83,7 @@ def build_app() -> None:
     build_comparativo_page(engine)
     build_amortizacao_page(engine)
     build_indicadores_page(engine)
-    build_fipe_page(engine)
+    build_veiculos_page(engine)
     build_configuracoes_page(engine)
     build_logs_page(engine)
     build_docs_page(engine)
