@@ -1,22 +1,6 @@
-import tempfile
 from decimal import Decimal
-from pathlib import Path
 
-import pytest
-
-from app.data.database import Base, create_engine_for_sqlite, get_session_factory
 from app.data.models import Vehicle
-
-
-@pytest.fixture()
-def session():
-    with tempfile.TemporaryDirectory() as tmp:
-        engine = create_engine_for_sqlite(Path(tmp) / "test.db")
-        Base.metadata.create_all(engine)
-        SessionLocal = get_session_factory(engine)
-        with SessionLocal() as s:
-            yield s
-        engine.dispose()
 
 
 def test_vehicle_has_new_fields(session):

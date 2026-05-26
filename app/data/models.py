@@ -69,12 +69,12 @@ class Vehicle(Base):
     valor_fipe: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
     valor_referencia: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
     mes_referencia_fipe: Mapped[str | None] = mapped_column(String(40), nullable=True)
-    cor:           Mapped[str | None]  = mapped_column(String(40), nullable=True)
-    placa:         Mapped[str | None]  = mapped_column(String(10), nullable=True)
-    odometro_km:   Mapped[int | None]  = mapped_column(Integer, nullable=True)
-    status:        Mapped[str]         = mapped_column(String(20), nullable=False, default="disponivel")
-    atualizado_em: Mapped[datetime]    = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
-    criado_por:    Mapped[int | None]  = mapped_column(ForeignKey("users.id"), nullable=True)
+    cor: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    placa: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    odometro_km: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="disponivel")  # disponivel|reservado|vendido
+    atualizado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
+    criado_por: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     snapshot_json: Mapped[str | None] = mapped_column(String, nullable=True)
     criado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
 
