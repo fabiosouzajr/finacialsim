@@ -111,6 +111,20 @@ def build_simulacao_page(engine) -> None:
                         "text-xs font-semibold text-slate-500 uppercase tracking-widest"
                     )
 
+                    ui.label("Cliente").classes(
+                        "text-xs font-semibold text-slate-500 uppercase tracking-widest"
+                    )
+                    _cliente_options: dict[int, str] = {0: "— sem cliente —"}
+                    _cliente_options.update(
+                        {c.id: f"{c.nome}  ({c.cpf_cnpj})" for c in clients}
+                    )
+                    cliente_sel = ui.select(
+                        _cliente_options,
+                        value=0,
+                        label="Cliente",
+                        with_input=True,
+                    ).classes("w-full")
+
                     # ── Seção Veículo ─────────────────────────────────────────
                     ui.label("Veículo").classes(
                         "text-xs font-semibold text-slate-500 uppercase tracking-widest"
