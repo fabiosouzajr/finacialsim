@@ -495,7 +495,9 @@ def build_simulacao_page(engine) -> None:
                                                 prazo_int, 3))
 
                         sim = SimulationService(session).run_and_save(SimulationInputDTO(
-                            criado_por=user_id, cliente_id=None, veiculo_id=v.id,
+                            criado_por=user_id,
+                            cliente_id=cliente_sel.value if cliente_sel.value != 0 else None,
+                            veiculo_id=v.id,
                             valor_veiculo=valor_veiculo.value, valor_entrada=valor_entrada.value,
                             prazo_meses=prazo_int, taxa_mensal=taxa.value,
                             data_liberacao=date.fromisoformat(inp_lib.value or date.today().isoformat()),
