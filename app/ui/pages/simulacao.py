@@ -187,6 +187,11 @@ def build_simulacao_page(engine) -> None:
 
                     def _set_valor_veiculo(val: Decimal) -> None:
                         valor_veiculo.value = val
+                        if not entrada_modified["v"]:
+                            valor_entrada.value = (
+                                entrada_minima_pct * val
+                            ).quantize(Decimal("0.01"))
+                            _update_pct_label()
 
                     _build_picker()
 
