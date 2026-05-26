@@ -750,6 +750,38 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-25T20:23:29.235Z"
+    },
+    {
+      "id": "bug-047",
+      "timestamp": "2026-05-26T14:06:16.977Z",
+      "error_message": "Significant refactor of ",
+      "file": "docs/superpowers/specs/2026-05-23-finacialsim-design.md",
+      "root_cause": "24 lines replaced/restructured",
+      "fix": "Rewrote 74→88 lines (24 removed) | Also: - `tipo`, `marca_id`, `modelo_id`, `ano_id` TEXT; - `ttl_horas` INTEGER | Also: (valor_veículo − entrada) = Σ_{k=1}^{n} PMT / (1 +; Resolvido com `scipy.optimize.brentq` no intervalo | Also: │ 📋 Cadastro  📊 Dashboard  💰 Simulação  ⚖ Compa; │ 📈 Indicadores  ⚙ Configurações  🔌 APIs  📝 Log",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-05-26T14:07:36.135Z"
+    },
+    {
+      "id": "bug-048",
+      "timestamp": "2026-05-26T14:07:08.510Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-23-finacialsim-design.md",
+      "root_cause": "Had `fipe/cached.py`",
+      "fix": "Changed to `fipe/cache.py`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-26T14:07:13.723Z"
     }
   ]
 }

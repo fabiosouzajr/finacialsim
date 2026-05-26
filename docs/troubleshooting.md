@@ -1,11 +1,14 @@
 # Troubleshooting
 
 ## "App nao abre" (Windows)
+
 - Verifique se o antivirus bloqueou o executavel. Adicione excecao para `C:\Program Files\FinacialSim\FinacialSim.exe`.
 - Reinstale o app.
 
 ## "WeasyPrint error" / "libpango not found" (Linux)
+
 Instale dependencias:
+
 ```bash
 sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
 ```

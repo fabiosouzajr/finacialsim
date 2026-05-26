@@ -3,6 +3,8 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 15:00 | Verified codebase vs design spec; updated spec + anatomy.md | docs/superpowers/specs/2026-05-23-finacialsim-design.md, .wolf/anatomy.md | spec now reflects implemented state (status, dir structure, CET bisection, FipeCache.acao, scheduler location, FIPE tab, APIs page pending) | ~3000 |
+
 | 00:00 | fix bug-044: IPVA/emplacamento só cobriam o 1º ano | app/ui/pages/simulacao.py | corrigido: num_anos=ceil(prazo/12), valor_total*=num_anos, duracao_meses=prazo_int, removido campo rateio | ~150 tok |
 
 | 00:00 | Fixed FIPE models bug: Parallelum v2 returns plain list for /models; data.get() raised AttributeError causing misleading BrasilAPI fallback error | app/integrations/fipe/parallelum.py | fixed | ~300 |
@@ -732,3 +734,32 @@
 | 17:23 | Edited app/ui/pages/indicadores.py | 2→1 lines | ~11 |
 | 17:23 | Edited app/main.py | — | ~0 |
 | 17:24 | Edited app/main.py | — | ~0 |
+
+## Session: 2026-05-26 10:17
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:50 | Edited CLAUDE.md | expanded (+50 lines) | ~628 |
+| 10:50 | Edited CLAUDE.md | 3→3 lines | ~24 |
+| 10:50 | Edited CLAUDE.md | inline fix | ~6 |
+| 10:51 | Edited CLAUDE.md | inline fix | ~8 |
+| 10:51 | Edited CLAUDE.md | 7→5 lines | ~116 |
+| 10:51 | Audited and updated CLAUDE.md | CLAUDE.md | Added Quick Start, Tech Stack, Project Structure, Gotchas; fixed stale refs and orphaned section numbers | ~800 |
+| 10:51 | Session end: 5 writes across 1 files (CLAUDE.md) | 5 reads | ~839 tok |
+
+## Session: 2026-05-26 11:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:05 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 2→3 lines | ~42 |
+| 11:05 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | inline fix | ~34 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | expanded (+14 lines) | ~1127 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 8→10 lines | ~87 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 12→14 lines | ~208 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 3→3 lines | ~90 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | modified fetch() | ~254 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | "fipe/cached.py" → "fipe/cache.py" | ~21 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | "utils/scheduler.py" → "services/scheduler.py" | ~23 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 30→33 lines | ~464 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 2→2 lines | ~47 |
+| 11:11 | Session end: 11 writes across 1 files (2026-05-23-finacialsim-design.md) | 16 reads | ~15500 tok |

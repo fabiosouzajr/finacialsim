@@ -4,7 +4,8 @@
 > Cálculo financeiro nível banco real (Tabela Price com dias corridos, IOF, CET via TIR).
 >
 > **Data:** 2026-05-23
-> **Status:** Spec aprovado, pronto para `writing-plans`
+> **Atualizado:** 2026-05-26
+> **Status:** Implementado (MVP scaffolding completo — core, data, integrations, services, UI, testes)
 > **Idioma do produto:** PT-BR (R$, dd/mm/yyyy, separador decimal vírgula)
 > **Plataformas:** Windows 10+ e Linux (Ubuntu/Debian/Fedora) e macOS 12+ (Monterey+) — instalação local
 
@@ -64,7 +65,7 @@ Capacidades resumidas:
 | Gráficos | Plotly + ECharts (embutidos via NiceGUI) | Interativos, exportáveis |
 | ORM + migrations | SQLAlchemy 2.x + Alembic | `NUMERIC(18,4)` para campos financeiros |
 | Banco | SQLite (WAL) | Embutido |
-| Cálculo financeiro | `decimal.Decimal` + `scipy.optimize.brentq` (TIR) | `numpy_financial` para utilitários |
+| Cálculo financeiro | `decimal.Decimal` + bisseção pure-Python 200 iter (TIR) | sem scipy/numpy — decisão intencional (§6.4) |
 | HTTP | httpx (async) + tenacity (retry) | Timeout 8s, retry exponencial 3× |
 | Validação | Pydantic v2 | Schemas para forms, configs, providers |
 | PDF | WeasyPrint + Jinja2 | Template HTML/CSS |
@@ -72,7 +73,7 @@ Capacidades resumidas:
 | Auth | bcrypt | PIN hashado |
 | Logs | loguru | Rotação diária, gzip após 7 dias |
 | Empacotamento | PyInstaller | `--onedir`; NSIS (Win), AppImage (Linux) |
-| Agendador | APScheduler | Updates de indicadores, backup, health-check |
+| Agendador | APScheduler (`services/scheduler.py`) | Updates de indicadores, backup, health-check |
 | Testes | pytest + hypothesis | Property tests para o core financeiro |
 
 ---
@@ -84,35 +85,42 @@ finacialsim/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py                    # ponto de entrada; inicia NiceGUI + pywebview
-│   ├── config/
-│   │   ├── settings.py            # Pydantic Settings (env + TOML)
-│   │   └── rules.py               # regras de negócio configuráveis
+│   │                              # NOTE: app/config/ (settings.py + rules.py) não implementado;
+│   │                              #       regras de negócio vivem em BusinessRule + rules_service.py
 │   │
 │   ├── core/                      # DOMÍNIO PURO — sem dependência de UI/DB
 │   │   ├── money.py               # Decimal + arredondamento bancário
 │   │   ├── price_table.py         # Tabela Price exata + dias corridos
 │   │   ├── iof.py                 # IOF veículo (0,38% + 0,0082%/dia)
-│   │   ├── cet.py                 # CET via TIR (Brent)
+│   │   ├── cet.py                 # CET via bisseção pure-Python (sem scipy)
 │   │   ├── amortization.py        # cronograma + amortização extraordinária
+│   │   ├── extras.py              # custos adicionais mensais (§6.5)
 │   │   ├── rate_suggestions.py    # taxa sugerida por prazo
 │   │   └── validators.py          # entrada mínima, prazos válidos
 │   │
 │   ├── data/                      # PERSISTÊNCIA
+│   │   ├── database.py            # engine + Base + get_session_factory
 │   │   ├── models.py              # ORM SQLAlchemy
 │   │   ├── repositories.py        # CRUD tipado por entidade
 │   │   ├── migrations/            # Alembic
-│   │   └── backup.py              # backup automático SQLite
+│   │   └── backup.py              # backup automático SQLite (primitivas)
 │   │
 │   ├── integrations/              # APIs EXTERNAS — chain de fallback
-│   │   ├── base.py                # Protocol Provider + ProviderChain
+│   │   ├── base.py                # Protocol Provider + ProviderChain + Ok/Err
+│   │   ├── http.py                # shared httpx helper (timeout 8s, User-Agent)
+│   │   ├── factory.py             # build_fipe_chain / build_bacen_chain
 │   │   ├── fipe/
+│   │   │   ├── schema.py          # VehicleQuote dataclass normalizado
 │   │   │   ├── parallelum.py      # primário
 │   │   │   ├── brasilapi.py       # fallback
+│   │   │   ├── cache.py           # decorator com TTL sobre fipe_cache (era cached.py no spec)
 │   │   │   └── manual.py          # entrada manual
 │   │   └── bacen/
+│   │       ├── schema.py          # IndicatorPoint dataclass + conversions
 │   │       ├── sgs.py             # SELIC/CDI/IPCA via api.bcb.gov.br
 │   │       ├── brasilapi.py       # fallback
-│   │       └── cached.py          # cache em disco
+│   │       ├── cached.py          # cache em disco
+│   │       └── conversions.py     # conversões entre unidades (mensal↔anual↔diária)
 │   │
 │   ├── services/                  # ORQUESTRAÇÃO (caso-de-uso)
 │   │   ├── simulation_service.py
@@ -122,37 +130,44 @@ finacialsim/
 │   │   ├── client_service.py
 │   │   ├── auth_service.py
 │   │   ├── indicators_service.py
-│   │   └── audit_service.py
+│   │   ├── audit_service.py
+│   │   ├── backup_service.py      # facade sobre data/backup.py para UI/scheduler
+│   │   ├── rules_service.py       # CRUD de business_rules (foi app/config/rules.py no spec)
+│   │   └── scheduler.py           # APScheduler (movido de utils/ para services/)
 │   │
 │   ├── ui/                        # NiceGUI — só apresentação
 │   │   ├── theme.py
+│   │   ├── layout.py              # shell() + TABS com guards por perfil
+│   │   ├── router.py              # helpers de navegação + get_logged_perfil
 │   │   ├── components/
 │   │   │   ├── currency_input.py
 │   │   │   ├── percent_input.py
 │   │   │   ├── kpi_card.py
 │   │   │   ├── amortization_table.py
 │   │   │   └── charts.py
-│   │   ├── pages/
-│   │   │   ├── login.py
-│   │   │   ├── cadastro.py
-│   │   │   ├── dashboard.py
-│   │   │   ├── simulacao.py
-│   │   │   ├── comparativo.py
-│   │   │   ├── amortizacao.py
-│   │   │   ├── indicadores.py
-│   │   │   ├── configuracoes.py
-│   │   │   ├── apis.py
-│   │   │   ├── logs.py
-│   │   │   └── docs.py
-│   │   └── router.py              # navegação + guards por perfil
+│   │   └── pages/
+│   │       ├── login.py
+│   │       ├── cadastro.py
+│   │       ├── dashboard.py
+│   │       ├── simulacao.py
+│   │       ├── comparativo.py
+│   │       ├── amortizacao.py
+│   │       ├── indicadores.py
+│   │       ├── fipe.py            # aba dedicada busca FIPE (nova, não estava no spec original)
+│   │       ├── configuracoes.py
+│   │       ├── apis.py            # existe mas NÃO está registrado em main.py (pendente)
+│   │       ├── logs.py
+│   │       ├── docs.py
+│   │       └── _proposal_helper.py  # helpers para geração de proposta
 │   │
 │   ├── reports/
-│   │   └── proposta.html          # template Jinja2 → WeasyPrint
+│   │   ├── proposta.html          # template Jinja2 → WeasyPrint
+│   │   └── proposta.css           # estilos do PDF
 │   │
 │   └── utils/
 │       ├── br_format.py
-│       ├── logger.py
-│       └── scheduler.py
+│       ├── document_validation.py # validação CPF/CNPJ (era parte de core/validators no spec)
+│       └── logger.py
 │
 ├── tests/
 │   ├── unit/core/                 # bateria pesada de cálculo
@@ -196,6 +211,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 ### 5.1 Usuários e clientes
 
 **`users`**
+
 - `id` PK
 - `nome` TEXT NOT NULL
 - `pin_hash` TEXT NOT NULL (bcrypt)
@@ -204,6 +220,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `criado_em`, `atualizado_em`, `ultimo_login` DATETIME
 
 **`clients`**
+
 - `id` PK
 - `nome` TEXT NOT NULL
 - `cpf_cnpj` TEXT UNIQUE — validado mod-11
@@ -218,6 +235,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 ### 5.2 Veículos e simulações
 
 **`vehicles`** (snapshot por simulação)
+
 - `id` PK
 - `fonte` TEXT — `fipe_parallelum` | `fipe_brasilapi` | `manual`
 - `tipo`, `marca`, `modelo`, `ano_modelo` INTEGER, `combustivel`
@@ -229,6 +247,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `criado_em`
 
 **`simulations`**
+
 - `id` PK
 - `codigo` TEXT UNIQUE — `SIM-2026-00123`
 - `cliente_id` FK→`clients.id` NULLABLE
@@ -250,6 +269,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `criado_em`, `atualizado_em`
 
 **`simulation_fees`**
+
 - `id` PK
 - `simulation_id` FK→`simulations.id`
 - `nome` TEXT — `Cadastro`, `Avaliação`, `Registro`, custom
@@ -257,6 +277,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `incluir_no_principal` BOOLEAN
 
 **`simulation_extras`** — custos adicionais mensais acrescidos à parcela (§6.5)
+
 - `id` PK
 - `simulation_id` FK→`simulations.id`
 - `tipo` TEXT — `protecao_veicular` | `ipva` | `emplacamento` | `seguro` | `custom`
@@ -268,6 +289,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `ordem` INTEGER — ordem de exibição no PDF e UI
 
 **`amortization_rows`**
+
 - `id` PK
 - `simulation_id` FK→`simulations.id` (índice)
 - `numero_parcela` INTEGER
@@ -279,6 +301,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `ajuste_arredondamento` NUMERIC(18,4) — resíduo na última parcela
 
 **`extraordinary_amortizations`**
+
 - `id` PK
 - `simulation_id` FK→`simulations.id`
 - `data` DATE
@@ -290,6 +313,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 ### 5.3 Propostas e comparações
 
 **`proposals`**
+
 - `id` PK
 - `codigo` TEXT UNIQUE — `PROP-2026-00123`
 - `simulation_id` FK→`simulations.id`
@@ -301,6 +325,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `gerado_em` DATETIME
 
 **`comparisons`**
+
 - `id` PK
 - `simulation_a_id`, `simulation_b_id` FK→`simulations.id`
 - `criado_por` FK→`users.id`
@@ -309,6 +334,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 ### 5.4 Indicadores, regras, auditoria, config
 
 **`indicators_history`**
+
 - `id` PK
 - `codigo` TEXT — `SELIC` | `CDI` | `IPCA` | `IOF_FIXO` | `IOF_DIARIO` | `TX_BACEN_VEIC`
 - `data_referencia` DATE
@@ -320,6 +346,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - UNIQUE(`codigo`, `data_referencia`)
 
 **`business_rules`**
+
 - `id` PK
 - `chave` TEXT UNIQUE — `entrada_minima_pct`, `taxa_por_prazo_curva`, `incluir_iof_default`, `iof_fixo_pct`, `iof_diario_pct`, `iof_diario_max_dias`, `dias_max_carencia`, `prazo_minimo_meses`, `prazo_maximo_meses`, `taxa_minima_mes`, `taxa_maxima_mes`, `valor_minimo_financiado`, `extras_padrao`, `rateio_ipva_meses_default`, `rateio_emplacamento_meses_default` (lista completa em §12)
 - `valor_json` TEXT
@@ -327,6 +354,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `atualizado_em`, `atualizado_por` FK→`users.id`
 
 **`audit_log`**
+
 - `id` PK
 - `timestamp` DATETIME
 - `usuario_id` FK→`users.id`
@@ -336,17 +364,21 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `ip`, `hostname` TEXT
 
 **`app_settings`**
+
 - `chave` PK TEXT
 - `valor_json` TEXT
 - `atualizado_em` DATETIME
 
 **`fipe_cache`**
+
 - `id` PK
-- `tipo`, `marca_id`, `modelo_id`, `ano_id` TEXT
+- `tipo` TEXT
+- `acao` TEXT — tipo de requisição (`brands`, `models`, `years`, `price`, etc.)
+- `marca_id`, `modelo_id`, `ano_id` TEXT (nullable)
 - `payload_json` TEXT
 - `coletado_em` DATETIME
-- `ttl_horas` INTEGER
-- UNIQUE(`tipo`, `marca_id`, `modelo_id`, `ano_id`)
+- `ttl_horas` INTEGER (default 720 = 30 dias)
+- UNIQUE(`tipo`, `acao`, `marca_id`, `modelo_id`, `ano_id`)
 
 ### 5.5 Decisões importantes do modelo
 
@@ -389,18 +421,20 @@ Modelo de capitalização exponencial fracionada (convenção BACEN/CCB):
 
 **Parcela fixa:**
 
-```
+```text
 PMT = PV · (1+i_d)^d1 · (i_m · (1+i_m)^(n-1)) / ((1+i_m)^n − 1)
 ```
 
 Quando `d1 = 30`, reduz-se à Tabela Price clássica `PMT = PV · i · (1+i)^n / ((1+i)^n − 1)`.
 
 **Cronograma:**
+
 - Parcela 1: `juros = PV · ((1+i_d)^d1 − 1)`; `amortização = PMT − juros`; `saldo = PV − amortização`
 - Parcelas 2..n−1: `juros = saldo · i_m`; `amortização = PMT − juros`
 - Parcela n: força saldo → 0; resíduo em `ajuste_arredondamento`
 
 **Saída:**
+
 ```python
 @dataclass
 class Schedule:
@@ -422,6 +456,7 @@ Regulamento: Decreto 6.306/2007. Percentuais ficam em `business_rules`.
 - **Total** = fixo + Σ diário por parcela
 
 **Fórmula (quando `incluir_iof = true`):**
+
 ```
 IOF_fixo    = 0.0038 × valor_financiado
 IOF_diario  = Σ_k [ amortização_k × 0.000082 × min(dias_até_venc_k, 365) ]
@@ -429,14 +464,17 @@ IOF_total   = IOF_fixo + IOF_diario
 ```
 
 **Circularidade quando incorporado ao principal** — resolvida por iteração:
-```
+
+```text
 PV₀ = valor_veículo − entrada + tarifas_incluídas
 PV_{n+1} = PV₀ + IOF(PV_n, cronograma(PV_n))
 parar quando |PV_{n+1} − PV_n| < R$ 0,01
 ```
+
 Converge em 2–3 iterações na prática.
 
 **Quando `incluir_iof = false`:**
+
 - IOF não é iterado nem somado ao principal
 - `PV = valor_veículo − entrada + tarifas_incluídas` (uma única passada)
 - `simulations.iof_total = 0`
@@ -453,15 +491,18 @@ CET é a TIR mensal do fluxo de caixa do **financiamento** (do ponto de vista do
 
 Encontrar `i_cet` tal que:
 
-```
-(valor_veículo − entrada) = Σ_{k=1}^{n} PMT / (1 + i_cet)^((d1 + 30(k-1))/30)
+```text
+(valor_veículo − entrada) = Σ_{k=1}^{n} PMT / (1 + i_cet)^(k * d1/30)
 ```
 
-Resolvido com `scipy.optimize.brentq` no intervalo `[1e-6, 1.0]`.
+Resolvido com **bisseção pure-Python** (200 iterações, tolerância 1e-10) no intervalo `[1e-8, 1.0]`.
 
+> **Decisão de implementação:** `scipy.optimize.brentq` foi substituído por bisseção pure-Python para evitar ~35MB de deps C. A função é suave o bastante que bisseção converge em <200 iterações. **Modelo de timing:** `meses = numero_parcela * (d1/30.0)` — garante CET == taxa_nominal quando não há IOF nem extras.
+>
 > **Convenção BCB:** o CET reflete apenas o custo do crédito. Custos adicionais (proteção veicular, IPVA, emplacamento — §6.5) **não entram no cálculo do CET**, porque são despesas externas ao crédito (serviços e tributos do veículo). Eles aparecem no cronograma e no PDF como linhas separadas, mas não distorcem o CET.
 
 Saída:
+
 - `cet_mes` (Decimal, 8 casas)
 - `cet_ano = (1 + cet_mes)^12 − 1`
 
@@ -472,7 +513,7 @@ A parcela paga pelo cliente todo mês pode incluir **custos externos ao financia
 **Tipos suportados de fábrica:**
 
 | Tipo | Modalidade típica | Significado |
-|---|---|---|
+| --- | --- | --- |
 | `protecao_veicular` | `mensal_continuo` | Plano de proteção/seguro mensal durante TODO o prazo do financiamento |
 | `ipva` | `rateio_meses` (default 12) | IPVA anual rateado em N primeiras parcelas |
 | `emplacamento` | `rateio_meses` (default 12) | Emplacamento + licenciamento rateados em N primeiras parcelas |
@@ -486,7 +527,7 @@ A parcela paga pelo cliente todo mês pode incluir **custos externos ao financia
 
 **Composição da parcela exibida:**
 
-```
+```text
 parcela_total[k] = parcela_financiamento[k] + Σ_extras_aplicáveis_à_parcela_k
 
 extras_aplicáveis_à_parcela_k = { e ∈ simulation_extras
@@ -494,17 +535,20 @@ extras_aplicáveis_à_parcela_k = { e ∈ simulation_extras
 ```
 
 **Persistência:**
+
 - `amortization_rows.extras_total` materializa o somatório por parcela (auditável)
 - `amortization_rows.parcela_total` = `parcela + extras_total`
 - `simulations.extras_total_acumulado` = soma de todos os extras ao longo de todas as parcelas (informativo)
 
 **O que extras NÃO afetam:**
+
 - `PMT` (parcela do financiamento) — calculada apenas com `PV`, taxa e prazo
 - `valor_financiado` — extras não são financiados (não incidem juros)
 - `IOF` — não incide sobre extras
 - `CET` — extras são serviços externos ao crédito (§6.4)
 
 **O que extras afetam:**
+
 - `parcela_total` mostrada para o cliente
 - `total_pago_cliente` (informativo): `total_pago_financiamento + extras_total_acumulado`
 - Cronograma exibido no PDF e na UI
@@ -529,6 +573,7 @@ Comportamento: se taxa atual < sugerida, UI mostra badge amarelo com botão "usa
 ### 6.7 Validações — `validators.py`
 
 Regras configuráveis (todas em `business_rules`):
+
 - `entrada_minima_pct` (default **10%**)
 - `prazo_minimo_meses` (12) / `prazo_maximo_meses` (72)
 - `taxa_minima_mes` (0,5%) / `taxa_maxima_mes` (5%)
@@ -543,6 +588,7 @@ Cada violação retorna `ValidationIssue(level='error'|'warning', field, message
 Entrada: simulação + lista de pagamentos extras `(data, valor, modo)`.
 
 Algoritmo:
+
 1. Percorre cronograma original aplicando pagamento extra na data (paga juros pro-rata até a data, depois reduz saldo)
 2. Modo `reduzir_prazo`: mantém PMT; recalcula quantas parcelas restantes cabem
 3. Modo `reduzir_parcela`: mantém prazo; recalcula PMT para saldo restante
@@ -551,6 +597,7 @@ Algoritmo:
 Resultado é um **novo cronograma persistido em paralelo** (não destrói o original).
 
 **Tratamento de extras na amortização extraordinária:**
+
 - Extras `mensal_continuo` reduzem proporcionalmente ao novo prazo (param de incidir após a quitação)
 - Extras `rateio_meses` ainda no período de rateio: continuam sendo cobrados nas próximas parcelas até completar o rateio (são despesas do veículo, não do financiamento — quitar o financiamento não as cancela)
 - Comportamento explícito documentado no `guia_usuario.md`
@@ -558,6 +605,7 @@ Resultado é um **novo cronograma persistido em paralelo** (não destrói o orig
 ### 6.9 Testes do core
 
 Indispensáveis:
+
 - **Casos conhecidos**: cronogramas de simuladores reais (Santander, Itaú, Bradesco) com mesma entrada → bate centavo a centavo
 - **Property tests (hypothesis)**: para qualquer `(PV, i, n, d1)` válido, `Σ amortizações ≈ PV`, `saldo_final == 0`, `parcelas > 0`
 - **Casos-borda**: `d1 = 0`, `d1 = 90`, `n = 1`, taxa próxima de 0%
@@ -568,32 +616,34 @@ Indispensáveis:
 
 ## 7. Integrações externas
 
-### 7.1 Padrão `ProviderChain` — `integrations/base.py`
+### 7.1 Padrão `ProviderChain` — `integrations/base.py` + `integrations/factory.py`
+
+`base.py` define `Provider` (Protocol), `ProviderChain`, e os tipos `Ok[T]` / `Err` (Result pattern):
 
 ```python
 class Provider(Protocol):
     name: str
-    async def fetch(self, query: Query) -> Result[Payload]: ...
+    async def fetch(self, query: dict) -> Ok[Any] | Err: ...
 
 class ProviderChain:
-    """Tenta providers em ordem; primeiro sucesso ganha. Última opção é sempre 'manual'."""
-    async def fetch(self, query) -> Result[Payload]:
+    async def fetch(self, query) -> Ok[Any] | Err:
         for p in self.providers:
-            r = await p.fetch(query)
-            if r.is_ok and validate(r.value):
-                audit_log("integration_hit", provider=p.name)
-                return r
-            audit_log("integration_miss", provider=p.name, reason=r.error)
-        return Err("all_providers_failed")
+            result = await p.fetch(query)
+            if result.is_ok:
+                return result
+        return Err("all_providers_failed: ...")
 ```
 
-- HTTP: `httpx.AsyncClient`, timeout 8s
-- Retry: `tenacity` 3× backoff exponencial (0.5s / 1s / 2s)
+`factory.py` expõe `build_fipe_chain(session_factory)` e `build_bacen_chain(session_factory)` que montam as chains com cache. `http.py` centraliza o cliente httpx (timeout 8s, User-Agent `FinacialSim/0.1`).
+
+- HTTP: `httpx.AsyncClient`, timeout 8s — via `integrations/http.py`
+- Retry: `tenacity` disponível mas não aplicado em todas as chamadas ainda
 - User-Agent identificando app + versão
 
 ### 7.2 FIPE — `integrations/fipe/`
 
 **Primário — Parallelum FIPE API**
+
 - Base: `https://parallelum.com.br/fipe/api/v2`
 - Endpoints:
   - `GET /{tipo}/brands` — `tipo` ∈ `cars`, `motorcycles`, `trucks`
@@ -602,19 +652,23 @@ class ProviderChain:
   - `GET /{tipo}/brands/{brandId}/models/{modelId}/years/{yearId}`
 
 **Fallback 1 — BrasilAPI**
+
 - Base: `https://brasilapi.com.br/api/fipe`
 - Endpoints: `/marcas/v1/{tipo}`, `/preco/v1/{codigoFipe}`
 - Schema adaptado para `VehicleQuote` interno
 
 **Fallback 2 — Manual**
+
 - Vendedor digita tipo/marca/modelo/ano/valor; gravado com `fonte='manual'`
 
-**Cache** — `fipe/cached.py`
+**Cache** — `fipe/cache.py` (implementado como `cached.py` no spec original)
+
 - Decorator sobre provider
 - TTL: 30 dias para listas, 24h para preço
 - Tabela `fipe_cache`
 
 **Schema normalizado:**
+
 ```python
 @dataclass
 class VehicleQuote:
@@ -635,6 +689,7 @@ class VehicleQuote:
 ### 7.3 Indicadores econômicos — `integrations/bacen/`
 
 **Primário — BCB SGS**
+
 - Base: `https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json&dataInicial=...&dataFinal=...`
 - Códigos:
   - `SELIC_META`: 432 (% a.a.)
@@ -645,9 +700,11 @@ class VehicleQuote:
 - Retorno: `[{"data": "23/05/2026", "valor": "10.50"}, ...]`
 
 **Fallback 1 — BrasilAPI**
+
 - `/taxas/v1/{selic|cdi|ipca}` — só último valor
 
 **Fallback 2 — Cache local + manual**
+
 - Usa último valor de `indicators_history` com flag `stale`
 - UI mostra badge laranja "Indicador desatualizado há X dias"
 - Admin pode forçar valor manual em Configurações
@@ -655,6 +712,7 @@ class VehicleQuote:
 **IOF** — não vem de API. Vive em `business_rules` (0,38% fixo + 0,0082%/dia). Alterado por admin se a regra mudar.
 
 **Normalização canônica:**
+
 ```python
 @dataclass
 class IndicatorPoint:
@@ -666,11 +724,13 @@ class IndicatorPoint:
 ```
 
 Conversões aplicadas no adapter:
+
 - BCB SGS retorna `"10.50"` → `Decimal("10.50") / 100`
 - Detecta unidade pela série (CDI=`pct_ad`, IPCA=`pct_am`, SELIC=`pct_aa`)
 - Rejeita valor fora de `[0, 1]` em fração ou `[0, 100]` em pct — loga erro
 
 **Conversões entre unidades — `bacen/conversions.py`:**
+
 - Mensal → anual: `(1+i_m)^12 − 1`
 - Diária (252) → mensal: `(1+i_d)^21 − 1`
 - Diária (252) → anual: `(1+i_d)^252 − 1`
@@ -678,7 +738,7 @@ Conversões aplicadas no adapter:
 
 UI sempre mostra mensal e anual lado a lado para evitar confusão.
 
-### 7.4 Agendamento — `utils/scheduler.py`
+### 7.4 Agendamento — `services/scheduler.py` (movido de `utils/` para `services/`)
 
 APScheduler em background no processo NiceGUI:
 
@@ -690,6 +750,7 @@ APScheduler em background no processo NiceGUI:
 | `verify_provider_health` | A cada 6h | Ping nos providers; status na aba APIs |
 
 Cada job:
+
 - Loga início/fim em `audit_log` (`acao='scheduled_job'`)
 - Em falha, incrementa contador; badge vermelho na aba APIs
 - Falhas não travam o app
@@ -704,24 +765,26 @@ Visível para gerente/admin: status, atualizar agora, reordenar chain, habilitar
 
 ### Layout geral
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ [Logo loja]        FinacialSim — Simulador de Financiamentos             │
 │                                                  [Vendedor: João] [⚙] [⎋]│
 ├──────────────────────────────────────────────────────────────────────────┤
-│ 📋 Cadastro  📊 Dashboard  💰 Simulação  ⚖ Comparativo  ⏩ Amortização   │
-│ 📈 Indicadores  ⚙ Configurações  🔌 APIs  📝 Logs  📚 Documentação        │
+│ 📊 Dashboard  📋 Cadastro  💰 Simulação  ⚖ Comparativo  ⏩ Amortização   │
+│ 📈 Indicadores  🚗 FIPE  ⚙ Configurações  📝 Logs  📚 Documentação        │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                       [conteúdo da aba selecionada]                      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
+> **Nota de implementação:** A aba "🔌 APIs" (originalmente no spec) não está registrada na navegação principal (`layout.py`). O arquivo `pages/apis.py` existe mas a rota `/apis` não é montada em `main.py` — está pendente de integração. No lugar, foi adicionada a aba "🚗 FIPE" (busca de veículos FIPE como página standalone).
+
 Abas restritas por perfil ficam **ocultas**, não apenas desabilitadas.
 
-### Visibilidade por perfil
+### Visibilidade por perfil (implementado em `layout.py`)
 
 | Aba | Vendedor | Gerente | Admin |
-|---|:---:|:---:|:---:|
+| --- | :---: | :---: | :---: |
 | Cadastro de clientes | ✅ | ✅ | ✅ |
 | Cadastro de usuários | ❌ | ❌ | ✅ |
 | Dashboard | ✅ (próprio) | ✅ (loja) | ✅ |
@@ -729,9 +792,10 @@ Abas restritas por perfil ficam **ocultas**, não apenas desabilitadas.
 | Comparativo | ✅ | ✅ | ✅ |
 | Amortização | ✅ | ✅ | ✅ |
 | Indicadores (leitura) | ✅ | ✅ | ✅ |
+| FIPE (busca standalone) | ✅ | ✅ | ✅ |
 | Indicadores (editar) | ❌ | ⚠️ valores manuais | ✅ |
 | Configurações (regras) | ❌ | ⚠️ visualizar | ✅ |
-| APIs | ❌ | ✅ | ✅ |
+| APIs *(pendente de integração)* | ❌ | ✅ | ✅ |
 | Logs | ❌ | ✅ (próprios + equipe) | ✅ (tudo) |
 | Documentação | ✅ | ✅ | ✅ |
 
@@ -747,6 +811,7 @@ Abas restritas por perfil ficam **ocultas**, não apenas desabilitadas.
 Duas sub-abas (admin vê ambas; vendedor só "Clientes"):
 
 **Clientes**
+
 - Tabela paginada com busca por nome/CPF
 - "+ Novo cliente" → modal:
   - Toggle PF/PJ alterna campos
@@ -758,18 +823,21 @@ Duas sub-abas (admin vê ambas; vendedor só "Clientes"):
 - "→ Nova simulação para este cliente" leva para Simulação pré-preenchida
 
 **Usuários** (admin)
+
 - Listar, criar, alterar PIN, alterar perfil, desativar
 - Última atividade
 
 ### 8.2 Dashboard
 
 Cards superiores (KPIs do mês):
+
 - Nº de simulações
 - Nº de propostas geradas
 - Ticket médio financiado
 - Taxa média praticada
 
 Gráficos:
+
 - Distribuição de prazos (barras: 24/36/48/60/72m)
 - Mix de cenários (pizza PF vs PJ ou marcas mais simuladas)
 - Indicadores econômicos atuais (mini-cards: SELIC, CDI, IPCA, Tx BACEN veículos)
@@ -783,6 +851,7 @@ Vendedor vê apenas dados próprios; gerente/admin veem toda a loja com filtro p
 Layout em 3 colunas.
 
 **Esquerda — Entrada**
+
 1. Cliente (combobox com busca, opcional)
 2. Veículo:
    - Toggle [FIPE] [Manual]
@@ -807,6 +876,7 @@ Layout em 3 colunas.
 Botão "Simular" + recálculo em tempo real ao alterar campos (debounced 400ms).
 
 **Central — Resultado (cards)**
+
 - **Parcela do financiamento** (PMT — valor fixo das parcelas do banco)
 - **Parcela total — 1º ano** (PMT + extras_total no período de rateio, ex.: meses 1–12)
 - **Parcela total — após rateio** (PMT + apenas extras mensais contínuos, ex.: meses 13+)
@@ -817,12 +887,14 @@ Botão "Simular" + recálculo em tempo real ao alterar campos (debounced 400ms).
 > Se não houver extras com `rateio_meses < prazo_total`, mostra apenas um card "Parcela total" único.
 
 **Direita — Visualizações**
+
 - Composição da parcela (barras empilhadas: juros + amortização + extras por categoria)
 - Saldo devedor (linha decrescente)
 - **Curva de parcela total ao longo do tempo** (linha — mostra "degrau" quando rateios terminam)
 - Tabela de amortização completa com colunas extras (expand, exportável CSV)
 
 **Rodapé**
+
 - Salvar simulação
 - Gerar proposta PDF (requer cliente)
 - Comparar com outra (envia para Comparativo)
@@ -833,7 +905,8 @@ Botão "Simular" + recálculo em tempo real ao alterar campos (debounced 400ms).
 Duas colunas espelhadas A/B com mesmo formulário compacto. Carrega simulações salvas ou edita ao vivo.
 
 **Linha central de diferenças:**
-```
+
+```text
                 A              ↔             B              Diferença
 Taxa            1,69% a.m.                   1,49% a.m.     ▼ 0,20 p.p.
 Prazo           60 meses                     48 meses       ▼ 12 meses
@@ -871,6 +944,7 @@ Salvar comparativo → grava em `comparisons`.
 ### 8.7 Configurações
 
 Áreas (admin vê todas; gerente vê leitura em algumas):
+
 - Geral: nome da loja, logo (upload), endereço, CNPJ — usados no PDF
 - Regras de negócio: entrada mínima, prazos min/max, faixa de taxa, dias máx carência, curva taxa-por-prazo
 - Tarifas: cadastro/avaliação/registro (default + habilitadas)
@@ -919,6 +993,7 @@ Salvar comparativo → grava em `comparisons`.
 Pipeline: dados → template Jinja2 (HTML/CSS) → WeasyPrint → PDF.
 
 **Blocos do `proposta.html`:**
+
 1. Cabeçalho — logo, razão social, CNPJ, endereço, telefone, código, data, validade
 2. Cliente — nome, CPF/CNPJ, contato, endereço
 3. Veículo — marca/modelo/ano/cor/placa (opc), valor FIPE, valor de venda, fonte FIPE + mês ref
@@ -971,6 +1046,7 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 ### 10.1 PyInstaller — `scripts/build_exe.py`
 
 **Windows** (`finacialsim.exe`)
+
 - `--onedir` (startup mais rápido que `--onefile`)
 - Ícone `assets/icon.ico`
 - Inclui GTK+ runtime do WeasyPrint
@@ -979,11 +1055,13 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 - Atalho desktop, registro em Add/Remove Programs
 
 **Linux** (`finacialsim.AppImage`)
+
 - PyInstaller `--onedir` → AppImage
 - Opcional: `.deb` via fpm em release futura
 - Dados em `~/.local/share/FinacialSim/data/`
 
 **macOS** (`FinacialSim.app`)
+
 - PyInstaller `--onedir` → `.app bundle` + `dmg` via `create-dmg`
 - Requer macOS 12+ (Monterey); Apple Silicon (arm64) e Intel (x86_64) suportados via fat binary
 - Inclui GTK+ runtime do WeasyPrint (via Homebrew bundled)
@@ -991,6 +1069,7 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 - Assinatura ad-hoc (`codesign --deep --force --sign -`) para distribuição manual; notarização Apple opcional em release futura
 
 **Versionamento**
+
 - `pyproject.toml` define versão
 - Embutida no binário e no rodapé do app
 - `app_settings.installed_version` detecta primeira execução pós-update → dispara `alembic upgrade`
@@ -998,18 +1077,21 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 ### 10.2 Scripts de instalação
 
 **Windows — `install_windows.ps1`**
+
 - Verifica Windows 10+ x64
 - Baixa instalador da última release (modo auto)
 - Executa setup silenciosamente (`/S` NSIS)
 - Cria atalho e entrada no menu iniciar
 
 **Linux — `install_linux.sh`**
+
 - Detecta distro via `/etc/os-release`
 - Instala dependências de sistema do WeasyPrint se necessário
 - Baixa AppImage, marca como executável, move para `/opt/finacialsim/`
 - Cria `.desktop` em `~/.local/share/applications/`
 
 **macOS — `install_macos.sh`**
+
 - Verifica macOS 12+ e arquitetura (arm64/x86_64)
 - Verifica/instala Homebrew (com prompt de confirmação do usuário)
 - Instala dependências do WeasyPrint via Homebrew (`pango`, `gdk-pixbuf`, `libffi`)
@@ -1049,7 +1131,7 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 Todas configuráveis em `business_rules` por admin (versionadas em `audit_log`):
 
 | Chave | Default | Descrição |
-|---|---|---|
+| --- | --- | --- |
 | `entrada_minima_pct` | **0.10** | 10% mínimo de entrada |
 | `prazo_minimo_meses` | 12 | |
 | `prazo_maximo_meses` | 72 | |

@@ -4,6 +4,56 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
+## Quick Start
+
+```bash
+# Run app (dev)
+.venv/Scripts/python.exe app/main.py
+
+# Tests
+.venv/Scripts/python.exe -m pytest
+.venv/Scripts/python.exe -m pytest tests/unit/          # unit only
+.venv/Scripts/python.exe -m pytest tests/integration/   # integration only
+
+# Lint + type-check
+.venv/Scripts/python.exe -m ruff check .
+.venv/Scripts/python.exe -m mypy app/
+
+# Build EXE
+.venv/Scripts/python.exe scripts/build_exe.py
+```
+
+## Tech Stack
+
+Python 3.12+ | NiceGUI 2.x (UI + pywebview) | SQLAlchemy 2.x + Alembic | Pydantic v2 | APScheduler | Loguru | WeasyPrint (PDF) | Plotly
+
+## Project Structure
+
+```text
+app/
+  core/         — pure financial math (Price table, CET, IOF, amortization)
+  data/         — SQLAlchemy models, Alembic migrations, repositories
+  integrations/ — FIPE + BACEN providers with fallback chains
+  services/     — orchestration (simulation, proposal, auth, scheduler)
+  ui/           — NiceGUI pages, layout, theme, components
+  reports/      — Jinja2/WeasyPrint PDF templates
+scripts/        — PyInstaller build
+tests/unit/     — unit tests mirroring app/ layout
+tests/integration/ — DB migration + full flow tests
+```
+
+Key files: `app/main.py` (entry), `app/core/price_table.py`, `app/core/cet.py`,
+`app/services/simulation_service.py`, `app/data/models.py`
+
+## Gotchas & Pitfalls
+
+- **Always use venv Python**: `python`/`pytest` directly fail — use `.venv/Scripts/python.exe` (Windows)
+- **NiceGUI global CSS**: `ui.add_head_html()` outside a `@ui.page` handler requires `shared=True`; else RuntimeError at startup
+- **PyInstaller entry**: `app/main.py` must call `main()` under `if __name__ == "__main__": multiprocessing.freeze_support(); main()`
+- **PyInstaller spec paths**: All paths in `finacialsim.spec` must use `str(project_root / "...")` — bare relative paths resolve to spec dir, not project root
+- **Alembic in frozen EXE**: Use Alembic Python API (`Config` + `alembic_command.upgrade`), never `subprocess [sys.executable, "-m", "alembic"]`
+- **SQLite + Windows tests**: Call `engine.dispose()` after session close in fixtures to release the connection pool before temp dir cleanup
+
 ## OpenWolf
 
 @.wolf/OPENWOLF.md
@@ -57,7 +107,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 
 ---
 
-## 3. Think Before Coding
+## Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
@@ -144,7 +194,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
-## 9. Demand Elegance (Balanced)
+## Demand Elegance (Balanced)
 
 - Non-trivial changes: pause. Ask "is there more elegant way?"
 - Fix feels hacky: "Knowing everything I know now, implement elegant solution."
@@ -166,10 +216,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 After every major change (new model, new page, new controller, route changes, migration changes, new test files, architectural shifts), update this CLAUDE.md file to reflect the current state. Specifically:
 
-- Add new models/controllers/pages/routes to the relevant tables below
-- Update test count if new tests are added
-- Add any new gotchas or patterns to the "Gotchas & Pitfalls" section
-- Update the "Current State" section if the status changes
+- Update the Project Structure section if directories or key files change
+- Add new gotchas or patterns to the "Gotchas & Pitfalls" section
 - Keep this file as the single source of truth for AI sessions working on this project
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
