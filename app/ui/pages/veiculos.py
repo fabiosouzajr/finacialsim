@@ -405,11 +405,89 @@ def build_veiculos_page(engine) -> None:
                             ui.button("Salvar veículo", icon="save",
                                       on_click=_salvar_manual).props("color=primary").classes("w-full mt-2")
 
+            # Holds edit-mode input widget refs for _save_edit to read
+            _edit_inputs: dict = {}
+
             def _show_panel_edit() -> None:
-                pass  # Implemented in Task 8
+                vid = selected_id["id"]
+                if vid is None:
+                    return
+                panel_mode["v"] = "edit"
+                panel_body.clear()
+                sims_section.clear()
+                btn_edit.set_visibility(False)
+                btn_save.set_visibility(True)
+
+                from app.data.models import Vehicle as _V
+                from app.ui.components.currency_input import CurrencyInput
+                with SessionLocal() as session:
+                    v = session.get(_V, vid)
+                    if v is None:
+                        return
+                    v_snap = {
+                        "marca": v.marca, "modelo": v.modelo, "ano_modelo": v.ano_modelo,
+                        "combustivel": v.combustivel, "codigo_fipe": v.codigo_fipe,
+                        "valor_fipe": v.valor_fipe,
+                        "cor": v.cor or "", "placa": v.placa or "",
+                        "odometro_km": v.odometro_km or 0,
+                        "valor_referencia": v.valor_referencia,
+                    }
+
+                panel_title.text = f"Editar — {v_snap['marca']} {v_snap['modelo']} {v_snap['ano_modelo']}"
+
+                with panel_body:
+                    ui.label("Dados FIPE (não editáveis)").classes(
+                        "text-xs text-slate-400 uppercase tracking-wider"
+                    )
+                    for lbl, val in [
+                        ("Marca/Modelo", f"{v_snap['marca']} {v_snap['modelo']} {v_snap['ano_modelo']}"),
+                        ("Combustível", v_snap["combustivel"]),
+                        ("Cód. FIPE", v_snap["codigo_fipe"] or "—"),
+                        ("FIPE", format_brl(v_snap["valor_fipe"]) if v_snap["valor_fipe"] else "—"),
+                    ]:
+                        with ui.row().classes("gap-2 items-center"):
+                            ui.label(f"{lbl}:").classes("text-xs text-slate-400 w-24")
+                            ui.label(val).classes("text-xs text-slate-700")
+
+                    ui.separator()
+                    ui.label("Dados físicos").classes(
+                        "text-xs text-slate-400 uppercase tracking-wider"
+                    )
+                    _edit_inputs["cor"] = ui.input(label="Cor", value=v_snap["cor"]).classes("w-full")
+                    _edit_inputs["placa"] = ui.input(
+                        label="Placa (ex: ABC1234)", value=v_snap["placa"]
+                    ).classes("w-full")
+                    _edit_inputs["odometro_km"] = ui.number(
+                        label="Odômetro (km)", value=v_snap["odometro_km"], min=0
+                    ).classes("w-full")
+                    _edit_inputs["valor_referencia"] = CurrencyInput(
+                        "Valor de referência (R$)", v_snap["valor_referencia"]
+                    )
 
             def _save_edit() -> None:
-                pass  # Implemented in Task 8
+                vid = selected_id["id"]
+                if vid is None:
+                    return
+                cor_val = _edit_inputs.get("cor")
+                placa_val = _edit_inputs.get("placa")
+                km_val = _edit_inputs.get("odometro_km")
+                ref_val = _edit_inputs.get("valor_referencia")
+                fields = {
+                    "cor": cor_val.value if cor_val else None,
+                    "placa": placa_val.value if placa_val else None,
+                    "odometro_km": int(km_val.value) if km_val and km_val.value else None,
+                    "valor_referencia": ref_val.value if ref_val else None,
+                }
+                # Remove None values except cor (empty string → None is fine)
+                fields = {k: v for k, v in fields.items() if v is not None}
+                with SessionLocal() as session:
+                    try:
+                        VehicleService(session).update(vid, fields, usuario_id=user_id)
+                        ui.notify("Veículo atualizado!", type="positive")
+                    except VehicleServiceError as e:
+                        ui.notify(str(e), type="negative")
+                        return
+                _select_vehicle(vid)
 
             # Initial load
             _refresh_table()
