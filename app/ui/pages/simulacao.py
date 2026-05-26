@@ -42,13 +42,43 @@ def build_simulacao_page(engine) -> None:
             _actions: dict = {}
             selected_vehicle_id: dict[str, int | None] = {"id": None}
 
+            # ── Load existing simulation (from /veiculos link) ────────
+            _open_sim_id = ng_app.storage.user.pop("open_simulation_id", None)
+            _loaded_sim: dict = {"sim": None}
+
+            if _open_sim_id:
+                from app.data.models import Simulation as _Sim
+                with SessionLocal() as _s:
+                    _sim = _s.get(_Sim, _open_sim_id)
+                    if _sim:
+                        _loaded_sim["sim"] = {
+                            "valor_veiculo": _sim.valor_veiculo,
+                            "valor_entrada": _sim.valor_entrada,
+                            "prazo": _sim.prazo_meses,
+                            "taxa": _sim.taxa_juros_mes,
+                            "incluir_iof": _sim.incluir_iof,
+                            "data_liberacao": _sim.data_liberacao.isoformat(),
+                            "data_venc": _sim.data_primeiro_venc.isoformat(),
+                            "veiculo_id": _sim.veiculo_id,
+                            "codigo": _sim.codigo,
+                        }
+
             # ── Header: title left, action buttons right ─────────────────
             with ui.row().classes("w-full items-center justify-between mb-2"):
                 ui.label("Simulação").classes("text-xl font-bold text-slate-800")
                 with ui.row().classes("gap-2"):
-                    ui.button("Simular", icon="play_arrow",
-                              on_click=lambda: _actions["simular"]()
-                              ).props("color=primary")
+                    if _loaded_sim["sim"]:
+                        ui.label(
+                            f"Carregado: {_loaded_sim['sim']['codigo']}"
+                        ).classes("text-xs text-slate-400 self-center")
+                        ui.button(
+                            "Nova simulação com esses dados", icon="content_copy",
+                            on_click=lambda: _actions["nova_a_partir"](),
+                        ).props("color=primary outline")
+                    else:
+                        ui.button("Simular", icon="play_arrow",
+                                  on_click=lambda: _actions["simular"]()
+                                  ).props("color=primary")
                     ui.button("Gerar PDF", icon="picture_as_pdf",
                               on_click=lambda: _actions["gerar_pdf"]()
                               ).props("color=primary outline")
@@ -293,6 +323,21 @@ def build_simulacao_page(engine) -> None:
                                     _venc_date = ui.date(mask="YYYY-MM-DD", value=_venc_def)
                                     _venc_date.bind_value(inp_venc)
 
+                    # ── Pre-fill if loading existing simulation ────────
+                    if _loaded_sim["sim"]:
+                        _d = _loaded_sim["sim"]
+                        valor_veiculo.value = _d["valor_veiculo"]
+                        valor_entrada.value = _d["valor_entrada"]
+                        prazo.set_value(_d["prazo"])
+                        taxa.value = _d["taxa"]
+                        incluir_iof.set_value(_d["incluir_iof"])
+                        inp_lib.set_value(_d["data_liberacao"])
+                        inp_venc.set_value(_d["data_venc"])
+                        selected_vehicle_id["id"] = _d["veiculo_id"]
+                        if _d["veiculo_id"]:
+                            _build_picker()
+                            _show_chips(_d["veiculo_id"])
+
                 # ── Right: Resultado KPIs + Charts ────────────────────────
                 with ui.column().classes("flex-1 gap-3 min-w-0"):
 
@@ -409,7 +454,15 @@ def build_simulacao_page(engine) -> None:
                 except Exception as exc:
                     ui.notify(f"Erro ao gerar PDF: {exc}", type="negative")
 
+            def nova_a_partir() -> None:
+                _loaded_sim["sim"] = None
+                ui.notify(
+                    "Dados carregados. Ajuste o que quiser e clique em Simular.",
+                    type="info",
+                )
+
             _actions["simular"] = simular
             _actions["gerar_pdf"] = gerar_pdf
+            _actions["nova_a_partir"] = nova_a_partir
 
         shell(content)

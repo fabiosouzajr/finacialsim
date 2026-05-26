@@ -46,3 +46,8 @@ class PercentInput:
             return _parse(self.input.value or "0")
         except (InvalidOperation, ValueError):
             return Decimal("0")
+
+    @value.setter
+    def value(self, v: Decimal) -> None:
+        self._value = v
+        self.input.value = self._format(v)
