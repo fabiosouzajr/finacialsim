@@ -52,24 +52,32 @@ Top of the left form column, above the existing "Veiculo" section label.
 
 ### Widget
 ```python
-cliente_options = {None: "— sem cliente —"}
+cliente_options = {0: "— sem cliente —"}
 cliente_options.update({c.id: f"{c.nome}  ({c.cpf_cnpj})" for c in clients})
 
 cliente_sel = ui.select(
     cliente_options,
-    value=None,
+    value=0,
     label="Cliente",
     with_input=True,
-    clearable=True,
 ).classes("w-full")
 ```
 
 - `with_input=True` enables built-in client-side search filter.
-- Default: `None` ("— sem cliente —"). Selection is optional.
-- Clearable: clicking x resets to `None`.
+- Sentinel `0` (int) used for "no client" — matches the vehicle picker pattern. `None` keys cause JSON serialization issues with Quasar's QSelect.
+- No `clearable` needed — user selects `0` ("— sem cliente —") to deselect.
 
 ### DTO wiring
-`SimulationInputDTO.cliente_id` is already `int | None`. The `simular()` callback passes `cliente_id=cliente_sel.value`. No service-layer changes needed.
+```python
+cliente_id = cliente_sel.value if cliente_sel.value != 0 else None
+```
+`SimulationInputDTO.cliente_id` is already `int | None`. No service-layer changes needed.
+
+### Loaded-simulation restore
+When a simulation is loaded from `/veiculos`, add `"cliente_id": _sim.cliente_id` to the `_loaded_sim["sim"]` dict. In the pre-fill block, set `cliente_sel.value = _d["cliente_id"] or 0`.
+
+### nova_a_partir
+`nova_a_partir()` leaves the form values intact — `cliente_sel` keeps the restored client. No change needed.
 
 ---
 
@@ -96,10 +104,12 @@ A `ui.label` placed directly below the `valor_entrada` input:
 | current % < `entrada_minima_pct` | `text-amber-500` |
 | `valor_veiculo` is zero | label hidden |
 
-**Update trigger:** both `valor_veiculo` and `valor_entrada` gain `on_change` callbacks that call `_update_pct_label()`. Exact binding depends on `CurrencyInput`'s event API (resolved during implementation).
+**Update trigger:** `CurrencyInput` fires `on_change` on `blur` (click-away). After `_update_pct_label` is defined, bind it to both fields via `valor_veiculo.input.on("blur", ...)` and `valor_entrada.input.on("blur", ...)`. Call it once immediately at page render to show the initial state.
+
+**Chip-click recalculation:** An `entrada_modified = {"v": False}` flag tracks manual edits. `_set_valor_veiculo` (chip click) recalculates `valor_entrada = quantize_brl(entrada_minima_pct * new_val)` and calls `_update_pct_label()` only when `not entrada_modified["v"]`. `valor_entrada.input.on("blur", lambda _: entrada_modified.__setitem__("v", True))` sets the flag when the user manually edits the field.
 
 ### Behavior after user edits
-The user owns the field immediately after touching it. There is no automatic recalculation of `valor_entrada` when `valor_veiculo` changes — the % indicator continues to reflect the current state.
+Once the user manually touches `valor_entrada` (blur fires, `entrada_modified = True`), subsequent chip clicks no longer recalculate it. The % indicator still updates on every blur of either field.
 
 ---
 
@@ -138,7 +148,7 @@ def _poll_bacen():
     bacen_hint.classes("text-slate-400", replace=True)
     bacen_hint.update()
     if not taxa_modified["v"]:
-        taxa.value = row.valor
+        taxa.value = new_val
         taxa.update()
 
 ui.timer(60, _poll_bacen)
