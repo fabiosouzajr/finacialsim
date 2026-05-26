@@ -881,3 +881,25 @@
 | 15:11 | Edited app/ui/pages/simulacao.py | 12→16 lines | ~284 |
 | 15:11 | Edited app/ui/pages/simulacao.py | modified nova_a_partir() | ~98 |
 | 15:14 | Created tests/integration/test_vehicle_simulation_flow.py | — | ~997 |
+
+## Session: 2026-05-26 15:31
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:45 | Created docs/superpowers/specs/2026-05-26-ui-error-feedback-design.md | — | ~1529 |
+| 15:46 | Edited docs/superpowers/specs/2026-05-26-ui-error-feedback-design.md | 1→2 lines | ~67 |
+| 15:55 | Created docs/superpowers/specs/2026-05-26-ui-error-feedback-design.md | — | ~1988 |
+| 15:58 | Created docs/superpowers/plans/2026-05-26-ui-error-feedback.md | — | ~4470 |
+| 15:59 | Edited docs/superpowers/plans/2026-05-26-ui-error-feedback.md | modified block() | ~180 |
+| 16:01 | Created app/ui/error_handler.py | — | ~97 |
+| 16:02 | Edited app/ui/pages/simulacao.py | added 1 import(s) | ~27 |
+| 16:02 | Edited app/ui/pages/simulacao.py | 4→5 lines | ~35 |
+| 16:02 | Edited app/ui/pages/simulacao.py | added 1 import(s) | ~40 |
+| 16:03 | Edited app/ui/pages/simulacao.py | commit() → flush() | ~23 |
+| 16:04 | Edited app/ui/pages/simulacao.py | modified simular() | ~1355 |
+| 16:07 | Edited app/ui/pages/simulacao.py | 2→3 lines | ~51 |
+| 16:07 | Edited app/ui/pages/simulacao.py | 2→4 lines | ~82 |
+| 16:08 | Edited app/ui/pages/veiculos.py | added 1 import(s) | ~46 |
+| 16:08 | Edited app/ui/pages/veiculos.py | 5→7 lines | ~128 |
+| 16:08 | Edited app/ui/pages/veiculos.py | 5→7 lines | ~122 |
+| 16:08 | Edited app/ui/pages/veiculos.py | 4→7 lines | ~93 |
