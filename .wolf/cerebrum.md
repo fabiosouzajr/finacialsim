@@ -21,6 +21,10 @@
 
 ## Do-Not-Repeat
 
+- [2026-05-26] **SQLite op.add_column with ForeignKey**: `op.add_column("t", sa.Column("c", sa.Integer(), sa.ForeignKey("other.id")))` raises `NotImplementedError` on SQLite — SQLite cannot add FK constraints via ALTER TABLE. Use `sa.Column("c", sa.Integer(), nullable=True)` without ForeignKey; the ORM relationship handles the FK at the Python level.
+- [2026-05-26] **SQLite non-transactional DDL**: SQLite executes DDL (ALTER TABLE ADD COLUMN) immediately even if the migration fails later. A failed alembic upgrade may partially apply DDL. Check `inspect(e).get_columns()` and alembic_version to assess actual DB state before re-running.
+- [2026-05-26] **SQLite op.alter_column nullable**: `op.alter_column("t", "c", nullable=False)` fails on SQLite — must use `with op.batch_alter_table("t") as batch_op: batch_op.alter_column("c", nullable=False)` (copy-and-move strategy).
+
 - [2026-05-25] **PyInstaller spec paths**: All paths in finacialsim.spec (script entry, datas, icon) must use `str(project_root / "...")` where `project_root = Path(SPECPATH).parent`. Bare relative paths resolve relative to the spec file directory, not the project root.
 - [2026-05-25] **PyInstaller entrypoint**: `app/main.py` defines `main()` but must call it via `if __name__ == "__main__": multiprocessing.freeze_support(); main()`. Without this, the frozen EXE silently exits with code 0.
 - [2026-05-25] **NiceGUI global scope CSS**: `ui.add_head_html()` called outside a `@ui.page` handler requires `shared=True`. Without it, NiceGUI raises RuntimeError at startup when native mode is used.

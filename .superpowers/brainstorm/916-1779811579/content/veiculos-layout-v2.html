@@ -1,0 +1,99 @@
+<h2>Layout B — revisado</h2>
+<p class="subtitle">Simulações vinculadas agora são links que navegam para a simulação</p>
+
+<div class="mockup">
+  <div class="mockup-header">Preview — /veiculos com painel lateral</div>
+  <div class="mockup-body" style="padding:12px;font-size:12px">
+
+    <!-- Header da página -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-weight:bold;font-size:15px">Veículos</span>
+      <span class="mock-button" style="font-size:11px;padding:4px 12px">+ Novo Veículo</span>
+    </div>
+
+    <!-- Filtros -->
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input class="mock-input" style="flex:1;font-size:11px;padding:3px 6px" placeholder="Buscar marca, modelo, placa, cor...">
+      <select class="mock-input" style="font-size:11px;padding:3px 6px">
+        <option>Todos os status</option><option>Disponível</option><option>Reservado</option><option>Vendido</option>
+      </select>
+    </div>
+
+    <!-- Layout split: tabela + painel -->
+    <div style="display:flex;gap:10px;min-height:220px">
+
+      <!-- Tabela -->
+      <div style="flex:0 0 58%">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="background:#f1f5f9">
+            <th style="padding:5px 4px;text-align:left">Modelo</th>
+            <th style="padding:5px 4px;text-align:left">Placa</th>
+            <th style="padding:5px 4px;text-align:left">Cor</th>
+            <th style="padding:5px 4px;text-align:right">Valor Ref.</th>
+            <th style="padding:5px 4px;text-align:center">Status</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #e2e8f0;background:#eff6ff;cursor:pointer">
+              <td style="padding:5px 4px;font-weight:500">Honda Civic 2022</td>
+              <td style="padding:5px 4px">ABC-1234</td>
+              <td style="padding:5px 4px">Prata</td>
+              <td style="padding:5px 4px;text-align:right">R$ 115.000</td>
+              <td style="padding:5px 4px;text-align:center"><span style="background:#dcfce7;color:#166534;padding:1px 6px;border-radius:8px;font-size:10px">Disponível</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;cursor:pointer">
+              <td style="padding:5px 4px">Toyota Corolla 2023</td>
+              <td style="padding:5px 4px">DEF-5678</td>
+              <td style="padding:5px 4px">Preto</td>
+              <td style="padding:5px 4px;text-align:right">R$ 145.000</td>
+              <td style="padding:5px 4px;text-align:center"><span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:10px">Reservado</span></td>
+            </tr>
+            <tr style="cursor:pointer">
+              <td style="padding:5px 4px;color:#94a3b8">VW Gol 2020</td>
+              <td style="padding:5px 4px;color:#94a3b8">GHI-9012</td>
+              <td style="padding:5px 4px;color:#94a3b8">Branco</td>
+              <td style="padding:5px 4px;text-align:right;color:#94a3b8">R$ 58.000</td>
+              <td style="padding:5px 4px;text-align:center"><span style="background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;font-size:10px">Vendido</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Painel lateral (Honda Civic selecionado) -->
+      <div style="flex:1;border-left:3px solid #3b82f6;padding-left:12px;background:#f8fafc;border-radius:4px;display:flex;flex-direction:column;gap:6px">
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:bold;font-size:12px;color:#1e40af">Honda Civic 2022</span>
+          <div style="display:flex;gap:4px">
+            <span class="mock-button" style="font-size:10px;padding:2px 7px">✏️ Editar</span>
+            <span class="mock-button" style="font-size:10px;padding:2px 7px;background:#f0fdf4;color:#166534;border-color:#86efac">Disponível ▾</span>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:#64748b">Gasolina · Cód. FIPE 001004-9</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px">
+          <div><span style="color:#94a3b8">FIPE</span> R$ 112.000</div>
+          <div><span style="color:#94a3b8">Referência</span> R$ 115.000</div>
+          <div><span style="color:#94a3b8">Cor</span> Prata</div>
+          <div><span style="color:#94a3b8">Placa</span> ABC-1234</div>
+          <div><span style="color:#94a3b8">Odômetro</span> 32.450 km</div>
+          <div><span style="color:#94a3b8">Mês ref.</span> Maio/2026</div>
+        </div>
+
+        <div style="border-top:1px solid #e2e8f0;padding-top:6px">
+          <div style="font-size:10px;font-weight:600;color:#475569;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Simulações vinculadas</div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <a style="font-size:10px;color:#2563eb;text-decoration:underline;cursor:pointer">SIM-2026-00042 · R$ 115.000 · 48x · 26/05/2026</a>
+            <a style="font-size:10px;color:#2563eb;text-decoration:underline;cursor:pointer">SIM-2026-00039 · R$ 110.000 · 36x · 20/05/2026</a>
+          </div>
+          <div style="font-size:9px;color:#94a3b8;margin-top:4px">Clique para abrir a simulação na aba /simulacao</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px;padding:10px 14px;background:#f0fdf4;border-radius:6px;border-left:3px solid #22c55e;font-size:12px;color:#166534">
+  ✅ <strong>Confirmado:</strong> Layout B com simulações como links. Clique em "SIM-XXXX" navega para /simulacao carregando aquela simulação.
+</div>

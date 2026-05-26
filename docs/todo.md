@@ -9,7 +9,7 @@ Voce esta trabalhando no desenvolvimento do FinacialSim, que é um aplicativo de
 5. Manter histórico auditável e reproduzível (uma proposta de 2026 deve poder ser regerada em 2027, idêntica).
 6. Servir de base modular para futuras integrações (CRM, WhatsApp, geração de carnê, APIs bancárias).
 
-ada simulacao deve referenciar um veiculo e um cliente. atualmente a implementacao do fipe serve apenas como base para obter dados do veiculo. para manter um registro de propostas devemos implementar uma pagina "veiculos" que use os dados do fipe como base para criar e atualizar veiculos. implementar a diferenciacao de veiculos do mesmo modelo/ano definindo campos como "cor", "placa" e "odometro".
+Cada simulacao pode referenciar um veiculo e um cliente. Atualmente a implementacao do fipe serve apenas como base para obter dados do veiculo. para manter um registro de propostas devemos implementar uma pagina "veiculos" que use os dados do fipe como base para criar e atualizar veiculos. implementar a diferenciacao de veiculos do mesmo modelo/ano definindo campos como "cor", "placa" e "odometro".
 
 ## implement a "veiculos" page
 

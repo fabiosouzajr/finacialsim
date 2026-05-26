@@ -1,0 +1,91 @@
+<h2>Layout da página /veiculos</h2>
+<p class="subtitle">Qual estrutura funciona melhor para o cadastro e gestão do estoque?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Tabela + Modal (padrão do /cadastro)</h3>
+      <p>Tabela filtrável ocupa toda a largura. Botão "Novo Veículo" abre modal com duas abas: <strong>Buscar na FIPE</strong> (dropdowns cascata) e <strong>Manual</strong>. Ao selecionar o ano na FIPE, os campos são preenchidos automaticamente e o usuário completa cor, placa, odômetro e valor de referência. Edição de veículo existente abre o mesmo modal preenchido.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Preview</div>
+        <div class="mockup-body" style="padding:10px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-weight:bold">Veículos</span>
+            <span class="mock-button" style="font-size:11px;padding:3px 10px">+ Novo Veículo</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <input class="mock-input" style="flex:1;font-size:11px;padding:3px 6px" placeholder="Buscar marca, modelo, placa...">
+            <select class="mock-input" style="font-size:11px;padding:3px 6px"><option>Todos os status</option><option>Disponível</option><option>Reservado</option><option>Vendido</option></select>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead><tr style="background:#f1f5f9">
+              <th style="padding:4px;text-align:left">Modelo</th>
+              <th style="padding:4px;text-align:left">Placa</th>
+              <th style="padding:4px;text-align:left">Cor</th>
+              <th style="padding:4px;text-align:right">Valor Ref.</th>
+              <th style="padding:4px;text-align:center">Status</th>
+              <th style="padding:4px;text-align:center">Ações</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #e2e8f0"><td style="padding:4px">Honda Civic 2022</td><td style="padding:4px">ABC-1234</td><td style="padding:4px">Prata</td><td style="padding:4px;text-align:right">R$ 115.000</td><td style="padding:4px;text-align:center"><span style="background:#dcfce7;color:#166534;padding:1px 6px;border-radius:8px;font-size:10px">Disponível</span></td><td style="padding:4px;text-align:center">✏️ ⋮</td></tr>
+              <tr style="border-bottom:1px solid #e2e8f0"><td style="padding:4px">Toyota Corolla 2023</td><td style="padding:4px">DEF-5678</td><td style="padding:4px">Preto</td><td style="padding:4px;text-align:right">R$ 145.000</td><td style="padding:4px;text-align:center"><span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:10px">Reservado</span></td><td style="padding:4px;text-align:center">✏️ ⋮</td></tr>
+              <tr><td style="padding:4px">VW Gol 2020</td><td style="padding:4px">GHI-9012</td><td style="padding:4px">Branco</td><td style="padding:4px;text-align:right">R$ 58.000</td><td style="padding:4px;text-align:center"><span style="background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;font-size:10px">Vendido</span></td><td style="padding:4px;text-align:center">✏️ ⋮</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Prós</h4><ul><li>Padrão já usado no /cadastro</li><li>Máxima área para a tabela</li><li>Mais rápido de implementar</li></ul></div>
+        <div class="cons"><h4>Contras</h4><ul><li>Modal com FIPE + campos extras fica mais longo</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Tabela + Painel lateral deslizante</h3>
+      <p>A tabela fica à esquerda (70% da largura). Ao clicar em "Novo" ou numa linha, um painel desliza da direita mostrando os detalhes completos do veículo: busca FIPE, campos extras e histórico de simulações vinculadas. Painel fecha com ESC ou clique fora.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Preview</div>
+        <div class="mockup-body" style="padding:10px;font-size:12px">
+          <div style="display:flex;gap:8px">
+            <div style="flex:0 0 62%">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-weight:bold">Veículos</span>
+                <span class="mock-button" style="font-size:11px;padding:3px 10px">+ Novo</span>
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:11px">
+                <thead><tr style="background:#f1f5f9">
+                  <th style="padding:4px;text-align:left">Modelo</th>
+                  <th style="padding:4px;text-align:left">Placa</th>
+                  <th style="padding:4px;text-align:center">Status</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid #e2e8f0;background:#eff6ff"><td style="padding:4px">Honda Civic 2022</td><td style="padding:4px">ABC-1234</td><td style="padding:4px;text-align:center"><span style="background:#dcfce7;color:#166534;padding:1px 6px;border-radius:8px;font-size:10px">Disponível</span></td></tr>
+                  <tr style="border-bottom:1px solid #e2e8f0"><td style="padding:4px">Toyota Corolla 2023</td><td style="padding:4px">DEF-5678</td><td style="padding:4px;text-align:center"><span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:10px">Reservado</span></td></tr>
+                  <tr><td style="padding:4px">VW Gol 2020</td><td style="padding:4px">GHI-9012</td><td style="padding:4px;text-align:center"><span style="background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;font-size:10px">Vendido</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="flex:1;border-left:2px solid #3b82f6;padding-left:8px;background:#f8fafc;border-radius:4px">
+              <div style="font-weight:bold;font-size:11px;margin-bottom:6px;color:#3b82f6">Honda Civic 2022 ▶</div>
+              <div style="font-size:10px;color:#64748b;margin-bottom:4px">FIPE: R$ 112.000 · Ref.: R$ 115.000</div>
+              <div style="font-size:10px;margin-bottom:2px">🎨 Cor: Prata</div>
+              <div style="font-size:10px;margin-bottom:2px">🔖 Placa: ABC-1234</div>
+              <div style="font-size:10px;margin-bottom:6px">🔢 Km: 32.450</div>
+              <div style="font-size:10px;font-weight:bold;margin-bottom:2px">Simulações vinculadas</div>
+              <div style="font-size:10px;color:#64748b">SIM-2026-00042</div>
+              <div style="font-size:10px;color:#64748b">SIM-2026-00039</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Prós</h4><ul><li>Mostra simulações vinculadas sem sair da página</li><li>UX mais rica para consulta</li></ul></div>
+        <div class="cons"><h4>Contras</h4><ul><li>Mais complexo de implementar</li><li>Tabela fica mais estreita</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -782,6 +782,206 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-05-26T14:07:13.723Z"
+    },
+    {
+      "id": "bug-049",
+      "timestamp": "2026-05-26T17:05:54.783Z",
+      "error_message": "Significant refactor of ",
+      "file": "tests/unit/data/test_models_vehicles.py",
+      "root_cause": "12 lines replaced/restructured",
+      "fix": "Rewrote 22→8 lines (12 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:05:54.783Z"
+    },
+    {
+      "id": "bug-050",
+      "timestamp": "2026-05-26T17:09:22.095Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 8→42 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:09:22.095Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-05-26T14:10:00.000Z",
+      "error_message": "NotImplementedError: No support for ALTER of constraints in SQLite dialect",
+      "file": "app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py",
+      "root_cause": "op.add_column used sa.ForeignKey() inline — SQLite cannot add FK constraints via ALTER TABLE",
+      "fix": "Removed sa.ForeignKey('users.id') from op.add_column for criado_por; kept as plain sa.Integer() nullable=True",
+      "tags": [
+        "alembic",
+        "sqlite",
+        "foreignkey",
+        "migrations"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T14:10:00.000Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-05-26T14:12:00.000Z",
+      "error_message": "SQLite non-transactional DDL left partial columns in DB; alembic_version not updated",
+      "file": "app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py",
+      "root_cause": "SQLite applies DDL (ADD COLUMN) immediately without transaction rollback. Failed migration left cor/placa/odometro_km/status/atualizado_em columns but not criado_por, and alembic_version unchanged",
+      "fix": "Applied remaining steps (batch alter_column for status nullable=False, CREATE UNIQUE INDEX) manually via direct SQL/alembic API, then ran alembic stamp to update version",
+      "tags": [
+        "alembic",
+        "sqlite",
+        "ddl",
+        "migrations",
+        "partial-migration"
+      ],
+      "related_bugs": [
+        "bug-051"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T14:12:00.000Z"
+    },
+    {
+      "id": "bug-053",
+      "timestamp": "2026-05-26T14:14:00.000Z",
+      "error_message": "op.alter_column nullable=False fails on SQLite",
+      "file": "app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py",
+      "root_cause": "SQLite does not support ALTER COLUMN; op.alter_column requires batch mode (copy-and-move)",
+      "fix": "Changed op.alter_column to use batch_alter_table context: with op.batch_alter_table('vehicles') as batch_op: batch_op.alter_column('status', nullable=False)",
+      "tags": [
+        "alembic",
+        "sqlite",
+        "alter-column",
+        "batch-mode"
+      ],
+      "related_bugs": [
+        "bug-052"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T14:14:00.000Z"
+    },
+    {
+      "id": "bug-054",
+      "timestamp": "2026-05-26T17:28:57.855Z",
+      "error_message": "Significant refactor of ",
+      "file": "tests/unit/services/test_vehicle_service.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 20→35 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:28:57.855Z"
+    },
+    {
+      "id": "bug-055",
+      "timestamp": "2026-05-26T17:30:19.929Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/ui/layout.py",
+      "root_cause": "Had \"FIPE\"",
+      "fix": "Changed to \"Veículos\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:30:19.929Z"
+    },
+    {
+      "id": "bug-056",
+      "timestamp": "2026-05-26T17:30:38.859Z",
+      "error_message": "Wrong reference: build_fipe_page should be build_veiculos_page",
+      "file": "app/main.py",
+      "root_cause": "Used \"build_fipe_page\" instead of \"build_veiculos_page\"",
+      "fix": "Changed build_fipe_page → build_veiculos_page",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:30:38.859Z"
+    },
+    {
+      "id": "bug-057",
+      "timestamp": "2026-05-26T17:41:55.966Z",
+      "error_message": "Missing await",
+      "file": "app/ui/pages/veiculos.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:41:55.966Z"
+    },
+    {
+      "id": "bug-058",
+      "timestamp": "2026-05-26T17:45:56.988Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/ui/pages/veiculos.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5→83 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:45:56.988Z"
+    },
+    {
+      "id": "bug-059",
+      "timestamp": "2026-05-26T17:52:41.736Z",
+      "error_message": "Missing await",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T17:52:41.736Z"
+    },
+    {
+      "id": "bug-060",
+      "timestamp": "2026-05-26T18:11:03.688Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 12→16 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T18:11:03.688Z"
     }
   ]
 }

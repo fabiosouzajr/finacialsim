@@ -3,6 +3,23 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 2026-05-26 | Created integration tests for vehicle→simulation flow | tests/integration/test_vehicle_simulation_flow.py | 2 passed, committed | ~800 |
+
+| HH:MM | description | file(s) | outcome | ~tokens |
+|-------|-------------|---------|---------|---------|
+| session | Task 9: added vehicle picker section (states 1-3) to /simulacao — stock picker, FIPE inline search, value chips, simular() updated to use selected vehicle | app/ui/pages/simulacao.py | 135 tests pass, committed 76b283c | ~4000 |
+
+| HH:MM | description | file(s) | outcome | ~tokens |
+| 00:00 | Implemented Task 7: _render_create_panel with FIPE tab (cascading dropdowns + price fetch) and Manual tab (free-form fields) | app/ui/pages/veiculos.py | committed 6c3d6ce, 135 tests pass | ~3500 |
+
+| 17:45 | Task 5: swapped /fipe→/veiculos in layout.py, main.py; created veiculos.py skeleton; deleted fipe.py via git rm | app/ui/layout.py, app/main.py, app/ui/pages/veiculos.py | 135 tests pass, committed 6689fd2 | ~3k |
+
+| 14:23 | appended test_set_status_invalido_levanta_erro and test_set_status_veiculo_inexistente_levanta_erro | tests/unit/services/test_vehicle_service.py | 9/9 passed, committed c8609bf | ~400 |
+
+| 2026-05-26 | Task 3: created VehicleService with placa validation + create_from_fipe + create_manual + set_status | app/services/vehicle_service.py, tests/unit/services/test_vehicle_service.py | 7 tests pass, committed b0e7e55 | ~3000 |
+
+| 14:15 | Task 2: Alembic migration — add vehicle fields (cor, placa, odometro_km, status, atualizado_em, criado_por) to vehicles table | app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py | done — partial DDL quirk recovered via stamp; DB at head 45b4fea970eb | ~3500 |
+
 | 15:00 | Verified codebase vs design spec; updated spec + anatomy.md | docs/superpowers/specs/2026-05-23-finacialsim-design.md, .wolf/anatomy.md | spec now reflects implemented state (status, dir structure, CET bisection, FipeCache.acao, scheduler location, FIPE tab, APIs page pending) | ~3000 |
 
 | 00:00 | fix bug-044: IPVA/emplacamento só cobriam o 1º ano | app/ui/pages/simulacao.py | corrigido: num_anos=ceil(prazo/12), valor_total*=num_anos, duracao_meses=prazo_int, removido campo rateio | ~150 tok |
@@ -763,3 +780,104 @@
 | 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 30→33 lines | ~464 |
 | 11:07 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 2→2 lines | ~47 |
 | 11:11 | Session end: 11 writes across 1 files (2026-05-23-finacialsim-design.md) | 16 reads | ~15500 tok |
+
+## Session: 2026-05-26 12:17
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:04 | Created .superpowers/brainstorm/472-1779808804/content/veiculos-layout.html | — | ~1999 |
+| 13:07 | Created .superpowers/brainstorm/916-1779811579/content/veiculos-layout.html | — | ~1999 |
+| 13:09 | Created .superpowers/brainstorm/916-1779811579/content/veiculos-layout-v2.html | — | ~1531 |
+| 13:11 | Created .superpowers/brainstorm/916-1779811579/content/simulacao-veiculo.html | — | ~2092 |
+| 13:17 | Created docs/superpowers/specs/2026-05-26-veiculos-design.md | — | ~2888 |
+| 13:36 | Created docs/superpowers/specs/2026-05-26-veiculos-design.md | — | ~3886 |
+| 13:50 | Created docs/superpowers/plans/2026-05-26-veiculos.md | — | ~20922 |
+
+## Session: 2026-05-26 13:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:56 | Created tests/unit/data/test_models_vehicles.py | — | ~406 |
+| 13:59 | Edited app/data/models.py | expanded (+6 lines) | ~232 |
+|  | Task 1: added cor, placa, odometro_km, status, atualizado_em, criado_por to Vehicle model (TDD) | app/data/models.py, tests/unit/data/test_models_vehicles.py | 2 tests pass, 116 total, committed 08c5656 | ~800 |
+| 14:03 | Task 1: added cor, placa, odometro_km, status, atualizado_em, criado_por to Vehicle model (TDD) | app/data/models.py, tests/unit/data/test_models_vehicles.py | 2 tests pass, 116 total, committed 08c5656 | ~800 |
+| 14:05 | Edited tests/unit/data/test_models_vehicles.py | modified test_vehicle_has_new_fields() | ~36 |
+| 14:06 | Edited tests/unit/data/test_models_vehicles.py | 5→3 lines | ~19 |
+| 14:06 | Edited app/data/models.py | 6→6 lines | ~156 |
+| 14:09 | Edited app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py | modified upgrade() | ~460 |
+| 14:09 | Edited app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py | inline fix | ~24 |
+| 14:10 | Edited app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py | 2→3 lines | ~53 |
+| 14:14 | Edited app/data/migrations/versions/20260526_45b4fea970eb_add_vehicle_fields.py | 7→11 lines | ~147 |
+| 14:17 | Created tests/unit/services/test_vehicle_service.py | — | ~1211 |
+| 14:18 | Created app/services/vehicle_service.py | — | ~1228 |
+| 14:23 | Edited tests/unit/services/test_vehicle_service.py | modified test_create_manual_persiste_campos() | ~309 |
+| 14:25 | Edited tests/unit/services/test_vehicle_service.py | modified test_set_status_veiculo_inexistente_levanta_erro() | ~963 |
+| 14:25 | Edited app/services/vehicle_service.py | 11→11 lines | ~92 |
+| 14:25 | Edited app/services/vehicle_service.py | modified set_status() | ~989 |
+| 14:28 | Edited tests/unit/services/test_vehicle_service.py | modified test_list_active_exclui_vendidos_e_fonte_manual() | ~398 |
+| 14:30 | Edited app/ui/layout.py | "FIPE" → "Veículos" | ~26 |
+| 14:30 | Created app/ui/pages/veiculos.py | — | ~210 |
+| 14:30 | Edited app/main.py | inline fix | ~16 |
+| 14:30 | Edited app/main.py | inline fix | ~9 |
+| 14:34 | Created app/ui/pages/veiculos.py | — | ~3455 |
+| 14:34 | Edited app/ui/pages/veiculos.py | 3→1 lines | ~11 |
+| 14:34 | Edited app/ui/pages/veiculos.py | modified element() | ~632 |
+| 14:35 | Edited app/ui/pages/veiculos.py | modified style() | ~372 |
+| 14:35 | Edited app/ui/pages/veiculos.py | added 1 import(s) | ~73 |
+
+## Session: 2026-05-26 14:36
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:36 | Task 6: replaced veiculos.py skeleton with full table+panel implementation; fixed Element.text type errors and Decimal cast issues | app/ui/pages/veiculos.py | 135 tests pass, committed a36801f | ~2500 |
+| 14:39 | Edited app/ui/pages/veiculos.py | added 1 import(s) | ~34 |
+| 14:39 | Edited app/ui/pages/veiculos.py | modified classes() | ~53 |
+| 14:39 | Edited app/ui/pages/veiculos.py | modified style() | ~172 |
+| 14:39 | Edited app/ui/pages/veiculos.py | 1→2 lines | ~42 |
+| 14:41 | Edited app/ui/pages/veiculos.py | modified _render_create_panel() | ~3174 |
+| 14:45 | Edited app/ui/pages/veiculos.py | modified _show_panel_edit() | ~1215 |
+| 14:46 | Edited app/ui/pages/veiculos.py | inline fix | ~22 |
+| 14:47 | Implemented Task 8: _show_panel_edit and _save_edit in /veiculos page; fixed str(val) linter warning | app/ui/pages/veiculos.py | 135 tests pass, committed ef322f6 | ~800 |
+| 14:51 | Edited app/ui/pages/simulacao.py | inline fix | ~11 |
+| 14:51 | Edited app/ui/pages/simulacao.py | added 2 import(s) | ~53 |
+| 14:51 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~35 |
+| 14:52 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~51 |
+
+## Session: 2026-05-26 14:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:52 | Edited app/ui/pages/simulacao.py | modified _build_picker() | ~2959 |
+
+## Session: 2026-05-26 14:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:52 | Edited app/ui/pages/simulacao.py | expanded (+7 lines) | ~214 |
+
+## Session: 2026-05-26 14:56
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-26 14:57
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-26 14:57
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:03 | Edited app/ui/pages/simulacao.py | modified _show_chips() | ~314 |
+| 15:04 | Edited app/ui/pages/simulacao.py | 6→7 lines | ~126 |
+| 15:04 | Edited app/ui/pages/simulacao.py | 13→14 lines | ~251 |
+| 15:06 | Edited app/ui/pages/simulacao.py | expanded (+21 lines) | ~386 |
+| 15:06 | Edited app/ui/pages/simulacao.py | modified classes() | ~269 |
+| 15:06 | Edited app/ui/pages/simulacao.py | expanded (+15 lines) | ~316 |
+| 15:06 | Edited app/ui/components/percent_input.py | modified value() | ~90 |
+| 15:07 | Edited app/ui/pages/simulacao.py | modified nova_a_partir() | ~110 |
+| 18:30 | Task 10: /simulacao load mode — pre-fill from /veiculos link | app/ui/pages/simulacao.py, app/ui/components/percent_input.py | 135 tests pass, committed | ~3500 |
+| 15:11 | Edited app/ui/pages/simulacao.py | 12→16 lines | ~284 |
+| 15:11 | Edited app/ui/pages/simulacao.py | modified nova_a_partir() | ~98 |
+| 15:14 | Created tests/integration/test_vehicle_simulation_flow.py | — | ~997 |
