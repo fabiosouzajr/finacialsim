@@ -424,6 +424,42 @@ def build_simulacao_page(engine) -> None:
                     chart_total = ui.plotly(parcela_total_chart([])).classes("w-full")
 
             # ── Callbacks (bound after UI built via _actions) ─────────────
+            def _update_pct_label() -> None:
+                if valor_veiculo.value == 0:
+                    pct_label.set_visibility(False)
+                    return
+                pct_label.set_visibility(True)
+                pct = valor_entrada.value / valor_veiculo.value
+                pct_label.set_text(
+                    f"{pct * 100:.1f}%  (min. {entrada_minima_pct * 100:.0f}%)"
+                )
+                if pct < entrada_minima_pct:
+                    pct_label.classes(remove="text-slate-400", add="text-amber-500")
+                else:
+                    pct_label.classes(remove="text-amber-500", add="text-slate-400")
+
+            valor_veiculo.input.on("blur", lambda _: _update_pct_label())
+            valor_entrada.input.on("blur", lambda _: _update_pct_label())
+            valor_entrada.input.on("blur", lambda _: entrada_modified.__setitem__("v", True))
+            _update_pct_label()
+
+            taxa.input.on("blur", lambda _: taxa_modified.__setitem__("v", True))
+
+            def _poll_bacen() -> None:
+                with SessionLocal() as _s:
+                    _row = IndicatorRepository(_s).get_latest("TX_BACEN_VEIC")
+                    new_val: Decimal | None = _row.valor if _row else None
+                if new_val is None:
+                    return
+                bacen_hint.set_text(f"BACEN TX_VEIC: {new_val * 100:.2f}% a.m.")
+                bacen_hint.style("color: rgb(148 163 184)")
+                bacen_hint.update()
+                if not taxa_modified["v"]:
+                    taxa.value = new_val
+                    taxa.input.update()
+
+            ui.timer(60, _poll_bacen)
+
             def simular() -> None:
                 try:
                     with SessionLocal() as session:
