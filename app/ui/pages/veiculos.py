@@ -8,6 +8,7 @@ from nicegui import app as ng_app, ui
 from app.data.database import get_session_factory
 from app.integrations.factory import build_fipe_chain
 from app.services.vehicle_service import VehicleService, VehicleServiceError
+from app.ui.error_handler import handle_unexpected
 from app.ui.layout import shell
 from app.ui.router import get_logged_user_id
 from app.utils.br_format import format_brl
@@ -358,6 +359,8 @@ def build_veiculos_page(engine) -> None:
                                             _refresh_table()
                                         except VehicleServiceError as e:
                                             ui.notify(str(e), type="negative")
+                                        except Exception as exc:
+                                            handle_unexpected(exc, "veiculos.salvar_fipe")
 
                                 ui.button("Salvar veículo", icon="save",
                                           on_click=_salvar_fipe).props("color=primary").classes("w-full")
@@ -401,6 +404,8 @@ def build_veiculos_page(engine) -> None:
                                         _refresh_table()
                                     except VehicleServiceError as e:
                                         ui.notify(str(e), type="negative")
+                                    except Exception as exc:
+                                        handle_unexpected(exc, "veiculos.salvar_manual")
 
                             ui.button("Salvar veículo", icon="save",
                                       on_click=_salvar_manual).props("color=primary").classes("w-full mt-2")
@@ -486,6 +491,9 @@ def build_veiculos_page(engine) -> None:
                         ui.notify("Veículo atualizado!", type="positive")
                     except VehicleServiceError as e:
                         ui.notify(str(e), type="negative")
+                        return
+                    except Exception as exc:
+                        handle_unexpected(exc, "veiculos.save_edit")
                         return
                 _select_vehicle(vid)
 

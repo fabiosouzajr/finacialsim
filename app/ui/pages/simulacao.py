@@ -6,6 +6,7 @@ import math
 from datetime import date, timedelta
 from decimal import Decimal
 
+from loguru import logger
 from nicegui import app as ng_app, ui
 
 from app.core.extras import Extra, ExtraModalidade
@@ -14,6 +15,7 @@ from app.data.models import Vehicle
 from app.services.simulation_service import (
     SimulationInputDTO,
     SimulationService,
+    SimulationServiceError,
 )
 from app.ui.components.charts import (
     composition_chart,
@@ -23,6 +25,7 @@ from app.ui.components.charts import (
 from app.ui.components.currency_input import CurrencyInput
 from app.ui.components.kpi_card import KpiCard
 from app.ui.components.percent_input import PercentInput
+from app.ui.error_handler import handle_unexpected
 from app.ui.layout import shell
 from app.ui.router import get_logged_user_id
 from app.utils.br_format import format_brl, format_pct
@@ -278,6 +281,8 @@ def build_simulacao_page(engine) -> None:
                                         ui.notify("Veículo cadastrado e selecionado!", type="positive")
                                     except VehicleServiceError as e:
                                         ui.notify(str(e), type="negative")
+                                    except Exception as exc:
+                                        handle_unexpected(exc, "cadastrar_e_usar")
 
                             ui.button("+ Cadastrar e usar este veículo",
                                       on_click=_cadastrar_e_usar).props("color=primary").classes("w-full")
@@ -374,77 +379,84 @@ def build_simulacao_page(engine) -> None:
 
             # ── Callbacks (bound after UI built via _actions) ─────────────
             def simular() -> None:
-                with SessionLocal() as session:
-                    if selected_vehicle_id["id"]:
-                        v = session.get(Vehicle, selected_vehicle_id["id"])
-                        if v is None:
-                            ui.notify("Veículo selecionado não encontrado.", type="negative")
-                            return
-                    else:
-                        # veiculo_id is required FK; placeholder stays hidden via list_active/list_all filters
-                        v = Vehicle(
-                            fonte="manual", tipo="carro", marca="Manual", modelo="Veiculo",
-                            ano_modelo=date.today().year, combustivel="Gasolina",
-                            valor_referencia=valor_veiculo.value,
+                try:
+                    with SessionLocal() as session:
+                        if selected_vehicle_id["id"]:
+                            v = session.get(Vehicle, selected_vehicle_id["id"])
+                            if v is None:
+                                ui.notify("Veículo selecionado não encontrado.", type="negative")
+                                return
+                        else:
+                            # veiculo_id is required FK; placeholder stays hidden via list_active/list_all filters
+                            v = Vehicle(
+                                fonte="manual", tipo="carro", marca="Manual", modelo="Veiculo",
+                                ano_modelo=date.today().year, combustivel="Gasolina",
+                                valor_referencia=valor_veiculo.value,
+                            )
+                            session.add(v)
+                            session.flush()
+
+                        extras = []
+                        prazo_int = int(prazo.value or 48)
+                        num_anos = math.ceil(prazo_int / 12)
+                        if protecao.value > 0:
+                            extras.append(Extra("protecao_veicular", "Plano de protecao",
+                                                protecao.value, ExtraModalidade.MENSAL_CONTINUO,
+                                                prazo_int, 1))
+                        if ipva_total.value > 0:
+                            extras.append(Extra("ipva", "IPVA", ipva_total.value * num_anos,
+                                                ExtraModalidade.RATEIO_MESES,
+                                                prazo_int, 2))
+                        if empl_total.value > 0:
+                            extras.append(Extra("emplacamento", "Emplacamento", empl_total.value * num_anos,
+                                                ExtraModalidade.RATEIO_MESES,
+                                                prazo_int, 3))
+
+                        sim = SimulationService(session).run_and_save(SimulationInputDTO(
+                            criado_por=user_id, cliente_id=None, veiculo_id=v.id,
+                            valor_veiculo=valor_veiculo.value, valor_entrada=valor_entrada.value,
+                            prazo_meses=prazo_int, taxa_mensal=taxa.value,
+                            data_liberacao=date.fromisoformat(inp_lib.value or date.today().isoformat()),
+                            data_primeiro_venc=date.fromisoformat(
+                                inp_venc.value or (date.today() + timedelta(days=30)).isoformat()
+                            ),
+                            incluir_iof=bool(incluir_iof.value), tarifas=[], extras=extras,
+                        ))
+                        last_sim_id["id"] = sim.id
+                        session.refresh(sim)
+
+                        from app.data.models import AmortizationRow
+                        rows = (
+                            session.query(AmortizationRow).filter_by(simulation_id=sim.id)
+                            .order_by(AmortizationRow.numero_parcela).all()
                         )
-                        session.add(v)
-                        session.commit()
 
-                    extras = []
-                    prazo_int = int(prazo.value or 48)
-                    num_anos = math.ceil(prazo_int / 12)
-                    if protecao.value > 0:
-                        extras.append(Extra("protecao_veicular", "Plano de protecao",
-                                            protecao.value, ExtraModalidade.MENSAL_CONTINUO,
-                                            prazo_int, 1))
-                    if ipva_total.value > 0:
-                        extras.append(Extra("ipva", "IPVA", ipva_total.value * num_anos,
-                                            ExtraModalidade.RATEIO_MESES,
-                                            prazo_int, 2))
-                    if empl_total.value > 0:
-                        extras.append(Extra("emplacamento", "Emplacamento", empl_total.value * num_anos,
-                                            ExtraModalidade.RATEIO_MESES,
-                                            prazo_int, 3))
-
-                    sim = SimulationService(session).run_and_save(SimulationInputDTO(
-                        criado_por=user_id, cliente_id=None, veiculo_id=v.id,
-                        valor_veiculo=valor_veiculo.value, valor_entrada=valor_entrada.value,
-                        prazo_meses=prazo_int, taxa_mensal=taxa.value,
-                        data_liberacao=date.fromisoformat(inp_lib.value or date.today().isoformat()),
-                        data_primeiro_venc=date.fromisoformat(
-                            inp_venc.value or (date.today() + timedelta(days=30)).isoformat()
-                        ),
-                        incluir_iof=bool(incluir_iof.value), tarifas=[], extras=extras,
-                    ))
-                    last_sim_id["id"] = sim.id
-                    session.refresh(sim)
-
-                    from app.data.models import AmortizationRow
-                    rows = (
-                        session.query(AmortizationRow).filter_by(simulation_id=sim.id)
-                        .order_by(AmortizationRow.numero_parcela).all()
+                    card_parcela.set(format_brl(sim.valor_parcela))
+                    if rows:
+                        last_idx = min(12, len(rows) - 1)
+                        card_total_apos.set(format_brl(rows[last_idx].parcela_total))
+                    card_financiado.set(format_brl(sim.valor_financiado))
+                    total_pago_cliente = (
+                        sum((Decimal(str(r.parcela_total)) for r in rows), start=Decimal("0"))
+                        + valor_entrada.value
                     )
+                    card_total_pago.set(format_brl(total_pago_cliente))
+                    card_cet.set(f"{format_pct(sim.cet_mes)} a.m.", f"{format_pct(sim.cet_ano)} a.a.")
 
-                card_parcela.set(format_brl(sim.valor_parcela))
-                if rows:
-                    last_idx = min(12, len(rows) - 1)
-                    card_total_apos.set(format_brl(rows[last_idx].parcela_total))
-                card_financiado.set(format_brl(sim.valor_financiado))
-                total_pago_cliente = (
-                    sum((Decimal(str(r.parcela_total)) for r in rows), start=Decimal("0"))
-                    + valor_entrada.value
-                )
-                card_total_pago.set(format_brl(total_pago_cliente))
-                card_cet.set(f"{format_pct(sim.cet_mes)} a.m.", f"{format_pct(sim.cet_ano)} a.a.")
+                    juros = [Decimal(str(r.juros)) for r in rows]
+                    amort = [Decimal(str(r.amortizacao)) for r in rows]
+                    extras_arr = [Decimal(str(r.extras_total)) for r in rows]
+                    saldos = [Decimal(str(r.saldo_devedor)) for r in rows]
+                    totals = [Decimal(str(r.parcela_total)) for r in rows]
+                    chart_comp.update_figure(composition_chart(juros, amort, extras_arr))
+                    chart_saldo.update_figure(saldo_devedor_chart(saldos))
+                    chart_total.update_figure(parcela_total_chart(totals))
 
-                juros = [Decimal(str(r.juros)) for r in rows]
-                amort = [Decimal(str(r.amortizacao)) for r in rows]
-                extras_arr = [Decimal(str(r.extras_total)) for r in rows]
-                saldos = [Decimal(str(r.saldo_devedor)) for r in rows]
-                totals = [Decimal(str(r.parcela_total)) for r in rows]
-                chart_comp.update_figure(composition_chart(juros, amort, extras_arr))
-                chart_saldo.update_figure(saldo_devedor_chart(saldos))
-                chart_total.update_figure(parcela_total_chart(totals))
+                except SimulationServiceError as e:
+                    for issue in e.issues:
+                        ui.notify(issue.message, type="negative", timeout=0)
+                except Exception as exc:
+                    handle_unexpected(exc, "simular")
 
             def gerar_pdf() -> None:
                 if last_sim_id["id"] is None:
@@ -456,6 +468,7 @@ def build_simulacao_page(engine) -> None:
                     with SessionLocal() as session:
                         generate_and_open_pdf(session, last_sim_id["id"], user_id, _platform_data_dir())
                 except Exception as exc:
+                    logger.exception("PDF generation failed")
                     ui.notify(f"Erro ao gerar PDF: {exc}", type="negative")
 
             def nova_a_partir() -> None:

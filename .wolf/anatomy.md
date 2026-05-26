@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-26T18:14:07.652Z
-> Files: 17 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-26T19:08:45.137Z
+> Files: 20 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -61,6 +61,7 @@
 
 ## app/ui/
 
+- `error_handler.py` — handle_unexpected(exc, context): logs via loguru + shows generic toast. Imported by simulacao.py and veiculos.py event handlers. (~120 tok)
 - `layout.py` — Common layout - sidebar + header. Used by all pages except /login. (~1127 tok)
 
 ## app/ui/components/
@@ -69,8 +70,8 @@
 
 ## app/ui/pages/
 
-- `simulacao.py` — Simulacao page - the central tab. (~7294 tok)
-- `veiculos.py` — Vehicle registry page. (~7803 tok)
+- `simulacao.py` — Simulacao page - the central tab. (~7541 tok)
+- `veiculos.py` — Vehicle registry page. (~7946 tok)
 
 ## app/utils/
 
@@ -86,10 +87,12 @@
 
 ## docs/superpowers/plans/
 
+- `2026-05-26-ui-error-feedback.md` — UI Error Feedback Implementation Plan (~4295 tok)
 - `2026-05-26-veiculos.md` — Vehicle Registry Implementation Plan (~19614 tok)
 
 ## docs/superpowers/specs/
 
+- `2026-05-26-ui-error-feedback-design.md` — Design Spec — UI Error Feedback for Simulation & Vehicle Flows (~1864 tok)
 - `2026-05-26-veiculos-design.md` — Design Spec — Cadastro de Veículos (~3643 tok)
 
 ## scripts/
