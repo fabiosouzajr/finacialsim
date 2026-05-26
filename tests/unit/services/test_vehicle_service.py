@@ -189,12 +189,15 @@ def test_refresh_fipe_atualiza_preco(svc, quote):
     assert updated.cor is None  # physical fields unchanged
 
 
-def test_list_active_exclui_vendidos_e_fonte_manual(svc, quote):
+def test_list_active_exclui_vendidos_e_fonte_manual(svc, quote, session):
+    # Sold vehicle should be excluded
     v1 = svc.create_from_fipe(
         quote, cor=None, placa=None,
         odometro_km=None, valor_referencia=Decimal("115000"), criado_por=1,
     )
     svc.set_status(v1.id, "vendido", usuario_id=1)
+
+    # Active FIPE vehicle should be included
     q2 = VehicleQuote(
         tipo="carro", marca="Toyota", marca_id="59", modelo="Corolla",
         modelo_id="1002", ano_modelo=2023, combustivel="Flex",
@@ -205,10 +208,22 @@ def test_list_active_exclui_vendidos_e_fonte_manual(svc, quote):
         q2, cor=None, placa=None,
         odometro_km=None, valor_referencia=Decimal("148000"), criado_por=1,
     )
+
+    # Legacy manual placeholder (fonte="manual") should be excluded
+    from app.data.models import Vehicle
+    v3 = Vehicle(
+        fonte="manual", tipo="carro", marca="Manual", modelo="Placeholder",
+        ano_modelo=2024, combustivel="Gasolina", valor_referencia=Decimal("50000"),
+        status="disponivel",
+    )
+    session.add(v3)
+    session.commit()
+
     result = svc.list_active()
     ids = [v.id for v in result]
-    assert v2.id in ids
-    assert v1.id not in ids
+    assert v2.id in ids       # active FIPE vehicle included
+    assert v1.id not in ids   # sold excluded
+    assert v3.id not in ids   # legacy manual placeholder excluded
 
 
 def test_list_active_search(svc, quote):
