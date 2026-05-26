@@ -2,6 +2,7 @@
 """Vehicle registry page."""
 from __future__ import annotations
 
+from decimal import Decimal
 from nicegui import app as ng_app, ui
 
 from app.data.database import get_session_factory
@@ -30,7 +31,8 @@ def build_veiculos_page(engine) -> None:
 
             # State refs
             selected_id: dict[str, int | None] = {"id": None}
-            panel_mode: dict[str, str] = {"v": "hidden"}  # hidden | view | create | edit
+            # Tracks current panel mode; read in Tasks 7/8 to distinguish view/create/edit
+            panel_mode: dict[str, str] = {"v": "hidden"}
 
             # ── Header ────────────────────────────────────────────────
             with ui.row().classes("w-full items-center justify-between mb-2"):
@@ -121,8 +123,7 @@ def build_veiculos_page(engine) -> None:
                                     with ui.element("td").classes("px-3 py-2"):
                                         ui.label(v.cor or "—")
                                     with ui.element("td").classes("px-3 py-2 text-right"):
-                                        from decimal import Decimal as _D
-                                        ui.label(format_brl(_D(str(v.valor_referencia))))
+                                        ui.label(format_brl(Decimal(str(v.valor_referencia))))
                                     s_style, s_label = _STATUS_STYLE.get(v.status, ("", v.status))
                                     with ui.element("td").classes("px-3 py-2 text-center"):
                                         ui.label(s_label).style(
@@ -184,13 +185,12 @@ def build_veiculos_page(engine) -> None:
                     with ui.element("div").classes(
                         "grid gap-x-4 gap-y-1 text-sm"
                     ).style("grid-template-columns: auto 1fr auto 1fr"):
-                        from decimal import Decimal as _D
                         _fipe = v_data["valor_fipe"]
                         _ref = v_data["valor_referencia"]
                         _odo = v_data["odometro_km"]
                         for field_label, val in [
-                            ("FIPE", format_brl(_D(str(_fipe))) if _fipe is not None else "—"),
-                            ("Referência", format_brl(_D(str(_ref))) if _ref is not None else "—"),
+                            ("FIPE", format_brl(Decimal(str(_fipe))) if _fipe is not None else "—"),
+                            ("Referência", format_brl(Decimal(str(_ref))) if _ref is not None else "—"),
                             ("Cor", v_data["cor"] or "—"),
                             ("Placa", v_data["placa"] or "—"),
                             ("Odômetro", f"{int(_odo):,} km".replace(",", ".") if _odo else "—"),
