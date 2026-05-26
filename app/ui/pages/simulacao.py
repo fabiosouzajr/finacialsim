@@ -329,7 +329,17 @@ def build_simulacao_page(engine) -> None:
                     pct_label = ui.label("").classes("text-xs text-slate-400")
                     entrada_modified: dict[str, bool] = {"v": False}
                     prazo = ui.number(label="Prazo (meses)", value=48, min=12, max=72).classes("w-full")
-                    taxa = PercentInput("Taxa mensal", Decimal("0.0189"))
+                    _taxa_initial = taxa_bacen_val if taxa_bacen_val is not None else Decimal("0")
+                    taxa = PercentInput("Taxa mensal", _taxa_initial)
+                    if taxa_bacen_val is not None:
+                        bacen_hint = ui.label(
+                            f"BACEN TX_VEIC: {taxa_bacen_val * 100:.2f}% a.m."
+                        ).classes("text-xs italic text-slate-400")
+                    else:
+                        bacen_hint = ui.label(
+                            "sem dados BACEN — informe manualmente"
+                        ).classes("text-xs italic text-amber-500")
+                    taxa_modified: dict[str, bool] = {"v": False}
                     incluir_iof = ui.checkbox("Incluir IOF", value=True)
 
                     # Custos adicionais above calendars
