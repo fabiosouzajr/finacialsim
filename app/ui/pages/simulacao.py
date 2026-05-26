@@ -67,18 +67,22 @@ def build_simulacao_page(engine) -> None:
             with ui.row().classes("w-full items-center justify-between mb-2"):
                 ui.label("Simulação").classes("text-xl font-bold text-slate-800")
                 with ui.row().classes("gap-2"):
-                    if _loaded_sim["sim"]:
-                        ui.label(
-                            f"Carregado: {_loaded_sim['sim']['codigo']}"
-                        ).classes("text-xs text-slate-400 self-center")
+                    btn_simular = ui.button("Simular", icon="play_arrow",
+                                            on_click=lambda: _actions["simular"]()
+                                            ).props("color=primary")
+
+                    with ui.row().classes("gap-2 items-center") as loaded_row:
+                        _codigo = _loaded_sim["sim"]["codigo"] if _loaded_sim["sim"] else ""
+                        ui.label(f"Carregado: {_codigo}").classes("text-xs text-slate-400 self-center")
                         ui.button(
                             "Nova simulação com esses dados", icon="content_copy",
                             on_click=lambda: _actions["nova_a_partir"](),
                         ).props("color=primary outline")
-                    else:
-                        ui.button("Simular", icon="play_arrow",
-                                  on_click=lambda: _actions["simular"]()
-                                  ).props("color=primary")
+
+                    # Set initial visibility based on load mode
+                    is_loaded = bool(_loaded_sim["sim"])
+                    btn_simular.set_visibility(not is_loaded)
+                    loaded_row.set_visibility(is_loaded)
                     ui.button("Gerar PDF", icon="picture_as_pdf",
                               on_click=lambda: _actions["gerar_pdf"]()
                               ).props("color=primary outline")
@@ -456,6 +460,8 @@ def build_simulacao_page(engine) -> None:
 
             def nova_a_partir() -> None:
                 _loaded_sim["sim"] = None
+                loaded_row.set_visibility(False)
+                btn_simular.set_visibility(True)
                 ui.notify(
                     "Dados carregados. Ajuste o que quiser e clique em Simular.",
                     type="info",
