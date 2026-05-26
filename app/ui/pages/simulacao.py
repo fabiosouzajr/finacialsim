@@ -104,8 +104,7 @@ def build_simulacao_page(engine) -> None:
                     def _show_chips(vid: int) -> None:
                         chips_row.clear()
                         with SessionLocal() as _s:
-                            from app.data.models import Vehicle as _V
-                            v = _s.get(_V, vid)
+                            v = _s.get(Vehicle, vid)
                             if v is None:
                                 return
                             vf = v.valor_fipe
@@ -117,10 +116,11 @@ def build_simulacao_page(engine) -> None:
                                     f"FIPE  {format_brl(vf)}",
                                     on_click=lambda vf=vf: _set_valor_veiculo(vf),
                                 ).props("outline dense no-caps color=positive size=sm")
-                            ui.button(
-                                f"Ref.  {format_brl(vr)}",
-                                on_click=lambda vr=vr: _set_valor_veiculo(vr),
-                            ).props("outline dense no-caps color=primary size=sm")
+                            if vr:
+                                ui.button(
+                                    f"Ref.  {format_brl(vr)}",
+                                    on_click=lambda vr=vr: _set_valor_veiculo(vr),
+                                ).props("outline dense no-caps color=primary size=sm")
 
                     def _set_valor_veiculo(val: Decimal) -> None:
                         valor_veiculo.value = val
@@ -332,6 +332,7 @@ def build_simulacao_page(engine) -> None:
                             ui.notify("Veículo selecionado não encontrado.", type="negative")
                             return
                     else:
+                        # veiculo_id is required FK; placeholder stays hidden via list_active/list_all filters
                         v = Vehicle(
                             fonte="manual", tipo="carro", marca="Manual", modelo="Veiculo",
                             ano_modelo=date.today().year, combustivel="Gasolina",
@@ -367,6 +368,7 @@ def build_simulacao_page(engine) -> None:
                         incluir_iof=bool(incluir_iof.value), tarifas=[], extras=extras,
                     ))
                     last_sim_id["id"] = sim.id
+                    session.refresh(sim)
 
                     from app.data.models import AmortizationRow
                     rows = (
