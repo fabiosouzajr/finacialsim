@@ -125,3 +125,19 @@ def test_create_manual_persiste_campos(svc):
     assert v.marca == "VW"
     assert v.placa == "DEF5678"
     assert v.status == "disponivel"
+
+
+def test_set_status_invalido_levanta_erro(svc, quote):
+    from app.services.vehicle_service import VehicleServiceError
+    v = svc.create_from_fipe(
+        quote, cor=None, placa=None,
+        odometro_km=None, valor_referencia=Decimal("115000"), criado_por=1,
+    )
+    with pytest.raises(VehicleServiceError, match="inválido"):
+        svc.set_status(v.id, "perdido", usuario_id=1)
+
+
+def test_set_status_veiculo_inexistente_levanta_erro(svc):
+    from app.services.vehicle_service import VehicleServiceError
+    with pytest.raises(VehicleServiceError, match="não encontrado"):
+        svc.set_status(99999, "disponivel", usuario_id=1)
