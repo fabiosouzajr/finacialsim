@@ -31,6 +31,9 @@ from app.ui.router import get_logged_user_id
 from app.utils.br_format import format_brl, format_pct
 from app.integrations.factory import build_fipe_chain
 from app.services.vehicle_service import VehicleService, VehicleServiceError
+from app.data.repositories import IndicatorRepository
+from app.services.client_service import ClientService
+from app.services.rules_service import RulesService
 
 
 def build_simulacao_page(engine) -> None:
