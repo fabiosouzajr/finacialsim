@@ -7,16 +7,22 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from loguru import logger
-from nicegui import app as ng_app, ui
+from nicegui import app as ng_app
+from nicegui import ui
 
 from app.core.extras import Extra, ExtraModalidade
 from app.data.database import get_session_factory
 from app.data.models import Vehicle
+from app.data.repositories import IndicatorRepository
+from app.integrations.factory import build_fipe_chain
+from app.services.client_service import ClientService
+from app.services.rules_service import RulesService
 from app.services.simulation_service import (
     SimulationInputDTO,
     SimulationService,
     SimulationServiceError,
 )
+from app.services.vehicle_service import VehicleService, VehicleServiceError
 from app.ui.components.charts import (
     composition_chart,
     parcela_total_chart,
@@ -29,11 +35,6 @@ from app.ui.error_handler import handle_unexpected
 from app.ui.layout import shell
 from app.ui.router import get_logged_user_id
 from app.utils.br_format import format_brl, format_pct
-from app.integrations.factory import build_fipe_chain
-from app.services.vehicle_service import VehicleService, VehicleServiceError
-from app.data.repositories import IndicatorRepository
-from app.services.client_service import ClientService
-from app.services.rules_service import RulesService
 
 
 def build_simulacao_page(engine) -> None:
