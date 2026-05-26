@@ -331,11 +331,14 @@ def build_simulacao_page(engine) -> None:
                     pct_label = ui.label("").classes("text-xs text-slate-400")
                     entrada_modified: dict[str, bool] = {"v": False}
                     prazo = ui.number(label="Prazo (meses)", value=48, min=12, max=72).classes("w-full")
-                    _taxa_initial = taxa_bacen_val if taxa_bacen_val is not None else Decimal("0")
+                    def _annual_to_monthly(r: Decimal) -> Decimal:
+                        return Decimal(str((1 + float(r)) ** (1 / 12) - 1))
+
+                    _taxa_initial = _annual_to_monthly(taxa_bacen_val) if taxa_bacen_val is not None else Decimal("0")
                     taxa = PercentInput("Taxa mensal", _taxa_initial)
                     if taxa_bacen_val is not None:
                         bacen_hint = ui.label(
-                            f"BACEN TX_VEIC: {taxa_bacen_val * 100:.2f}% a.m."
+                            f"BACEN TX_VEIC: {_taxa_initial * 100:.2f}% a.m."
                         ).classes("text-xs italic text-slate-400")
                     else:
                         bacen_hint = ui.label(
@@ -454,11 +457,12 @@ def build_simulacao_page(engine) -> None:
                     new_val: Decimal | None = _row.valor if _row else None
                 if new_val is None:
                     return
-                bacen_hint.set_text(f"BACEN TX_VEIC: {new_val * 100:.2f}% a.m.")
+                new_monthly = _annual_to_monthly(new_val)
+                bacen_hint.set_text(f"BACEN TX_VEIC: {new_monthly * 100:.2f}% a.m.")
                 bacen_hint.style("color: rgb(148 163 184)")
                 bacen_hint.update()
                 if not taxa_modified["v"]:
-                    taxa.value = new_val
+                    taxa.value = new_monthly
                     taxa.input.update()
 
             ui.timer(60, _poll_bacen)
