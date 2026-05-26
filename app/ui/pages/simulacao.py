@@ -44,6 +44,15 @@ def build_simulacao_page(engine) -> None:
     def page() -> None:
         def content() -> None:
             user_id = get_logged_user_id() or 0
+
+            with SessionLocal() as _page_session:
+                entrada_minima_pct = Decimal(
+                    RulesService(_page_session).get_raw("entrada_minima_pct") or "0.10"
+                )
+                _taxa_row = IndicatorRepository(_page_session).get_latest("TX_BACEN_VEIC")
+                taxa_bacen_val: Decimal | None = _taxa_row.valor if _taxa_row else None
+                clients = ClientService(_page_session).find("")
+
             last_sim_id: dict[str, int | None] = {"id": None}
             _actions: dict = {}
             selected_vehicle_id: dict[str, int | None] = {"id": None}
