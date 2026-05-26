@@ -76,6 +76,7 @@ def build_simulacao_page(engine) -> None:
                             "data_venc": _sim.data_primeiro_venc.isoformat(),
                             "veiculo_id": _sim.veiculo_id,
                             "codigo": _sim.codigo,
+                            "cliente_id": _sim.cliente_id,
                         }
 
             # ── Header: title left, action buttons right ─────────────────
@@ -392,6 +393,7 @@ def build_simulacao_page(engine) -> None:
                         if _d["veiculo_id"]:
                             _build_picker()
                             _show_chips(_d["veiculo_id"])
+                        cliente_sel.value = _d["cliente_id"] or 0
 
                 # ── Right: Resultado KPIs + Charts ────────────────────────
                 with ui.column().classes("flex-1 gap-3 min-w-0"):
