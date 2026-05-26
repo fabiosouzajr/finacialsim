@@ -317,7 +317,12 @@ def build_simulacao_page(engine) -> None:
                     # ── fim seção Veículo ─────────────────────────────────────
 
                     valor_veiculo = CurrencyInput("Valor do veículo", Decimal("50000"))
-                    valor_entrada = CurrencyInput("Entrada (R$)", Decimal("10000"))
+                    _entrada_default = (
+                        entrada_minima_pct * Decimal("50000")
+                    ).quantize(Decimal("0.01"))
+                    valor_entrada = CurrencyInput("Entrada (R$)", _entrada_default)
+                    pct_label = ui.label("").classes("text-xs text-slate-400")
+                    entrada_modified: dict[str, bool] = {"v": False}
                     prazo = ui.number(label="Prazo (meses)", value=48, min=12, max=72).classes("w-full")
                     taxa = PercentInput("Taxa mensal", Decimal("0.0189"))
                     incluir_iof = ui.checkbox("Incluir IOF", value=True)
