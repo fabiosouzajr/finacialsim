@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
-from app.data.models import Vehicle
+from app.data.models import Simulation, Vehicle
 from app.integrations.fipe.schema import VehicleQuote
 from app.services.audit_service import AuditService
 
@@ -134,3 +134,73 @@ class VehicleService:
             entidade="vehicles", entidade_id=vehicle_id,
         )
         return v
+
+    def update(self, vehicle_id: int, fields: dict, usuario_id: int | None = None) -> Vehicle:
+        v = self.session.get(Vehicle, vehicle_id)
+        if v is None:
+            raise VehicleServiceError(f"Veículo {vehicle_id} não encontrado.")
+        allowed = {"cor", "placa", "odometro_km", "valor_referencia"}
+        if "placa" in fields:
+            fields["placa"] = self._validate_placa(fields["placa"])
+            self._check_placa_unique(fields["placa"], exclude_id=vehicle_id)
+        for k, val in fields.items():
+            if k in allowed:
+                setattr(v, k, val)
+        self.session.commit()
+        self.audit.log(
+            usuario_id=usuario_id, acao="veiculo_editado",
+            entidade="vehicles", entidade_id=vehicle_id,
+        )
+        return v
+
+    def refresh_fipe(self, vehicle_id: int, quote: VehicleQuote, usuario_id: int | None = None) -> Vehicle:
+        v = self.session.get(Vehicle, vehicle_id)
+        if v is None:
+            raise VehicleServiceError(f"Veículo {vehicle_id} não encontrado.")
+        v.valor_fipe = quote.valor
+        v.mes_referencia_fipe = quote.mes_referencia
+        self.session.commit()
+        self.audit.log(
+            usuario_id=usuario_id, acao="veiculo_fipe_atualizado",
+            entidade="vehicles", entidade_id=vehicle_id,
+        )
+        return v
+
+    def list_active(self, search: str = "") -> list[Vehicle]:
+        from sqlalchemy import or_
+        q = self.session.query(Vehicle).filter(
+            Vehicle.status.in_(["disponivel", "reservado"]),
+            Vehicle.fonte != "manual",
+        )
+        if search:
+            like = f"%{search}%"
+            q = q.filter(or_(
+                Vehicle.marca.ilike(like),
+                Vehicle.modelo.ilike(like),
+                Vehicle.placa.ilike(like),
+                Vehicle.cor.ilike(like),
+            ))
+        return q.order_by(Vehicle.marca, Vehicle.modelo, Vehicle.ano_modelo).all()
+
+    def list_all(self, status_filter: str | None = None, search: str = "") -> list[Vehicle]:
+        from sqlalchemy import or_
+        q = self.session.query(Vehicle).filter(Vehicle.fonte != "manual")
+        if status_filter:
+            q = q.filter(Vehicle.status == status_filter)
+        if search:
+            like = f"%{search}%"
+            q = q.filter(or_(
+                Vehicle.marca.ilike(like),
+                Vehicle.modelo.ilike(like),
+                Vehicle.placa.ilike(like),
+                Vehicle.cor.ilike(like),
+            ))
+        return q.order_by(Vehicle.marca, Vehicle.modelo, Vehicle.ano_modelo).all()
+
+    def get_simulations(self, vehicle_id: int) -> list[Simulation]:
+        return (
+            self.session.query(Simulation)
+            .filter(Simulation.veiculo_id == vehicle_id)
+            .order_by(Simulation.criado_em.desc())
+            .all()
+        )
