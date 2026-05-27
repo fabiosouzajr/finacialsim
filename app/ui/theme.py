@@ -15,7 +15,7 @@ TEXT_MUTED    = "#64748B"   # slate-500
 SIDEBAR_BG    = "#0F172A"   # slate-900
 SIDEBAR_HOVER = "#1E293B"   # slate-800
 
-FONT_FAMILY = "Inter, 'Segoe UI', Roboto, Arial, sans-serif"
+FONT_FAMILY = "'IBM Plex Sans', 'Segoe UI', Arial, sans-serif"
 
 SIZE_XS   = "0.75rem"
 SIZE_SM   = "0.875rem"
@@ -32,7 +32,7 @@ def apply_global_styles() -> None:
     from nicegui import ui
     ui.add_head_html(f"""
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
 
     /* ── Base ─────────────────────────────────────────────────────── */
@@ -117,6 +117,11 @@ def apply_global_styles() -> None:
         box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
         border: 1px solid #e2e8f0;
         min-width: 160px;
+        transition: box-shadow 150ms ease, border-color 150ms ease;
+    }}
+    .kpi-card:hover {{
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        border-color: #cbd5e1;
     }}
     .kpi-value {{
         font-size: 1.875rem;
@@ -124,6 +129,7 @@ def apply_global_styles() -> None:
         color: {PRIMARY};
         letter-spacing: -0.025em;
         line-height: 1.2;
+        font-variant-numeric: tabular-nums;
     }}
     .kpi-label {{
         font-size: 0.6875rem;
@@ -156,6 +162,7 @@ def apply_global_styles() -> None:
     .q-table tbody td {{
         color: {TEXT};
         font-size: 0.875rem;
+        font-variant-numeric: tabular-nums;
     }}
     .q-table__container {{
         border-radius: {RADIUS};
@@ -186,6 +193,10 @@ def apply_global_styles() -> None:
         letter-spacing: 0.01em !important;
     }}
     .q-btn--flat {{ border-radius: 0.375rem !important; }}
+    .q-btn:active {{
+        transform: scale(0.96);
+        transition-duration: 80ms !important;
+    }}
 
     /* ── Cards ────────────────────────────────────────────────────── */
     .q-card {{
@@ -205,18 +216,24 @@ def apply_global_styles() -> None:
     .kpi-card-compact {{
         background: {SURFACE};
         border-radius: 0.5rem;
-        padding: 0.5rem 0.75rem;
+        padding: 0.375rem 0.625rem;
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         border: 1px solid #e2e8f0;
         width: 100%;
         box-sizing: border-box;
+        transition: box-shadow 150ms ease, border-color 150ms ease;
+    }}
+    .kpi-card-compact:hover {{
+        box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+        border-color: #cbd5e1;
     }}
     .kpi-value-compact {{
-        font-size: 1.1rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: {PRIMARY};
         letter-spacing: -0.02em;
         line-height: 1.2;
+        font-variant-numeric: tabular-nums;
     }}
     .kpi-group-label {{
         font-size: 0.6875rem;
@@ -225,6 +242,17 @@ def apply_global_styles() -> None:
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin-bottom: 0.125rem;
+    }}
+
+    /* ── Utilities ────────────────────────────────────────────────── */
+    .fs-heading {{ text-wrap: balance; }}
+
+    /* ── Reduced Motion ───────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {{
+        *, *::before, *::after {{
+            transition-duration: 0ms !important;
+            animation-duration: 0ms !important;
+        }}
     }}
 
     </style>
