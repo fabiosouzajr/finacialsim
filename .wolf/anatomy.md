@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-26T20:55:26.734Z
-> Files: 24 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T14:31:13.847Z
+> Files: 30 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -64,14 +64,18 @@
 
 - `error_handler.py` — handle_unexpected(exc, context): logs via loguru + shows generic toast. Imported by simulacao.py and veiculos.py event handlers. (~120 tok)
 - `layout.py` — Common layout - sidebar + header. Used by all pages except /login. (~1127 tok)
+- `theme.py` — Cores, tipografia, espaçamentos da UI. (~2231 tok)
 
 ## app/ui/components/
 
+- `charts.py` — Plotly chart factories for the simulation UI. (~606 tok)
 - `percent_input.py` — PercentInput - input as % (display) -> Decimal fraction (model). (~459 tok)
 
 ## app/ui/pages/
 
-- `cadastro.py` — Cadastro page — split layout (form left, table right). Redesigned clientes + usuarios tabs matching simulacao style. (~850 tok)
+- `cadastro.py` — Cadastro page - clientes + usuarios sub-tabs. (~1463 tok)
+- `configuracoes.py` — Configuracoes - edit business_rules. (~1754 tok)
+- `login.py` — Login page - PIN-based auth. (~514 tok)
 - `simulacao.py` — Simulacao page - the central tab. (~8838 tok)
 - `veiculos.py` — Vehicle registry page. (~7946 tok)
 
@@ -92,12 +96,14 @@
 - `2026-05-26-simulacao-smart-defaults.md` — Simulacao Smart Defaults Implementation Plan (~4554 tok)
 - `2026-05-26-ui-error-feedback.md` — UI Error Feedback Implementation Plan (~4295 tok)
 - `2026-05-26-veiculos.md` — Vehicle Registry Implementation Plan (~19614 tok)
+- `2026-05-27-ui-polish.md` — UI Polish Implementation Plan (~3826 tok)
 
 ## docs/superpowers/specs/
 
 - `2026-05-26-simulacao-smart-defaults-design.md` — Design Spec — Simulacao Smart Defaults (~1591 tok)
 - `2026-05-26-ui-error-feedback-design.md` — Design Spec — UI Error Feedback for Simulation & Vehicle Flows (~1864 tok)
 - `2026-05-26-veiculos-design.md` — Design Spec — Cadastro de Veículos (~3643 tok)
+- `2026-05-27-ui-polish-design.md` — Design Spec — UI Polish: Login, Cadastro, Simulação, Configurações (~2273 tok)
 
 ## scripts/
 

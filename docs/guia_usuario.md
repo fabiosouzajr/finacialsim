@@ -44,6 +44,7 @@ A aba "Indicadores" mostra SELIC, CDI, IPCA e taxa BACEN de veiculos atualizados
 ## 7. Gerar PDF da proposta
 
 Na simulacao, clique "Gerar PDF". O arquivo abre automaticamente no leitor padrao. O PDF inclui:
+
 - Dados do cliente, veiculo, condicoes
 - Bloco de custos adicionais (se houver)
 - Resumo financeiro (parcela e total)

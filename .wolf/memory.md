@@ -3,9 +3,15 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 2026-05-27 | applied three lint cleanups: split long column dicts in cadastro.py (E501), restored TypeError in _safe_int (configuracoes.py), fixed W292 in login.py and charts.py | app/ui/pages/cadastro.py app/ui/pages/configuracoes.py app/ui/pages/login.py app/ui/components/charts.py | committed 7f508a5; ruff clean | ~400 tok |
+
+| 2026-05-27 | fix(configuracoes): narrow widgets type to Any; remove unreachable ValueError/TypeError catches | app/ui/pages/configuracoes.py | committed 1382971 | ~800 tok |
+
 | 17:45 | implemented Tasks 3-9 of simulacao smart defaults (cliente selector, entrada smart default, pct_label, _set_valor_veiculo recalc, taxa BACEN prefill, bacen_hint, blur bindings, _poll_bacen timer, cliente_id DTO wiring, load restore) | app/ui/pages/simulacao.py | 7 commits d039ba9..7e75c7d | ~3500 |
 
 | 2026-05-26 | Created integration tests for vehicle→simulation flow | tests/integration/test_vehicle_simulation_flow.py | 2 passed, committed | ~800 |
+| 2026-05-27 10:42 | ran ui-ux-pro-max to generate fintech design system | design-system/financialsim/MASTER.md | design system persisted; IBM Plex Sans + dark-OLED + green CTA recommended; existing theme is light-mode Inter | ~1800 |
+| 2026-05-27 | replaced configuracoes.py with typed widgets (PercentInput, CurrencyInput, ui.switch, ui.number), grouped ui.expansion sections, friendly LABEL_MAP | app/ui/pages/configuracoes.py | committed 856a4e9; ruff clean; module import OK | ~600 |
 
 | HH:MM | description | file(s) | outcome | ~tokens |
 |-------|-------------|---------|---------|---------|
@@ -959,3 +965,85 @@
 | 17:46 | Edited app/ui/pages/simulacao.py | 25→25 lines | ~289 |
 | 17:55 | Edited app/ui/pages/simulacao.py | modified _annual_to_monthly() | ~165 |
 | 17:55 | Edited app/ui/pages/simulacao.py | 5→6 lines | ~94 |
+
+## Session: 2026-05-27 08:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 08:03
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 08:37
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 08:40
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 08:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 09:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 09:58
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 10:09
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:45 | Edited app/ui/theme.py | "Inter, " → "IBM Plex Sans" | ~18 |
+| 10:45 | Edited app/ui/theme.py | 2→2 lines | ~55 |
+| 10:46 | Edited app/ui/theme.py | 7→8 lines | ~60 |
+| 10:46 | Edited app/ui/theme.py | 7→8 lines | ~62 |
+| 10:46 | Edited app/ui/theme.py | 4→5 lines | ~37 |
+| 10:47 | Edited app/ui/theme.py | modified not() | ~120 |
+| 10:48 | Edited app/ui/theme.py | 10→15 lines | ~149 |
+| 10:48 | Edited app/ui/theme.py | 9→14 lines | ~146 |
+| 10:48 | Edited app/ui/theme.py | modified media() | ~121 |
+
+## Session: 2026-05-27 10:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:57 | Created docs/superpowers/specs/2026-05-27-ui-polish-design.md | — | ~2118 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | inline fix | ~13 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | 1→4 lines | ~67 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | 4→3 lines | ~16 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | expanded (+9 lines) | ~114 |
+| 11:06 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | 1→2 lines | ~45 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | modified _safe_decimal() | ~182 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | 2→3 lines | ~50 |
+| 11:07 | Edited docs/superpowers/specs/2026-05-27-ui-polish-design.md | inline fix | ~34 |
+| 11:10 | Created docs/superpowers/plans/2026-05-27-ui-polish.md | — | ~4081 |
+| 11:12 | Edited app/ui/pages/login.py | modified classes() | ~124 |
+| 11:14 | Edited app/ui/pages/cadastro.py | modified _clients_panel() | ~53 |
+| 11:14 | Edited app/ui/pages/cadastro.py | 9→7 lines | ~109 |
+| 11:14 | Edited app/ui/pages/cadastro.py | modified _refresh() | ~73 |
+| 11:17 | Edited app/ui/components/charts.py | modified composition_chart() | ~178 |
+| 11:17 | Edited app/ui/components/charts.py | modified saldo_devedor_chart() | ~102 |
+| 11:17 | Edited app/ui/components/charts.py | modified parcela_total_chart() | ~117 |
+| 11:17 | Edited app/ui/theme.py | 23→23 lines | ~212 |
+| 11:18 | UI Polish: reduced chart heights (composition 320→240, saldo 300→220, parcela 260→200) and tightened compact KPI CSS (padding 0.5→0.375, font 1.1→0.95) | app/ui/components/charts.py, app/ui/theme.py | app clean startup verified, committed c6c64b0 | ~800 |
+| 11:20 | Created app/ui/pages/configuracoes.py | — | ~1715 |
+| 11:21 | Edited app/ui/pages/configuracoes.py | expanded (+6 lines) | ~338 |
+| 11:27 | Edited app/ui/pages/configuracoes.py | added 1 import(s) | ~20 |
+| 11:27 | Edited app/ui/pages/configuracoes.py | 4→4 lines | ~29 |
+| 11:27 | Edited app/ui/pages/configuracoes.py | 4→4 lines | ~22 |
+| 11:27 | Edited app/ui/pages/configuracoes.py | inline fix | ~12 |
+| 11:31 | Edited app/ui/pages/cadastro.py | modified classes() | ~179 |
+| 11:31 | Edited app/ui/pages/configuracoes.py | modified _safe_int() | ~35 |
+| 11:31 | Edited app/ui/components/charts.py | modified composition_chart() | ~32 |

@@ -1128,6 +1128,70 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-26T20:55:20.303Z"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-05-27T13:45:00.102Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/ui/theme.py",
+      "root_cause": "Had \"Inter, '",
+      "fix": "Changed to 'IBM Plex Sans'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-27T13:45:05.251Z"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-05-27T14:06:57.674Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-27-ui-polish-design.md",
+      "root_cause": "Had `backup_diario_horario`",
+      "fix": "Changed to `CurrencyInput`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-27T14:07:11.772Z"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-05-27T14:14:31.302Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/ui/pages/cadastro.py",
+      "root_cause": "Had \"w-full gap-6 items-start\"",
+      "fix": "Changed to \"w-full gap-4 items-start\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T14:14:31.302Z"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-05-27T14:27:34.043Z",
+      "error_message": "Wrong reference: object should be Any",
+      "file": "app/ui/pages/configuracoes.py",
+      "root_cause": "Used \"object\" instead of \"Any\"",
+      "fix": "Changed object → Any",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-27T14:27:34.043Z"
     }
   ]
 }

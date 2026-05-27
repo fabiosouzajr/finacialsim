@@ -16,6 +16,7 @@
 3. Execute: `./FinacialSim-x86_64.AppImage`.
 
 Ou via script automatico:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/your-org/finacialsim/main/scripts/install_linux.sh | bash
 ```

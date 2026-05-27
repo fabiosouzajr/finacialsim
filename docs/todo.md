@@ -39,3 +39,32 @@ Cada simulacao pode referenciar um veiculo e um cliente. Atualmente a implementa
 - [] in "CDI" KPI
   - [] add display CDI of the past 30 days,
   - [] add display CDI of the last 12 months,
+
+---
+
+## minor fixes in the user login
+
+- [] make the user field the same size as the pin field;
+- [] make it possible to interface using the keyboard (enter key to submit, etc);
+
+---
+
+## changes in the "cadastro section"
+
+- [] reduce paddding to maximize screen real estate while keeping aesthetic clean and pleasant to look at;
+- [] in clientes cadastrados
+  - [] center align column labels;
+  - [] make the client list narrower by hiding unnecessary columns ("tipo_de_cliente" and "telefone");
+
+---
+
+## changes in simulacao
+
+- [] reduce the size of the KPI components;
+- [] reduce the sizes of the graphs;
+
+## changes in "configuracoes - regras de negocio"
+
+- [] implement actual user friendly labels for the ui;
+- [] display percent values as "x%" (for example: "20%" instead of "0.20");
+- [] group similar components in a user friendly way;
