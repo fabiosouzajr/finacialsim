@@ -184,6 +184,7 @@ class Proposal(Base):
     gerado_por: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     snapshot_json: Mapped[str] = mapped_column(String, nullable=False)
     pdf_path: Mapped[str | None] = mapped_column(String, nullable=True)
+    carne_path: Mapped[str | None] = mapped_column(String, nullable=True)
     validade_dias: Mapped[int] = mapped_column(Integer, default=7, nullable=False)
     gerado_em: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
 

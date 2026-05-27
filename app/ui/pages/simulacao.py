@@ -55,6 +55,7 @@ def build_simulacao_page(engine) -> None:
                 clients = ClientService(_page_session).find("")
 
             last_sim_id: dict[str, int | None] = {"id": None}
+            last_proposal_id: dict[str, int | None] = {"id": None}
             _actions: dict = {}
             selected_vehicle_id: dict[str, int | None] = {"id": None}
 
@@ -84,6 +85,9 @@ def build_simulacao_page(engine) -> None:
             with ui.row().classes("w-full items-center justify-between mb-2"):
                 ui.label("Simulação").classes("text-xl font-bold text-slate-800")
                 with ui.row().classes("gap-2"):
+                    ui.button("Abrir", icon="folder_open",
+                              on_click=lambda: _actions["abrir_sim"]()
+                              ).props("color=secondary outline")
                     btn_simular = ui.button("Simular", icon="play_arrow",
                                             on_click=lambda: _actions["simular"]()
                                             ).props("color=primary")
@@ -103,6 +107,10 @@ def build_simulacao_page(engine) -> None:
                     ui.button("Gerar PDF", icon="picture_as_pdf",
                               on_click=lambda: _actions["gerar_pdf"]()
                               ).props("color=primary outline")
+                    btn_carne = ui.button("Gerar Carnê", icon="receipt_long",
+                                          on_click=lambda: _actions["gerar_carne"]()
+                                          ).props("color=secondary outline")
+                    btn_carne.disable()
 
             # ── Main layout: narrow form | wide results ───────────────────
             with ui.row().classes("w-full gap-4 items-start"):
@@ -557,10 +565,29 @@ def build_simulacao_page(engine) -> None:
                 from app.ui.pages._proposal_helper import generate_and_open_pdf
                 try:
                     with SessionLocal() as session:
-                        generate_and_open_pdf(session, last_sim_id["id"], user_id, _platform_data_dir())
+                        pid = generate_and_open_pdf(
+                            session, last_sim_id["id"], user_id, _platform_data_dir()
+                        )
+                    last_proposal_id["id"] = pid
+                    btn_carne.enable()
                 except Exception as exc:
                     logger.exception("PDF generation failed")
                     ui.notify(f"Erro ao gerar PDF: {exc}", type="negative")
+
+            def gerar_carne() -> None:
+                if last_proposal_id["id"] is None:
+                    ui.notify("Gere o PDF da proposta antes de gerar o carnê", type="warning")
+                    return
+                from app.main import _platform_data_dir
+                from app.ui.pages._proposal_helper import generate_and_open_carne
+                try:
+                    with SessionLocal() as session:
+                        generate_and_open_carne(
+                            session, last_proposal_id["id"], _platform_data_dir()
+                        )
+                except Exception as exc:
+                    logger.exception("Carne generation failed")
+                    ui.notify(f"Erro ao gerar carnê: {exc}", type="negative")
 
             def nova_a_partir() -> None:
                 _loaded_sim["sim"] = None
@@ -571,8 +598,96 @@ def build_simulacao_page(engine) -> None:
                     type="info",
                 )
 
+            def abrir_sim() -> None:
+                from app.data.models import Client as _Cli
+                from app.data.models import Simulation as _Sim
+                with SessionLocal() as _s:
+                    sims = (
+                        _s.query(_Sim)
+                        .order_by(_Sim.criado_em.desc())
+                        .limit(100)
+                        .all()
+                    )
+                    rows = []
+                    for s in sims:
+                        v = _s.get(Vehicle, s.veiculo_id)
+                        c = _s.get(_Cli, s.cliente_id) if s.cliente_id else None
+                        rows.append({
+                            "codigo": s.codigo,
+                            "veiculo": f"{v.marca} {v.modelo} {v.ano_modelo}" if v else "—",
+                            "cliente": c.nome if c else "—",
+                            "valor": format_brl(s.valor_veiculo),
+                            "prazo": f"{s.prazo_meses}x",
+                            "data": s.criado_em.strftime("%d/%m/%Y"),
+                            "_valor_veiculo": s.valor_veiculo,
+                            "_valor_entrada": s.valor_entrada,
+                            "_prazo": s.prazo_meses,
+                            "_taxa": s.taxa_juros_mes,
+                            "_incluir_iof": s.incluir_iof,
+                            "_data_lib": s.data_liberacao.isoformat(),
+                            "_data_venc": s.data_primeiro_venc.isoformat(),
+                            "_veiculo_id": s.veiculo_id,
+                            "_cliente_id": s.cliente_id,
+                        })
+
+                dlg = ui.dialog()
+                with dlg, ui.card().classes("w-full max-w-3xl"):
+                    with ui.row().classes("w-full items-center justify-between mb-2"):
+                        ui.label("Abrir simulação").classes("text-lg font-bold")
+                        ui.button(icon="close", on_click=dlg.close).props("flat round dense")
+                    with ui.row().classes(
+                        "w-full border-b pb-1 text-xs font-semibold text-slate-500 uppercase"
+                    ):
+                        ui.label("Código").classes("w-32")
+                        ui.label("Veículo").classes("flex-1")
+                        ui.label("Cliente").classes("w-40")
+                        ui.label("Valor").classes("w-28 text-right")
+                        ui.label("Prazo").classes("w-16 text-right")
+                        ui.label("Data").classes("w-24")
+
+                    def _do_load(r: dict) -> None:
+                        valor_veiculo.value = r["_valor_veiculo"]
+                        valor_entrada.value = r["_valor_entrada"]
+                        prazo.set_value(r["_prazo"])
+                        taxa.value = r["_taxa"]
+                        incluir_iof.set_value(r["_incluir_iof"])
+                        inp_lib.set_value(r["_data_lib"])
+                        inp_venc.set_value(r["_data_venc"])
+                        selected_vehicle_id["id"] = r["_veiculo_id"]
+                        if r["_veiculo_id"]:
+                            _build_picker()
+                            _show_chips(r["_veiculo_id"])
+                        cliente_sel.value = r["_cliente_id"] or 0
+                        last_sim_id["id"] = None
+                        last_proposal_id["id"] = None
+                        btn_carne.disable()
+                        loaded_row.set_visibility(False)
+                        btn_simular.set_visibility(True)
+                        dlg.close()
+                        ui.notify(f"Simulação {r['codigo']} carregada", type="positive")
+
+                    with ui.scroll_area().classes("h-96 w-full"):
+                        if not rows:
+                            ui.label("Nenhuma simulação encontrada.").classes(
+                                "text-sm text-slate-400 p-4"
+                            )
+                        for r in rows:
+                            with ui.row().classes(
+                                "w-full border-b py-2 cursor-pointer hover:bg-slate-50 items-center"
+                            ).on("click", lambda r=r: _do_load(r)):
+                                ui.label(r["codigo"]).classes("w-32 text-sm font-mono")
+                                ui.label(r["veiculo"]).classes("flex-1 text-sm")
+                                ui.label(r["cliente"]).classes("w-40 text-sm")
+                                ui.label(r["valor"]).classes("w-28 text-sm text-right")
+                                ui.label(r["prazo"]).classes("w-16 text-sm text-right")
+                                ui.label(r["data"]).classes("w-24 text-sm text-slate-400")
+                    ui.button("Fechar", on_click=dlg.close).props("flat").classes("mt-2")
+                dlg.open()
+
             _actions["simular"] = simular
+            _actions["abrir_sim"] = abrir_sim
             _actions["gerar_pdf"] = gerar_pdf
+            _actions["gerar_carne"] = gerar_carne
             _actions["nova_a_partir"] = nova_a_partir
 
         shell(content)

@@ -1078,3 +1078,24 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 12:20 | Edited app/services/proposal_service.py | 7→8 lines | ~129 |
+| 12:21 | Edited app/data/models.py | 2→3 lines | ~66 |
+| 12:21 | Created app/data/migrations/versions/20260527_a1b2c3d4e5f6_add_carne_fields.py | — | ~490 |
+| 12:23 | Created app/reports/carne.html | — | ~511 |
+| 12:23 | Created app/reports/carne.css | — | ~507 |
+| 12:23 | Edited app/services/proposal_service.py | 9→10 lines | ~48 |
+| 12:24 | Edited app/services/proposal_service.py | modified _get_loja() | ~328 |
+| 12:24 | Edited app/services/proposal_service.py | modified generate_carne() | ~601 |
+| 12:24 | Edited app/ui/pages/_proposal_helper.py | modified generate_and_open_pdf() | ~225 |
+| 12:25 | Edited app/ui/pages/configuracoes.py | 9→10 lines | ~150 |
+| 12:25 | Edited app/ui/pages/configuracoes.py | 2→6 lines | ~93 |
+| 12:25 | Edited app/ui/pages/configuracoes.py | 2→5 lines | ~42 |
+| 12:26 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~66 |
+| 12:26 | Edited app/ui/pages/simulacao.py | 3→7 lines | ~137 |
+| 12:26 | Edited app/ui/pages/simulacao.py | modified gerar_pdf() | ~436 |
+| 12:27 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~55 |
+| 12:27 | Edited app/ui/pages/simulacao.py | 3→5 lines | ~76 |
+| 12:27 | Edited app/ui/pages/simulacao.py | 2→4 lines | ~60 |
+| 12:35 | Edited app/ui/pages/simulacao.py | modified classes() | ~134 |
+| 12:35 | Edited app/ui/pages/simulacao.py | modified nova_a_partir() | ~1491 |
+| 12:35 | Edited app/ui/pages/simulacao.py | 4→5 lines | ~68 |

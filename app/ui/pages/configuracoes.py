@@ -15,6 +15,7 @@ from app.ui.layout import shell
 from app.ui.router import get_logged_user_id
 
 EDITABLE_KEYS = [
+    "nome_loja", "cnpj_loja", "endereco_loja", "telefone_loja",
     "entrada_minima_pct", "prazo_minimo_meses", "prazo_maximo_meses",
     "taxa_minima_mes", "taxa_maxima_mes", "dias_max_carencia",
     "valor_minimo_financiado", "incluir_iof_default",
@@ -25,6 +26,10 @@ EDITABLE_KEYS = [
 ]
 
 LABEL_MAP: dict[str, str] = {
+    "nome_loja":                         "Nome da loja",
+    "cnpj_loja":                         "CNPJ da loja",
+    "endereco_loja":                     "Endereço da loja",
+    "telefone_loja":                     "Telefone da loja",
     "entrada_minima_pct":                "Entrada mínima",
     "prazo_minimo_meses":                "Prazo mínimo (meses)",
     "prazo_maximo_meses":                "Prazo máximo (meses)",
@@ -59,6 +64,9 @@ CURRENCY_KEYS = {"valor_minimo_financiado"}
 # backup_diario_horario, update_indicadores_horario → plain ui.input
 
 GROUPS = [
+    ("Dados da Loja", True, [
+        "nome_loja", "cnpj_loja", "endereco_loja", "telefone_loja",
+    ]),
     ("Financiamento", True, [
         "entrada_minima_pct", "prazo_minimo_meses", "prazo_maximo_meses",
         "taxa_minima_mes", "taxa_maxima_mes", "dias_max_carencia",

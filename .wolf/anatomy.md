@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T14:59:17.294Z
-> Files: 36 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T15:35:52.819Z
+> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -41,7 +41,7 @@
 
 ## app/data/
 
-- `models.py` — Declares User (~4137 tok)
+- `models.py` — Declares User (~4158 tok)
 
 ## app/data/migrations/
 
@@ -49,6 +49,7 @@
 ## app/data/migrations/versions/
 
 - `20260526_45b4fea970eb_add_vehicle_fields.py` — add_vehicle_fields (~699 tok)
+- `20260527_a1b2c3d4e5f6_add_carne_fields.py` — add_carne_fields (~490 tok)
 
 ## app/integrations/
 
@@ -61,10 +62,13 @@
 
 ## app/reports/
 
+- `carne.css` — Styles: 22 rules (~507 tok)
+- `carne.html` — Carnê {{ proposal.codigo }} (~511 tok)
 
 ## app/services/
 
 - `client_service.py` — ClientService - validated client CRUD. (~825 tok)
+- `proposal_service.py` — ProposalService - builds Proposal record + snapshot JSON + PDF rendering. (~3786 tok)
 - `vehicle_service.py` — VehicleService — full CRUD: placa validation, create_from_fipe, create_manual, set_status, update, refresh_fipe, list_active, list_all, get_simulations. (~2100 tok)
 
 ## app/ui/
@@ -80,11 +84,12 @@
 
 ## app/ui/pages/
 
+- `_proposal_helper.py` — Helper to generate PDF from a simulation in UI context. (~398 tok)
 - `cadastro.py` — Cadastro page - clientes + usuarios sub-tabs. (~1463 tok)
-- `configuracoes.py` — Configuracoes - edit business_rules. (~1754 tok)
+- `configuracoes.py` — Configuracoes - edit business_rules. (~1870 tok)
 - `docs.py` — Documentacao tecnica - renderiza docs/*.md inline. (~396 tok)
 - `login.py` — Login page - PIN-based auth. (~514 tok)
-- `simulacao.py` — Simulacao page - the central tab. (~8838 tok)
+- `simulacao.py` — Simulacao page - the central tab. (~10662 tok)
 - `veiculos.py` — Vehicle registry page. (~7946 tok)
 
 ## app/utils/

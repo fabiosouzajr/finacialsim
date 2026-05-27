@@ -13,6 +13,7 @@ from weasyprint import CSS, HTML
 
 from app.data.models import (
     AmortizationRow,
+    BusinessRule,
     Client,
     Proposal,
     Simulation,
@@ -181,6 +182,7 @@ class ProposalService:
             "veiculo": {
                 "marca": veiculo.marca, "modelo": veiculo.modelo,
                 "ano_modelo": veiculo.ano_modelo, "combustivel": veiculo.combustivel,
+                "placa": veiculo.placa,
                 "codigo_fipe": veiculo.codigo_fipe,
                 "valor_fipe": _decimal_to_str(veiculo.valor_fipe) if veiculo.valor_fipe else None,
                 "mes_referencia_fipe": veiculo.mes_referencia_fipe,
@@ -226,6 +228,17 @@ class ProposalService:
         )
         return proposal
 
+    def _get_loja(self) -> dict:
+        def _raw(chave: str) -> str:
+            row = self.session.query(BusinessRule).filter_by(chave=chave).first()
+            return json.loads(row.valor_json) if row else ""
+        return {
+            "nome": _raw("nome_loja"),
+            "cnpj": _raw("cnpj_loja"),
+            "endereco": _raw("endereco_loja"),
+            "telefone": _raw("telefone_loja"),
+        }
+
     def render_pdf(self, proposal_id: int, output_path: Path,
                    loja: dict | None = None, vendedor: dict | None = None) -> Path:
         proposal = self.session.get(Proposal, proposal_id)
@@ -234,9 +247,10 @@ class ProposalService:
         snap = json.loads(proposal.snapshot_json)
         snap.setdefault("proposta", {})["codigo"] = proposal.codigo
 
+        resolved_loja = loja if loja is not None else self._get_loja()
         ctx = _build_template_context(
             snap,
-            loja=loja or {"nome": "Loja"},
+            loja=resolved_loja or {"nome": "Loja"},
             vendedor=vendedor or {"nome": "Vendedor"},
             gerado_em=proposal.gerado_em,
             validade=proposal.validade_dias,
@@ -251,3 +265,60 @@ class ProposalService:
         proposal.pdf_path = str(output_path)
         self.session.commit()
         return output_path
+
+    def generate_carne(self, proposal_id: int, output_dir: Path) -> Path:
+        proposal = self.session.get(Proposal, proposal_id)
+        if proposal is None:
+            raise ValueError("proposal not found")
+
+        snap = json.loads(proposal.snapshot_json)
+        cliente = snap.get("cliente")
+        veiculo = snap["veiculo"]
+        rows = snap["cronograma"]
+        total = len(rows)
+
+        loja = self._get_loja()
+
+        cliente_nome = cliente["nome"] if cliente else ""
+        cliente_cpf = (
+            _format_cpf_cnpj(cliente["cpf_cnpj"], cliente["tipo"]) if cliente else ""
+        )
+        descricao = f"{veiculo['marca']} {veiculo['modelo']} {veiculo['ano_modelo']}"
+        placa = veiculo.get("placa")
+
+        parcelas = [
+            {
+                "numero": r["numero"],
+                "total": total,
+                "vencimento_br": format_date_br(date.fromisoformat(r["venc"])),
+                "valor_total_brl": format_brl(Decimal(r["parcela_total"])),
+            }
+            for r in rows
+        ]
+
+        ctx = {
+            "loja": loja,
+            "proposal": {"codigo": proposal.codigo},
+            "cliente": {"nome": cliente_nome, "cpf_cnpj_fmt": cliente_cpf},
+            "veiculo": {"descricao": descricao, "placa": placa},
+            "parcelas": parcelas,
+        }
+
+        template = _jinja_env.get_template("carne.html")
+        html_str = template.render(**ctx)
+        css = CSS(filename=str(_REPORTS_DIR / "carne.css"))
+
+        placa_clean = placa.replace("-", "").replace(" ", "") if placa else None
+        filename = (
+            f"CARNE-{placa_clean}-{proposal.codigo}.pdf"
+            if placa_clean
+            else f"CARNE-{proposal.codigo}.pdf"
+        )
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        out_path = output_dir / filename
+        HTML(string=html_str).write_pdf(str(out_path), stylesheets=[css])
+
+        proposal.carne_path = str(out_path)
+        self.session.commit()
+        return out_path
