@@ -28,7 +28,8 @@ def build_docs_page(engine) -> None:
                         ui.button(label, on_click=lambda p=path: _load(p)).classes("w-full")
 
                 content_area = ui.column().classes("w-3/4")
-                placeholder = content_area.add(ui.markdown("Selecione um documento."))
+                with content_area:
+                    ui.markdown("Selecione um documento.")
 
                 def _load(path: str) -> None:
                     content_area.clear()

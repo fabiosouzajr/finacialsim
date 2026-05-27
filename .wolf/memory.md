@@ -1047,3 +1047,34 @@
 | 11:31 | Edited app/ui/pages/cadastro.py | modified classes() | ~179 |
 | 11:31 | Edited app/ui/pages/configuracoes.py | modified _safe_int() | ~35 |
 | 11:31 | Edited app/ui/components/charts.py | modified composition_chart() | ~32 |
+
+## Session: 2026-05-27 11:36
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 11:38
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-27 11:44
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:45 | Edited app/ui/pages/docs.py | 2→3 lines | ~44 |
+
+## Session: 2026-05-27 11:48
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:48 | Created .superpowers/brainstorm/60-1779893261/content/carne-layout.html | — | ~1877 |
+| 11:51 | Created .superpowers/brainstorm/60-1779893261/content/carne-conteudo.html | — | ~1570 |
+| 11:51 | Created .superpowers/brainstorm/60-1779893261/content/waiting-1.html | — | ~39 |
+| 11:55 | Created .superpowers/brainstorm/60-1779893261/content/carne-pagina.html | — | ~2091 |
+| 11:59 | Created docs/superpowers/specs/2026-05-27-carne-design.md | — | ~1061 |
+
+## Session: 2026-05-27 12:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T14:31:13.847Z
-> Files: 30 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T14:59:17.294Z
+> Files: 36 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -18,6 +18,13 @@
 ## .superpowers/brainstorm/472-1779808804/content/
 
 - `veiculos-layout.html` (~1999 tok)
+
+## .superpowers/brainstorm/60-1779893261/content/
+
+- `carne-conteudo.html` (~1570 tok)
+- `carne-layout.html` (~1877 tok)
+- `carne-pagina.html` (~2091 tok)
+- `waiting-1.html` (~39 tok)
 
 ## .superpowers/brainstorm/916-1779811579/content/
 
@@ -75,6 +82,7 @@
 
 - `cadastro.py` — Cadastro page - clientes + usuarios sub-tabs. (~1463 tok)
 - `configuracoes.py` — Configuracoes - edit business_rules. (~1754 tok)
+- `docs.py` — Documentacao tecnica - renderiza docs/*.md inline. (~396 tok)
 - `login.py` — Login page - PIN-based auth. (~514 tok)
 - `simulacao.py` — Simulacao page - the central tab. (~8838 tok)
 - `veiculos.py` — Vehicle registry page. (~7946 tok)
@@ -103,6 +111,7 @@
 - `2026-05-26-simulacao-smart-defaults-design.md` — Design Spec — Simulacao Smart Defaults (~1591 tok)
 - `2026-05-26-ui-error-feedback-design.md` — Design Spec — UI Error Feedback for Simulation & Vehicle Flows (~1864 tok)
 - `2026-05-26-veiculos-design.md` — Design Spec — Cadastro de Veículos (~3643 tok)
+- `2026-05-27-carne-design.md` — Design Spec — Geração de Carnê PDF (~995 tok)
 - `2026-05-27-ui-polish-design.md` — Design Spec — UI Polish: Login, Cadastro, Simulação, Configurações (~2273 tok)
 
 ## scripts/
