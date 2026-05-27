@@ -61,8 +61,14 @@ def _clients_panel(SessionLocal, user_id: int) -> None:
             ui.label("Clientes Cadastrados").classes(_SECTION_LABEL)
             table = ui.table(
                 columns=[
-                    {"name": "nome", "label": "Nome",     "field": "nome", "sortable": True, "align": "center"},
-                    {"name": "doc",  "label": "CPF/CNPJ", "field": "doc",                    "align": "center"},
+                    {
+                        "name": "nome", "label": "Nome", "field": "nome",
+                        "sortable": True, "align": "center",
+                    },
+                    {
+                        "name": "doc", "label": "CPF/CNPJ", "field": "doc",
+                        "align": "center",
+                    },
                 ],
                 rows=[],
             ).classes("w-full").props("flat bordered")

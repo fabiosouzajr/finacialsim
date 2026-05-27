@@ -87,7 +87,7 @@ def _safe_decimal(raw: str) -> Decimal:
 def _safe_int(raw: str) -> int:
     try:
         return int(raw or 0)
-    except ValueError:
+    except (ValueError, TypeError):
         return 0
 
 

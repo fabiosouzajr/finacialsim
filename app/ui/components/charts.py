@@ -7,7 +7,9 @@ from decimal import Decimal
 import plotly.graph_objects as go
 
 
-def composition_chart(juros: list[Decimal], amort: list[Decimal], extras: list[Decimal]) -> go.Figure:
+def composition_chart(
+    juros: list[Decimal], amort: list[Decimal], extras: list[Decimal],
+) -> go.Figure:
     n = list(range(1, len(juros) + 1))
     fig = go.Figure()
     fig.add_bar(name="Juros", x=n, y=[float(x) for x in juros], marker_color="#FB8C00")
