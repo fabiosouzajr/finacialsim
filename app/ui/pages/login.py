@@ -21,8 +21,9 @@ def build_login_page(engine) -> None:
 
         with ui.card().classes("absolute-center w-96"):
             ui.label("FinacialSim - Login").classes("text-xl font-bold")
-            user_select = ui.select(options=user_options, label="Usuario")
+            user_select = ui.select(options=user_options, label="Usuario").classes("w-full")
             pin_input = ui.input(label="PIN", password=True).props("type=password")
+            pin_input.on("keydown.enter", lambda _: do_login())
             error_label = ui.label("").classes("text-red-500")
 
             def do_login() -> None:
