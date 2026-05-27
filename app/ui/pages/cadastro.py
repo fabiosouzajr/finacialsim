@@ -41,7 +41,7 @@ def build_cadastro_page(engine) -> None:
 
 def _clients_panel(SessionLocal, user_id: int) -> None:
     # ── Split layout: form left | table right ─────────────────────────
-    with ui.row().classes("w-full gap-6 items-start"):
+    with ui.row().classes("w-full gap-4 items-start"):
 
         # ── Form ──────────────────────────────────────────────────────
         with ui.column().classes("gap-3").style("width: 290px; flex-shrink: 0"):
@@ -61,10 +61,8 @@ def _clients_panel(SessionLocal, user_id: int) -> None:
             ui.label("Clientes Cadastrados").classes(_SECTION_LABEL)
             table = ui.table(
                 columns=[
-                    {"name": "nome",     "label": "Nome",      "field": "nome",     "sortable": True},
-                    {"name": "doc",      "label": "CPF/CNPJ",  "field": "doc"},
-                    {"name": "tipo",     "label": "Tipo",      "field": "tipo"},
-                    {"name": "telefone", "label": "Telefone",  "field": "telefone"},
+                    {"name": "nome", "label": "Nome",     "field": "nome", "sortable": True, "align": "center"},
+                    {"name": "doc",  "label": "CPF/CNPJ", "field": "doc",                    "align": "center"},
                 ],
                 rows=[],
             ).classes("w-full").props("flat bordered")
@@ -73,7 +71,7 @@ def _clients_panel(SessionLocal, user_id: int) -> None:
         with SessionLocal() as session:
             results = ClientService(session).find("")
         table.rows = [
-            {"nome": c.nome, "doc": c.cpf_cnpj, "tipo": c.tipo, "telefone": c.telefone or ""}
+            {"nome": c.nome, "doc": c.cpf_cnpj}
             for c in results
         ]
         table.update()
