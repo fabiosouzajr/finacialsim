@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
+from typing import Any
 
 from nicegui import ui
 
@@ -79,14 +80,14 @@ GROUPS = [
 def _safe_decimal(raw: str) -> Decimal:
     try:
         return Decimal(raw or "0")
-    except (InvalidOperation, ValueError):
+    except InvalidOperation:
         return Decimal("0")
 
 
 def _safe_int(raw: str) -> int:
     try:
         return int(raw or 0)
-    except (ValueError, TypeError):
+    except ValueError:
         return 0
 
 
@@ -98,7 +99,7 @@ def build_configuracoes_page(engine) -> None:
         def content() -> None:
             ui.label("Regras de negocio").classes("text-lg font-bold")
 
-            widgets: dict[str, object] = {}
+            widgets: dict[str, Any] = {}
 
             with SessionLocal() as session:
                 svc = RulesService(session)
