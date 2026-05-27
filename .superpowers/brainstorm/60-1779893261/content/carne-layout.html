@@ -1,0 +1,108 @@
+<h2>Layout do Carnê — Boletos por Página A4</h2>
+<p class="subtitle">Quantos boletos de cobrança por folha impressa?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="3pp" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f8f9fa; border-radius:6px; font-family:monospace; font-size:11px;">
+      <div style="border:2px solid #333; padding:8px; margin-bottom:6px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">━━━━━━━━━ PARCELA 1/36 ━━━━━━━━━</div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>Vencimento: <b>10/06/2026</b></span>
+          <span>Valor: <b>R$ 1.250,00</b></span>
+        </div>
+        <div style="font-size:9px; color:#777; margin-top:3px;">João da Silva — CPF: 045.202.593-12</div>
+        <div style="background:#e9ecef; height:8px; border-radius:2px; margin-top:5px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:8px; margin-bottom:6px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">━━━━━━━━━ PARCELA 2/36 ━━━━━━━━━</div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>Vencimento: <b>10/07/2026</b></span>
+          <span>Valor: <b>R$ 1.250,00</b></span>
+        </div>
+        <div style="font-size:9px; color:#777; margin-top:3px;">João da Silva — CPF: 045.202.593-12</div>
+        <div style="background:#e9ecef; height:8px; border-radius:2px; margin-top:5px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:8px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">━━━━━━━━━ PARCELA 3/36 ━━━━━━━━━</div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>Vencimento: <b>10/08/2026</b></span>
+          <span>Valor: <b>R$ 1.250,00</b></span>
+        </div>
+        <div style="font-size:9px; color:#777; margin-top:3px;">João da Silva — CPF: 045.202.593-12</div>
+        <div style="background:#e9ecef; height:8px; border-radius:2px; margin-top:5px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>3 boletos por página</h3>
+      <p>Padrão mais comum no Brasil. Bom espaço para informações. 36 parcelas = 12 folhas.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="4pp" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f8f9fa; border-radius:6px; font-family:monospace; font-size:11px;">
+      <div style="border:2px solid #333; padding:6px; margin-bottom:4px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:2px;">── PARCELA 1/36 ──</div>
+        <div style="display:flex; justify-content:space-between; font-size:9px;">
+          <span>Venc: <b>10/06/2026</b></span><span>R$ 1.250,00</span>
+        </div>
+        <div style="background:#e9ecef; height:6px; border-radius:2px; margin-top:4px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:6px; margin-bottom:4px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:2px;">── PARCELA 2/36 ──</div>
+        <div style="display:flex; justify-content:space-between; font-size:9px;">
+          <span>Venc: <b>10/07/2026</b></span><span>R$ 1.250,00</span>
+        </div>
+        <div style="background:#e9ecef; height:6px; border-radius:2px; margin-top:4px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:6px; margin-bottom:4px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:2px;">── PARCELA 3/36 ──</div>
+        <div style="display:flex; justify-content:space-between; font-size:9px;">
+          <span>Venc: <b>10/08/2026</b></span><span>R$ 1.250,00</span>
+        </div>
+        <div style="background:#e9ecef; height:6px; border-radius:2px; margin-top:4px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:6px; border-radius:3px; background:white;">
+        <div style="font-size:10px; font-weight:bold; color:#555; margin-bottom:2px;">── PARCELA 4/36 ──</div>
+        <div style="display:flex; justify-content:space-between; font-size:9px;">
+          <span>Venc: <b>10/09/2026</b></span><span>R$ 1.250,00</span>
+        </div>
+        <div style="background:#e9ecef; height:6px; border-radius:2px; margin-top:4px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>4 boletos por página</h3>
+      <p>Mais compacto. Menos papel — 36 parcelas = 9 folhas. Espaço menor por boleto.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="2pp" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f8f9fa; border-radius:6px; font-family:monospace; font-size:11px;">
+      <div style="border:2px solid #333; padding:12px; margin-bottom:8px; border-radius:3px; background:white;">
+        <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:6px; border-bottom:1px solid #ddd; padding-bottom:4px;">PARCELA 1/36</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <div><div style="font-size:8px; color:#888;">VENCIMENTO</div><div style="font-size:12px; font-weight:bold;">10/06/2026</div></div>
+          <div><div style="font-size:8px; color:#888;">VALOR</div><div style="font-size:14px; font-weight:bold; color:#1a5c2e;">R$ 1.250,00</div></div>
+        </div>
+        <div style="font-size:9px; color:#666;">João da Silva — VW Gol 2022 — SIMSIM-0001</div>
+        <div style="background:#333; height:10px; border-radius:2px; margin-top:6px;"></div>
+      </div>
+      <div style="border:2px solid #333; padding:12px; border-radius:3px; background:white;">
+        <div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:6px; border-bottom:1px solid #ddd; padding-bottom:4px;">PARCELA 2/36</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <div><div style="font-size:8px; color:#888;">VENCIMENTO</div><div style="font-size:12px; font-weight:bold;">10/07/2026</div></div>
+          <div><div style="font-size:8px; color:#888;">VALOR</div><div style="font-size:14px; font-weight:bold; color:#1a5c2e;">R$ 1.250,00</div></div>
+        </div>
+        <div style="font-size:9px; color:#666;">João da Silva — VW Gol 2022 — SIMSIM-0001</div>
+        <div style="background:#333; height:10px; border-radius:2px; margin-top:6px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>2 boletos por página</h3>
+      <p>Mais espaço e legibilidade. Ideal para mais detalhes por boleto. 36 parcelas = 18 folhas.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:20px;">Clique em uma opção e confirme no terminal. A maioria dos carnês brasileiros usa 3 por página.</p>

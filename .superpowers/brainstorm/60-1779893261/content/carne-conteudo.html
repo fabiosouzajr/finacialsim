@@ -1,0 +1,98 @@
+<h2>Conteúdo de Cada Boleto</h2>
+<p class="subtitle">Quais informações aparecem em cada um dos 4 boletos por página?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="minimal" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:12px; background:#f8f9fa; border-radius:6px;">
+      <div style="border:1.5px solid #555; border-radius:4px; background:white; padding:10px; font-family:sans-serif; font-size:11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
+          <span style="font-weight:bold; font-size:10px; color:#333;">LOJA FINANCIAMENTO LTDA</span>
+          <span style="font-size:10px; color:#888;">PARCELA <b>01</b>/36</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <div>
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Vencimento</div>
+            <div style="font-size:13px; font-weight:bold;">10/06/2026</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Valor</div>
+            <div style="font-size:14px; font-weight:bold; color:#1a5c2e;">R$ 1.250,00</div>
+          </div>
+        </div>
+        <div style="font-size:9px; color:#555; margin-bottom:4px;">João da Silva — CPF: 045.202.593-12</div>
+        <div style="font-size:9px; color:#888;">Ref.: SIM-2026-0001</div>
+        <div style="background: repeating-linear-gradient(90deg,#000 0,#000 2px,transparent 0,transparent 4px); height:10px; border-radius:2px; margin-top:6px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Mínimo</h3>
+      <p>Loja · Parcela N/total · Vencimento · Valor · Nome/CPF · Código da simulação · Linha de corte</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="veiculo" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:12px; background:#f8f9fa; border-radius:6px;">
+      <div style="border:1.5px solid #555; border-radius:4px; background:white; padding:10px; font-family:sans-serif; font-size:11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
+          <span style="font-weight:bold; font-size:10px; color:#333;">LOJA FINANCIAMENTO LTDA</span>
+          <span style="font-size:10px; color:#888;">PARCELA <b>01</b>/36</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <div>
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Vencimento</div>
+            <div style="font-size:13px; font-weight:bold;">10/06/2026</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Valor</div>
+            <div style="font-size:14px; font-weight:bold; color:#1a5c2e;">R$ 1.250,00</div>
+          </div>
+        </div>
+        <div style="font-size:9px; color:#555; margin-bottom:2px;">João da Silva — CPF: 045.202.593-12</div>
+        <div style="font-size:9px; color:#666; font-style:italic; margin-bottom:4px;">VW Gol 1.0 2022 · Placa ABC-1234</div>
+        <div style="font-size:9px; color:#888;">Ref.: SIM-2026-0001</div>
+        <div style="background: repeating-linear-gradient(90deg,#000 0,#000 2px,transparent 0,transparent 4px); height:10px; border-radius:2px; margin-top:6px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Com veículo</h3>
+      <p>Igual ao A + modelo/ano e placa do veículo financiado. Útil para identificação rápida.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="detalhado" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:12px; background:#f8f9fa; border-radius:6px;">
+      <div style="border:1.5px solid #555; border-radius:4px; background:white; padding:10px; font-family:sans-serif; font-size:11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:5px;">
+          <span style="font-weight:bold; font-size:10px; color:#333;">LOJA FINANCIAMENTO LTDA</span>
+          <span style="font-size:10px; color:#888;">PARCELA <b>01</b>/36</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+          <div>
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Vencimento</div>
+            <div style="font-size:12px; font-weight:bold;">10/06/2026</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:8px; color:#888; text-transform:uppercase;">Total a pagar</div>
+            <div style="font-size:13px; font-weight:bold; color:#1a5c2e;">R$ 1.250,00</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:4px; font-size:8px; color:#666;">
+          <span>Juros: R$ 180,00</span>
+          <span>Amort.: R$ 1.070,00</span>
+          <span>Saldo: R$ 28.930,00</span>
+        </div>
+        <div style="font-size:9px; color:#555; margin-bottom:2px;">João da Silva · VW Gol 2022 · ABC-1234</div>
+        <div style="font-size:9px; color:#888;">Ref.: SIM-2026-0001</div>
+        <div style="background: repeating-linear-gradient(90deg,#000 0,#000 2px,transparent 0,transparent 4px); height:10px; border-radius:2px; margin-top:5px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Detalhado</h3>
+      <p>Igual ao B + breakdown: juros, amortização e saldo devedor após a parcela. Mais informativo, mais denso.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:20px;">Clique em uma opção ou responda no terminal.</p>
