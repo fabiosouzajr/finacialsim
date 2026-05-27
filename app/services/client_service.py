@@ -44,6 +44,8 @@ class ClientService:
         cpf_d = _only_digits(cpf)
         if not is_valid_cpf(cpf_d):
             raise ClientServiceError(f"CPF invalido: {cpf}")
+        if self.repo.find_by_cpf_cnpj(cpf_d):
+            raise ClientServiceError(f"CPF ja cadastrado: {cpf}")
         c = self.repo.create(
             nome=nome, cpf_cnpj=cpf_d, tipo="PF", criado_por=criado_por,
             rg=rg, data_nasc=data_nasc, profissao=profissao, renda=renda,
@@ -67,6 +69,8 @@ class ClientService:
         cnpj_d = _only_digits(cnpj)
         if not is_valid_cnpj(cnpj_d):
             raise ClientServiceError(f"CNPJ invalido: {cnpj}")
+        if self.repo.find_by_cpf_cnpj(cnpj_d):
+            raise ClientServiceError(f"CNPJ ja cadastrado: {cnpj}")
         c = self.repo.create(
             nome=razao_social, cpf_cnpj=cnpj_d, tipo="PJ", criado_por=criado_por,
             telefone=telefone, email=email, endereco_json=endereco_json,

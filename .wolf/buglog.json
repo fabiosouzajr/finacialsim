@@ -1046,6 +1046,88 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-26T19:08:45.175Z"
+    },
+    {
+      "id": "bug-065",
+      "timestamp": "2026-05-26T19:24:47.350Z",
+      "error_message": "Incorrect value in code",
+      "file": "app/main.py",
+      "root_cause": "Had \"finacialsim.db\"",
+      "fix": "Changed to \"data\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T19:24:47.350Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-05-26T00:00:00.000Z",
+      "error_message": "Clientes nao aparecem na tabela apos serem cadastrados",
+      "file": "app/ui/pages/cadastro.py",
+      "root_cause": "1) _refresh_client_list modificava table_data in-place e chamava table.update() — em NiceGUI 2.x o correto e atribuir table.rows = [...] diretamente. 2) _refresh era chamado dentro do with SessionLocal() de save(), com a sessao de gravacao ainda aberta.",
+      "fix": "Refatorado: table.rows = [...] atribuido diretamente. _refresh() chamado fora do bloco with SessionLocal() da funcao _save(). Status label substituido por ui.notify().",
+      "tags": [
+        "nicegui",
+        "table",
+        "cadastro",
+        "refresh",
+        "ui-bug"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-05-26T20:24:50.958Z",
+      "error_message": "Significant refactor of ",
+      "file": "docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 20→28 lines (6 removed) | Also: **Update trigger:** both `valor_veiculo` and `valo; The user owns the field immediately after touching",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-26T20:25:12.953Z"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-05-26T20:43:55.528Z",
+      "error_message": "Wrong reference: update should be input",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "Used \"update\" instead of \"input\"",
+      "fix": "Changed update → input",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T20:43:55.528Z"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-05-26T20:55:20.303Z",
+      "error_message": "Significant refactor of ",
+      "file": "app/ui/pages/simulacao.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 6→9 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-26T20:55:20.303Z"
     }
   ]
 }

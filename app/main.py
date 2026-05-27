@@ -66,9 +66,9 @@ def _run_migrations(db_path: Path) -> None:
 
 
 def build_app() -> None:
-    data_dir = _platform_data_dir()
-    setup_logging(data_dir / "logs")
-    db_path = data_dir / "finacialsim.db"
+    project_root = Path(__file__).resolve().parents[1]
+    setup_logging(project_root / "logs")
+    db_path = project_root / "data" / "finacialsim.db"
 
     # Run migrations if DB is new or schema outdated
     _run_migrations(db_path)

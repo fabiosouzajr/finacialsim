@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-26T19:08:45.137Z
-> Files: 20 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-26T20:55:26.734Z
+> Files: 24 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -27,7 +27,7 @@
 
 ## app/
 
-- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1034 tok)
+- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1044 tok)
 
 ## app/core/
 
@@ -57,6 +57,7 @@
 
 ## app/services/
 
+- `client_service.py` — ClientService - validated client CRUD. (~825 tok)
 - `vehicle_service.py` — VehicleService — full CRUD: placa validation, create_from_fipe, create_manual, set_status, update, refresh_fipe, list_active, list_all, get_simulations. (~2100 tok)
 
 ## app/ui/
@@ -70,7 +71,8 @@
 
 ## app/ui/pages/
 
-- `simulacao.py` — Simulacao page - the central tab. (~7541 tok)
+- `cadastro.py` — Cadastro page — split layout (form left, table right). Redesigned clientes + usuarios tabs matching simulacao style. (~850 tok)
+- `simulacao.py` — Simulacao page - the central tab. (~8838 tok)
 - `veiculos.py` — Vehicle registry page. (~7946 tok)
 
 ## app/utils/
@@ -87,11 +89,13 @@
 
 ## docs/superpowers/plans/
 
+- `2026-05-26-simulacao-smart-defaults.md` — Simulacao Smart Defaults Implementation Plan (~4554 tok)
 - `2026-05-26-ui-error-feedback.md` — UI Error Feedback Implementation Plan (~4295 tok)
 - `2026-05-26-veiculos.md` — Vehicle Registry Implementation Plan (~19614 tok)
 
 ## docs/superpowers/specs/
 
+- `2026-05-26-simulacao-smart-defaults-design.md` — Design Spec — Simulacao Smart Defaults (~1591 tok)
 - `2026-05-26-ui-error-feedback-design.md` — Design Spec — UI Error Feedback for Simulation & Vehicle Flows (~1864 tok)
 - `2026-05-26-veiculos-design.md` — Design Spec — Cadastro de Veículos (~3643 tok)
 

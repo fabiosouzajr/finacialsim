@@ -3,6 +3,8 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 17:45 | implemented Tasks 3-9 of simulacao smart defaults (cliente selector, entrada smart default, pct_label, _set_valor_veiculo recalc, taxa BACEN prefill, bacen_hint, blur bindings, _poll_bacen timer, cliente_id DTO wiring, load restore) | app/ui/pages/simulacao.py | 7 commits d039ba9..7e75c7d | ~3500 |
+
 | 2026-05-26 | Created integration tests for vehicle→simulation flow | tests/integration/test_vehicle_simulation_flow.py | 2 passed, committed | ~800 |
 
 | HH:MM | description | file(s) | outcome | ~tokens |
@@ -784,6 +786,7 @@
 ## Session: 2026-05-26 12:17
 
 | Time | Action | File(s) | Outcome | ~Tokens |
+| 20:40 | Task 2: page-data loading block — added DB session to simulacao.py content() to load entrada_minima_pct, taxa_bacen_val, clients | app/ui/pages/simulacao.py | import verified clean, committed 9b8a6c8 | ~200 |
 |------|--------|---------|---------|--------|
 | 13:04 | Created .superpowers/brainstorm/472-1779808804/content/veiculos-layout.html | — | ~1999 |
 | 13:07 | Created .superpowers/brainstorm/916-1779811579/content/veiculos-layout.html | — | ~1999 |
@@ -903,3 +906,56 @@
 | 16:08 | Edited app/ui/pages/veiculos.py | 5→7 lines | ~128 |
 | 16:08 | Edited app/ui/pages/veiculos.py | 5→7 lines | ~122 |
 | 16:08 | Edited app/ui/pages/veiculos.py | 4→7 lines | ~93 |
+
+## Session: 2026-05-26 16:15
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:17 | Edited app/services/client_service.py | modified is_valid_cpf() | ~78 |
+| 16:17 | Edited app/services/client_service.py | modified is_valid_cnpj() | ~81 |
+| 16:17 | duplicate CPF guard in ClientService.create_pf/create_pj | app/services/client_service.py | raises ClientServiceError instead of propagating IntegrityError | ~100 tok |
+| 16:24 | Edited app/main.py | 3→3 lines | ~43 |
+| 16:25 | Edited app/main.py | 3→3 lines | ~43 |
+
+## Session: 2026-05-26 16:32
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:51 | Created app/ui/pages/cadastro.py | — | ~1468 |
+| 16:51 | Edited app/ui/pages/cadastro.py | 10→10 lines | ~151 |
+| 16:51 | Edited app/ui/pages/cadastro.py | 3→3 lines | ~47 |
+| 16:52 | Redesigned cadastro.py: split layout, simulacao-style labels, ui.toggle PF/PJ, fixed table.rows bug | app/ui/pages/cadastro.py | done | ~350 tok |
+| 17:15 | Created docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | — | ~1427 |
+| 17:15 | Edited docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | modified _poll_bacen() | ~79 |
+| 17:24 | Edited docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | simular() → nova_a_partir() | ~290 |
+| 17:24 | Edited docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | 3→3 lines | ~22 |
+| 17:25 | Edited docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | API() → quantize_brl() | ~222 |
+| 17:25 | Edited docs/superpowers/specs/2026-05-26-simulacao-smart-defaults-design.md | 4→4 lines | ~171 |
+
+## Session: 2026-05-26 17:29
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:33 | Created docs/superpowers/plans/2026-05-26-simulacao-smart-defaults.md | — | ~4857 |
+
+| 17:34 | wrote simulacao smart defaults implementation plan (9 tasks, simulacao.py only) | docs/superpowers/plans/2026-05-26-simulacao-smart-defaults.md | done | ~2800 tok |
+| 17:36 | Edited app/ui/pages/simulacao.py | added 3 import(s) | ~83 |
+
+## Session: 2026-05-26 17:37 (Task 1: Add imports)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|---------|
+| 17:37 | Task 1: added IndicatorRepository, ClientService, RulesService imports | app/ui/pages/simulacao.py | import test passed, committed 5679047 | ~500 |
+| 17:38 | Edited app/ui/pages/simulacao.py | modified content() | ~197 |
+| 17:41 | Edited app/ui/pages/simulacao.py | expanded (+14 lines) | ~216 |
+| 17:42 | Edited app/ui/pages/simulacao.py | 1→6 lines | ~110 |
+| 17:43 | Edited app/ui/pages/simulacao.py | modified _set_valor_veiculo() | ~110 |
+| 17:43 | Edited app/ui/pages/simulacao.py | expanded (+10 lines) | ~196 |
+| 17:43 | Edited app/ui/pages/simulacao.py | modified _update_pct_label() | ~502 |
+| 17:43 | Edited app/ui/pages/simulacao.py | 3→3 lines | ~36 |
+| 17:44 | Edited app/ui/pages/simulacao.py | 2→4 lines | ~79 |
+| 17:44 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~56 |
+| 17:44 | Edited app/ui/pages/simulacao.py | 3→4 lines | ~61 |
+| 17:46 | Edited app/ui/pages/simulacao.py | 25→25 lines | ~289 |
+| 17:55 | Edited app/ui/pages/simulacao.py | modified _annual_to_monthly() | ~165 |
+| 17:55 | Edited app/ui/pages/simulacao.py | 5→6 lines | ~94 |
