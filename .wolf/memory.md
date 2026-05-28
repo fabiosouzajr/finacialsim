@@ -1099,3 +1099,35 @@
 | 12:35 | Edited app/ui/pages/simulacao.py | modified classes() | ~134 |
 | 12:35 | Edited app/ui/pages/simulacao.py | modified nova_a_partir() | ~1491 |
 | 12:35 | Edited app/ui/pages/simulacao.py | 4→5 lines | ~68 |
+
+## Session: 2026-05-27 12:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-28 09:51
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-28 09:55
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:02 | Created ../../AppData/Local/Temp/architecture-review-20260528.html | — | ~9804 |
+| 10:26 | Created app/ui/components/fipe_picker.py | — | ~1536 |
+| 10:26 | Edited app/ui/pages/simulacao.py | added 1 import(s) | ~33 |
+| 10:26 | Edited app/ui/pages/simulacao.py | removed 122 lines | ~385 |
+| 10:27 | Edited app/ui/pages/veiculos.py | added 1 import(s) | ~39 |
+| 10:27 | Edited app/ui/pages/veiculos.py | removed 122 lines | ~138 |
+| 10:27 | Edited app/ui/pages/veiculos.py | inline fix | ~19 |
+| 10:29 | Edited app/ui/pages/simulacao.py | added 1 import(s) | ~29 |
+| 10:29 | Edited app/ui/pages/simulacao.py | inline fix | ~17 |
+| 10:29 | Edited app/ui/pages/simulacao.py | modified gerar_pdf() | ~140 |
+| 10:30 | Edited app/ui/pages/simulacao.py | modified gerar_carne() | ~146 |
+| 10:30 | Edited app/main.py | 1→2 lines | ~23 |
+| 10:33 | Edited app/services/simulation_service.py | inline fix | ~10 |
+| 10:33 | Edited app/services/simulation_service.py | expanded (+17 lines) | ~110 |
+| 10:33 | Edited app/services/simulation_service.py | modified find_recent() | ~356 |
+| 10:33 | Edited app/ui/pages/simulacao.py | 5→6 lines | ~42 |
+| 10:33 | Edited app/ui/pages/simulacao.py | modified abrir_sim() | ~980 |

@@ -1,7 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T15:35:52.819Z
-> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T13:33:56.546Z
+> Files: 44 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../AppData/Local/Temp/
+
+- `architecture-review-20260528.html` — Architecture Review — finacialsim (~9804 tok)
 
 ## ./
 
@@ -34,7 +38,7 @@
 
 ## app/
 
-- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1044 tok)
+- `main.py` — FinacialSim entry point - boots NiceGUI in a pywebview window. (~1057 tok)
 
 ## app/core/
 
@@ -69,6 +73,7 @@
 
 - `client_service.py` — ClientService - validated client CRUD. (~825 tok)
 - `proposal_service.py` — ProposalService - builds Proposal record + snapshot JSON + PDF rendering. (~3786 tok)
+- `simulation_service.py` — SimulationService - orchestrates calculation + persistence. (~3000 tok)
 - `vehicle_service.py` — VehicleService — full CRUD: placa validation, create_from_fipe, create_manual, set_status, update, refresh_fipe, list_active, list_all, get_simulations. (~2100 tok)
 
 ## app/ui/
@@ -80,6 +85,7 @@
 ## app/ui/components/
 
 - `charts.py` — Plotly chart factories for the simulation UI. (~606 tok)
+- `fipe_picker.py` — FIPE cascade picker — tipo→marca→modelo→ano→price, then saves vehicle. (~1536 tok)
 - `percent_input.py` — PercentInput - input as % (display) -> Decimal fraction (model). (~459 tok)
 
 ## app/ui/pages/
@@ -89,8 +95,8 @@
 - `configuracoes.py` — Configuracoes - edit business_rules. (~1870 tok)
 - `docs.py` — Documentacao tecnica - renderiza docs/*.md inline. (~396 tok)
 - `login.py` — Login page - PIN-based auth. (~514 tok)
-- `simulacao.py` — Simulacao page - the central tab. (~10662 tok)
-- `veiculos.py` — Vehicle registry page. (~7946 tok)
+- `simulacao.py` — Simulacao page - the central tab. (~8603 tok)
+- `veiculos.py` — Vehicle registry page. (~5878 tok)
 
 ## app/utils/
 
