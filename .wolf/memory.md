@@ -1140,3 +1140,32 @@
 |------|--------|---------|---------|--------|
 | 11:18 | Created README.md | — | ~1367 |
 | 11:25 | Edited README.md | modified SQLite() | ~1142 |
+
+## Session: 2026-05-28 11:29
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:58 | Created docs/superpowers/specs/2026-05-28-ipva-emplacamento-auto-calc-design.md | — | ~1192 |
+
+## Session: 2026-05-28 12:22
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-05-28 12:29
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | inline fix | ~8 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 3→5 lines | ~83 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | inline fix | ~35 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 11→16 lines | ~195 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 2→3 lines | ~38 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 2→2 lines | ~41 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | "🚗 FIPE" → "🚗 Veículos" | ~36 |
+| 12:53 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | inline fix | ~10 |
+| 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 5→5 lines | ~92 |
+| 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | expanded (+6 lines) | ~148 |
+| 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | "services/carne_service.py" → "proposal_service.generate" | ~47 |
+| 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 1→2 lines | ~46 |
+| 12:54 | Updated 2026-05-23-finacialsim-design.md to reflect codebase state: vehicles→inventory model, carnê implemented, Veículos tab, carne_path on proposals | docs/superpowers/specs/2026-05-23-finacialsim-design.md | done | ~800 |

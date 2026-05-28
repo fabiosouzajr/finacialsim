@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T14:25:03.102Z
-> Files: 45 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T15:54:29.692Z
+> Files: 47 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../AppData/Local/Temp/
 
@@ -120,11 +120,13 @@
 
 ## docs/superpowers/specs/
 
+- `2026-05-23-finacialsim-design.md` — FinacialSim — Design Spec (~13774 tok)
 - `2026-05-26-simulacao-smart-defaults-design.md` — Design Spec — Simulacao Smart Defaults (~1591 tok)
 - `2026-05-26-ui-error-feedback-design.md` — Design Spec — UI Error Feedback for Simulation & Vehicle Flows (~1864 tok)
 - `2026-05-26-veiculos-design.md` — Design Spec — Cadastro de Veículos (~3643 tok)
 - `2026-05-27-carne-design.md` — Design Spec — Geração de Carnê PDF (~995 tok)
 - `2026-05-27-ui-polish-design.md` — Design Spec — UI Polish: Login, Cadastro, Simulação, Configurações (~2273 tok)
+- `2026-05-28-ipva-emplacamento-auto-calc-design.md` — Design Spec — IPVA & Emplacamento Auto-Calculation (~1117 tok)
 
 ## scripts/
 

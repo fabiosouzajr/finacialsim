@@ -4,7 +4,7 @@
 > Cálculo financeiro nível banco real (Tabela Price com dias corridos, IOF, CET via TIR).
 >
 > **Data:** 2026-05-23
-> **Atualizado:** 2026-05-26
+> **Atualizado:** 2026-05-28
 > **Status:** Implementado (MVP scaffolding completo — core, data, integrations, services, UI, testes)
 > **Idioma do produto:** PT-BR (R$, dd/mm/yyyy, separador decimal vírgula)
 > **Plataformas:** Windows 10+ e Linux (Ubuntu/Debian/Fedora) e macOS 12+ (Monterey+) — instalação local
@@ -44,7 +44,7 @@ Capacidades resumidas:
 ## 2. Decisões arquiteturais aprovadas
 
 | Decisão | Escolha | Justificativa |
-|---|---|---|
+| --- | --- | --- |
 | Modelo de uso | 1 PC compartilhado pela equipe, SQLite local | Atende a maioria das lojas pequenas/médias |
 | Stack de UI | **NiceGUI** (Quasar/Vue) em janela nativa via pywebview | Visual profissional, multiplataforma (Win/Linux/macOS), alto reuso de componentes |
 | Precisão financeira | IOF + tarifas + CET via TIR, modo "banco real" | Requisito explícito do cliente |
@@ -153,7 +153,7 @@ finacialsim/
 │   │       ├── comparativo.py
 │   │       ├── amortizacao.py
 │   │       ├── indicadores.py
-│   │       ├── fipe.py            # aba dedicada busca FIPE (nova, não estava no spec original)
+│   │       ├── veiculos.py        # inventário de estoque — FIPE picker + gestão de veículos (nova, não estava no spec original)
 │   │       ├── configuracoes.py
 │   │       ├── apis.py            # existe mas NÃO está registrado em main.py (pendente)
 │   │       ├── logs.py
@@ -161,8 +161,10 @@ finacialsim/
 │   │       └── _proposal_helper.py  # helpers para geração de proposta
 │   │
 │   ├── reports/
-│   │   ├── proposta.html          # template Jinja2 → WeasyPrint
-│   │   └── proposta.css           # estilos do PDF
+│   │   ├── proposta.html          # template Jinja2 → WeasyPrint (proposta em PDF)
+│   │   ├── proposta.css           # estilos do PDF
+│   │   ├── carne.html             # template Jinja2 → WeasyPrint (carnê de pagamento) [IMPLEMENTADO]
+│   │   └── carne.css              # estilos do carnê
 │   │
 │   └── utils/
 │       ├── br_format.py
@@ -234,17 +236,22 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 
 ### 5.2 Veículos e simulações
 
-**`vehicles`** (snapshot por simulação)
+**`vehicles`** (inventário de estoque — não é mais snapshot por simulação)
 
 - `id` PK
 - `fonte` TEXT — `fipe_parallelum` | `fipe_brasilapi` | `manual`
 - `tipo`, `marca`, `modelo`, `ano_modelo` INTEGER, `combustivel`
 - `codigo_fipe` TEXT
 - `valor_fipe` NUMERIC(18,2)
-- `valor_referencia` NUMERIC(18,2) — valor real usado
+- `valor_referencia` NUMERIC(18,2) — valor real de venda (ajustável independente do FIPE)
 - `mes_referencia_fipe` TEXT
+- `cor` TEXT
+- `placa` TEXT UNIQUE — formato antigo (ABC1234) ou Mercosul (ABC1D23); nullable para veículos sem placa ainda
+- `odometro_km` INTEGER
+- `status` TEXT DEFAULT 'disponivel' — `disponivel` | `reservado` | `vendido`
 - `snapshot_json` TEXT — payload bruto da API (auditável)
-- `criado_em`
+- `criado_por` FK→`users.id`
+- `criado_em`, `atualizado_em`
 
 **`simulations`**
 
@@ -321,6 +328,7 @@ Todas as colunas financeiras são `NUMERIC(18,4)` (Decimal no ORM). Datas usam t
 - `gerado_por` FK→`users.id`
 - `snapshot_json` TEXT — tudo congelado para reproduzir o PDF
 - `pdf_path` TEXT
+- `carne_path` TEXT — caminho do carnê PDF gerado (opcional, preenchido por `generate_carne()`)
 - `validade_dias` INTEGER
 - `gerado_em` DATETIME
 
@@ -771,13 +779,13 @@ Visível para gerente/admin: status, atualizar agora, reordenar chain, habilitar
 │                                                  [Vendedor: João] [⚙] [⎋]│
 ├──────────────────────────────────────────────────────────────────────────┤
 │ 📊 Dashboard  📋 Cadastro  💰 Simulação  ⚖ Comparativo  ⏩ Amortização   │
-│ 📈 Indicadores  🚗 FIPE  ⚙ Configurações  📝 Logs  📚 Documentação        │
+│ 📈 Indicadores  🚗 Veículos  ⚙ Configurações  📝 Logs  📚 Documentação    │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                       [conteúdo da aba selecionada]                      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-> **Nota de implementação:** A aba "🔌 APIs" (originalmente no spec) não está registrada na navegação principal (`layout.py`). O arquivo `pages/apis.py` existe mas a rota `/apis` não é montada em `main.py` — está pendente de integração. No lugar, foi adicionada a aba "🚗 FIPE" (busca de veículos FIPE como página standalone).
+> **Nota de implementação:** A aba "🔌 APIs" (originalmente no spec) não está registrada na navegação principal (`layout.py`). O arquivo `pages/apis.py` existe mas a rota `/apis` não é montada em `main.py` — está pendente de integração. No lugar, foi adicionada a aba "🚗 Veículos" (inventário de estoque com FIPE picker integrado como componente — `pages/veiculos.py`).
 
 Abas restritas por perfil ficam **ocultas**, não apenas desabilitadas.
 
@@ -792,7 +800,7 @@ Abas restritas por perfil ficam **ocultas**, não apenas desabilitadas.
 | Comparativo | ✅ | ✅ | ✅ |
 | Amortização | ✅ | ✅ | ✅ |
 | Indicadores (leitura) | ✅ | ✅ | ✅ |
-| FIPE (busca standalone) | ✅ | ✅ | ✅ |
+| Veículos (inventário) | ✅ | ✅ | ✅ |
 | Indicadores (editar) | ❌ | ⚠️ valores manuais | ✅ |
 | Configurações (regras) | ❌ | ⚠️ visualizar | ✅ |
 | APIs *(pendente de integração)* | ❌ | ✅ | ✅ |
@@ -854,10 +862,10 @@ Layout em 3 colunas.
 
 1. Cliente (combobox com busca, opcional)
 2. Veículo:
-   - Toggle [FIPE] [Manual]
-   - FIPE: dropdowns em cascata Tipo → Marca → Modelo → Ano
-   - Manual: campos livres + valor
-   - Card mostra valor FIPE + mês de referência
+   - Seleção do estoque (dropdown dos veículos `disponivel`/`reservado` do Cadastro de Veículos)
+   - Botões para ver valor FIPE e ajustar valor de referência
+   - Card mostra valor FIPE + mês de referência + valor de venda utilizado
+   - Novos veículos são cadastrados na aba Veículos (via FIPE picker ou manual), não inline aqui
 3. Valor do veículo (currency, pré-preenchido)
 4. Entrada — R$ ou %, sincronizados
 5. Prazo (meses) — slider 12–72 + input livre
@@ -1009,7 +1017,13 @@ CSS: paleta da loja (cor primária configurável), Inter + serif, A4 com page-br
 
 **Snapshot:** `proposals.snapshot_json` grava tudo usado no PDF (incluindo regras e indicadores vigentes). PDF reproduzível anos depois.
 
-**Saída:** `data/propostas/PROP-2026-00123_NomeCliente.pdf` + path em `proposals.pdf_path`. Dispara `audit_log("proposta_gerada")` e abre no visualizador padrão do SO.
+**Saída PDF:** `data/propostas/PROP-2026-00123_NomeCliente.pdf` + path em `proposals.pdf_path`. Dispara `audit_log("proposta_gerada")` e abre no visualizador padrão do SO.
+
+**Carnê de pagamento** — `app/reports/carne.html` + `carne.css` [IMPLEMENTADO]
+
+Pipeline idêntico ao PDF de proposta (Jinja2 → WeasyPrint). Gera um carnê estilo boleto por parcela com: código do contrato, vencimento, valor total da parcela, dados do cliente e veículo.
+
+Gerado via `proposal_service.generate_carne(proposal_id, output_dir)`. Caminho salvo em `proposals.carne_path`.
 
 ### 9.2 Backup automático — `app/data/backup.py`
 
@@ -1177,7 +1191,7 @@ A camada `integrations/` e os `services/` foram desenhados para acomodar:
 
 - **CRM** — `integrations/crm/` com providers Bling/RDStation/etc. — `client_service` exporta clientes em formato compatível
 - **WhatsApp** — `integrations/whatsapp/` com Twilio/Z-API — `proposal_service.send_via_whatsapp(proposal_id, phone)` mockado
-- **Geração de carnê** — `services/carne_service.py` consome `amortization_rows`
+- **Geração de carnê** — **IMPLEMENTADO** em `proposal_service.generate_carne()` com template `reports/carne.html`/`carne.css`; `carne_service.py` separado não foi necessário
 - **APIs bancárias** — `integrations/bancos/` (Santander, Itaú, BV, Bradesco) — submissão real de proposta
 
 Cada uma fica desligada via feature flag em `app_settings`. Aba "Configurações → Integrações Futuras" exibe lista cinza com botão "Configurar (em breve)".
@@ -1212,7 +1226,8 @@ Em `docs/`:
 
 ## 16. Fora do escopo do MVP
 
-- CRM, WhatsApp, geração de carnê, APIs bancárias (apenas arquitetura preparada)
+- CRM, WhatsApp, APIs bancárias (apenas arquitetura preparada)
+- ~~Geração de carnê~~ → **já implementada** em `proposal_service.generate_carne()` + `reports/carne.html`
 - Sincronização entre lojas/PCs (estratégia "híbrido com sync futuro" não foi escolhida)
 - Multi-tenancy
 - App mobile

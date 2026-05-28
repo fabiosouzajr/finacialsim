@@ -68,3 +68,30 @@ Cada simulacao pode referenciar um veiculo e um cliente. Atualmente a implementa
 - [] implement actual user friendly labels for the ui;
 - [] display percent values as "x%" (for example: "20%" instead of "0.20");
 - [] group similar components in a user friendly way;
+
+## changes in "Regras de Negócio"
+
+- [] remove the " " from the "Dados de Loja" section text fields as this might confuse the user.
+- [] include fields for "Seguro Proteção Veicular", "IPVA" and "Emplacamento" in "Extras / Rateio".
+
+## changes in IPVA and emplacamento
+
+We need to change the way values are calculated in the "Extras / Rateio" section:
+
+"IPVA" is an anual vehicle tax that is calculated based on a percentage of the vehicle's value (from the fipe vehicle data), and the vehicle type ("carro", "moto", "caminhao").
+Currently ipva has the follwing percentages based on vehicle types:
+"carros":  3,5%;
+"motas":  3%;
+"caminhoes": 1%;
+
+"emplacamento" is fixed value anual fee, also based on vehicle type:
+"carros" e "caminhoes": R$ 220,46;
+"motos": R$ 188,96;
+
+Your task is to implement changes that create user updateable fields for these values in "regras de negocio - Extra / Rateio". The default values for these fields should be the current values.
+
+These values (from "regras de negocio - Extra / Rateio") should appear when the user performs a simulation.
+
+---
+
+## changes in "simulação - comparação"
