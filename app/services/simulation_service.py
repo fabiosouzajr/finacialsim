@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
@@ -40,6 +40,23 @@ class Tarifa:
     nome: str
     valor: Decimal
     incluir_no_principal: bool = True
+
+
+@dataclass
+class SimulationSummary:
+    codigo: str
+    veiculo_label: str
+    cliente_nome: str
+    valor_veiculo: Decimal
+    valor_entrada: Decimal
+    prazo_meses: int
+    taxa_juros_mes: Decimal
+    incluir_iof: bool
+    data_liberacao: date
+    data_primeiro_venc: date
+    veiculo_id: int
+    cliente_id: int | None
+    criado_em: datetime
 
 
 @dataclass
@@ -82,6 +99,35 @@ class SimulationService:
     def __init__(self, session: Session) -> None:
         self.session = session
         self.audit = AuditService(session)
+
+    def find_recent(self, limit: int = 100) -> list[SimulationSummary]:
+        from app.data.models import Client, Vehicle
+        sims = (
+            self.session.query(Simulation)
+            .order_by(Simulation.criado_em.desc())
+            .limit(limit)
+            .all()
+        )
+        result = []
+        for s in sims:
+            v = self.session.get(Vehicle, s.veiculo_id)
+            c = self.session.get(Client, s.cliente_id) if s.cliente_id else None
+            result.append(SimulationSummary(
+                codigo=s.codigo,
+                veiculo_label=f"{v.marca} {v.modelo} {v.ano_modelo}" if v else "—",
+                cliente_nome=c.nome if c else "—",
+                valor_veiculo=s.valor_veiculo,
+                valor_entrada=s.valor_entrada,
+                prazo_meses=s.prazo_meses,
+                taxa_juros_mes=s.taxa_juros_mes,
+                incluir_iof=s.incluir_iof,
+                data_liberacao=s.data_liberacao,
+                data_primeiro_venc=s.data_primeiro_venc,
+                veiculo_id=s.veiculo_id,
+                cliente_id=s.cliente_id,
+                criado_em=s.criado_em,
+            ))
+        return result
 
     def run_and_save(self, dto: SimulationInputDTO) -> Simulation:
         # 1. Carencia

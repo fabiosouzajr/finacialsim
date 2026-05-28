@@ -8,6 +8,7 @@ from nicegui import app as ng_app, ui
 from app.data.database import get_session_factory
 from app.integrations.factory import build_fipe_chain
 from app.services.vehicle_service import VehicleService, VehicleServiceError
+from app.ui.components.fipe_picker import build_fipe_picker
 from app.ui.error_handler import handle_unexpected
 from app.ui.layout import shell
 from app.ui.router import get_logged_user_id
@@ -246,126 +247,11 @@ def build_veiculos_page(engine) -> None:
 
                         # ── FIPE tab ──────────────────────────────────
                         with ui.tab_panel(tab_fipe):
-                            fipe_status = ui.label("").classes("text-xs text-slate-400")
-                            fipe_result: dict = {"quote": None}
-
-                            async def _load_brands_create(_=None) -> None:
-                                fipe_status.text = "Buscando marcas..."
-                                r = await chain.fetch({"action": "brands", "tipo": tipo_sel.value})
-                                if not r.is_ok:
-                                    ui.notify(f"Erro: {r.error}", type="negative")
-                                    return
-                                marca_sel.options = {b["id"]: b["nome"] for b in r.value}
-                                marca_sel.value = None
-                                modelo_sel.options = {}
-                                modelo_sel.value = None
-                                ano_sel.options = {}
-                                ano_sel.value = None
-                                fipe_result["quote"] = None
-                                fipe_result_box.set_visibility(False)
-                                marca_sel.update()
-                                fipe_status.text = f"{len(r.value)} marcas"
-
-                            async def _load_models_create(_=None) -> None:
-                                if not marca_sel.value:
-                                    return
-                                fipe_status.text = "Buscando modelos..."
-                                r = await chain.fetch({
-                                    "action": "models", "tipo": tipo_sel.value,
-                                    "brand_id": marca_sel.value,
-                                })
-                                if not r.is_ok:
-                                    ui.notify(f"Erro: {r.error}", type="negative")
-                                    return
-                                modelo_sel.options = {m["id"]: m["nome"] for m in r.value}
-                                modelo_sel.value = None
-                                ano_sel.options = {}
-                                ano_sel.value = None
-                                modelo_sel.update()
-                                fipe_status.text = f"{len(r.value)} modelos"
-
-                            async def _load_years_create(_=None) -> None:
-                                if not modelo_sel.value:
-                                    return
-                                fipe_status.text = "Buscando anos..."
-                                r = await chain.fetch({
-                                    "action": "years", "tipo": tipo_sel.value,
-                                    "brand_id": marca_sel.value, "model_id": modelo_sel.value,
-                                })
-                                if not r.is_ok:
-                                    ui.notify(f"Erro: {r.error}", type="negative")
-                                    return
-                                ano_sel.options = {y["id"]: y["nome"] for y in r.value}
-                                ano_sel.value = None
-                                ano_sel.update()
-                                fipe_status.text = f"{len(r.value)} anos"
-
-                            async def _get_price_create(_=None) -> None:
-                                if not ano_sel.value:
-                                    return
-                                fipe_status.text = "Buscando preço..."
-                                r = await chain.fetch({
-                                    "action": "price", "tipo": tipo_sel.value,
-                                    "brand_id": marca_sel.value, "model_id": modelo_sel.value,
-                                    "year_id": ano_sel.value,
-                                })
-                                if not r.is_ok:
-                                    ui.notify(f"Erro: {r.error}", type="negative")
-                                    return
-                                q = r.value
-                                fipe_result["quote"] = q
-                                fipe_result_box.set_visibility(True)
-                                fipe_label.text = (
-                                    f"{q.marca} {q.modelo} {q.ano_modelo} · {q.combustivel} · "
-                                    f"FIPE: {format_brl(q.valor)} · {q.mes_referencia}"
-                                )
-                                inp_ref_fipe.value = q.valor
-                                fipe_status.text = "Pronto"
-
-                            tipo_sel = ui.select(
-                                ["carro", "moto", "caminhao"], label="Tipo", value="carro",
-                                on_change=_load_brands_create,
-                            ).classes("w-full")
-                            marca_sel = ui.select({}, label="Marca", on_change=_load_models_create).classes("w-full")
-                            modelo_sel = ui.select({}, label="Modelo", on_change=_load_years_create).classes("w-full")
-                            ano_sel = ui.select({}, label="Ano / Combustível", on_change=_get_price_create).classes("w-full")
-
-                            with ui.column().classes("w-full gap-2 mt-2") as fipe_result_box:
-                                fipe_result_box.set_visibility(False)
-                                fipe_label = ui.label("").classes("text-xs text-slate-600 font-medium")
-                                inp_cor_fipe = ui.input(label="Cor").classes("w-full")
-                                inp_placa_fipe = ui.input(label="Placa (ex: ABC1234)").classes("w-full")
-                                inp_km_fipe = ui.number(label="Odômetro (km)", min=0).classes("w-full")
-                                from app.ui.components.currency_input import CurrencyInput
-                                inp_ref_fipe = CurrencyInput("Valor de referência (R$)", Decimal("0"))
-
-                                def _salvar_fipe() -> None:
-                                    q = fipe_result["quote"]
-                                    if q is None:
-                                        return
-                                    with SessionLocal() as session:
-                                        svc = VehicleService(session)
-                                        try:
-                                            svc.create_from_fipe(
-                                                quote=q,
-                                                cor=inp_cor_fipe.value or None,
-                                                placa=inp_placa_fipe.value or None,
-                                                odometro_km=int(inp_km_fipe.value) if inp_km_fipe.value else None,
-                                                valor_referencia=inp_ref_fipe.value,
-                                                criado_por=user_id,
-                                            )
-                                            ui.notify("Veículo cadastrado!", type="positive")
-                                            panel_col.set_visibility(False)
-                                            _refresh_table()
-                                        except VehicleServiceError as e:
-                                            ui.notify(str(e), type="negative")
-                                        except Exception as exc:
-                                            handle_unexpected(exc, "veiculos.salvar_fipe")
-
-                                ui.button("Salvar veículo", icon="save",
-                                          on_click=_salvar_fipe).props("color=primary").classes("w-full")
-
-                            ui.timer(0, _load_brands_create, once=True)
+                            def _on_vehicle_created(_v) -> None:
+                                ui.notify("Veículo cadastrado!", type="positive")
+                                panel_col.set_visibility(False)
+                                _refresh_table()
+                            build_fipe_picker(chain, SessionLocal, user_id, _on_vehicle_created)
 
                         # ── Manual tab ────────────────────────────────
                         with ui.tab_panel(tab_manual):

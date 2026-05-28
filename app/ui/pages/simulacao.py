@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from datetime import date, timedelta
 from decimal import Decimal
+from pathlib import Path
 
 from loguru import logger
 from nicegui import app as ng_app
@@ -21,8 +22,10 @@ from app.services.simulation_service import (
     SimulationInputDTO,
     SimulationService,
     SimulationServiceError,
+    SimulationSummary,
 )
-from app.services.vehicle_service import VehicleService, VehicleServiceError
+from app.services.vehicle_service import VehicleService
+from app.ui.components.fipe_picker import build_fipe_picker
 from app.ui.components.charts import (
     composition_chart,
     parcela_total_chart,
@@ -37,7 +40,7 @@ from app.ui.router import get_logged_user_id
 from app.utils.br_format import format_brl, format_pct
 
 
-def build_simulacao_page(engine) -> None:
+def build_simulacao_page(engine, data_dir: Path) -> None:
     SessionLocal = get_session_factory(engine)
     fipe_chain = build_fipe_chain(SessionLocal)
 
@@ -205,128 +208,29 @@ def build_simulacao_page(engine) -> None:
 
                     _build_picker()
 
-                    ui.button(
-                        "🔍 Buscar na FIPE e cadastrar",
-                        on_click=lambda: ui.timer(0, _toggle_fipe_panel, once=True),
-                    ).props("flat dense no-caps size=sm").classes("text-blue-600 text-xs self-start")
-
-                    async def _toggle_fipe_panel() -> None:
+                    def _toggle_fipe_panel() -> None:
                         visible = not fipe_panel.visible
                         fipe_panel.set_visibility(visible)
                         if visible:
-                            await _load_brands_sim()
+                            fipe_panel.clear()
+                            with fipe_panel:
+                                def _on_vehicle_created(v) -> None:
+                                    selected_vehicle_id["id"] = v.id
+                                    valor_veiculo.value = v.valor_referencia
+                                    fipe_panel.set_visibility(False)
+                                    _build_picker()
+                                    _show_chips(v.id)
+                                    ui.notify("Veículo cadastrado e selecionado!", type="positive")
+                                build_fipe_picker(
+                                    fipe_chain, SessionLocal, user_id, _on_vehicle_created,
+                                    button_label="+ Cadastrar e usar este veículo",
+                                    button_icon=None,
+                                )
 
-                    with fipe_panel:
-                        sim_fipe_status = ui.label("").classes("text-xs text-slate-400")
-                        sim_quote: dict = {"q": None}
-
-                        async def _load_brands_sim(_=None) -> None:
-                            sim_fipe_status.text = "Buscando marcas..."
-                            r = await fipe_chain.fetch({"action": "brands", "tipo": sim_tipo.value})
-                            if not r.is_ok:
-                                ui.notify(f"Erro: {r.error}", type="negative")
-                                return
-                            sim_marca.options = {b["id"]: b["nome"] for b in r.value}
-                            sim_marca.value = None
-                            sim_modelo.options = {}
-                            sim_modelo.value = None
-                            sim_ano.options = {}
-                            sim_ano.value = None
-                            sim_quote["q"] = None
-                            sim_result_box.set_visibility(False)
-                            sim_marca.update()
-                            sim_fipe_status.text = f"{len(r.value)} marcas"
-
-                        async def _load_models_sim(_=None) -> None:
-                            if not sim_marca.value:
-                                return
-                            r = await fipe_chain.fetch({
-                                "action": "models", "tipo": sim_tipo.value,
-                                "brand_id": sim_marca.value,
-                            })
-                            if not r.is_ok:
-                                return
-                            sim_modelo.options = {m["id"]: m["nome"] for m in r.value}
-                            sim_modelo.value = None
-                            sim_ano.options = {}
-                            sim_ano.value = None
-                            sim_modelo.update()
-
-                        async def _load_years_sim(_=None) -> None:
-                            if not sim_modelo.value:
-                                return
-                            r = await fipe_chain.fetch({
-                                "action": "years", "tipo": sim_tipo.value,
-                                "brand_id": sim_marca.value, "model_id": sim_modelo.value,
-                            })
-                            if not r.is_ok:
-                                return
-                            sim_ano.options = {y["id"]: y["nome"] for y in r.value}
-                            sim_ano.value = None
-                            sim_ano.update()
-
-                        async def _get_price_sim(_=None) -> None:
-                            if not sim_ano.value:
-                                return
-                            r = await fipe_chain.fetch({
-                                "action": "price", "tipo": sim_tipo.value,
-                                "brand_id": sim_marca.value, "model_id": sim_modelo.value,
-                                "year_id": sim_ano.value,
-                            })
-                            if not r.is_ok:
-                                return
-                            sim_quote["q"] = r.value
-                            q = r.value
-                            sim_result_box.set_visibility(True)
-                            sim_result_label.text = (
-                                f"{q.marca} {q.modelo} {q.ano_modelo} · {format_brl(q.valor)}"
-                            )
-                            sim_ref_inp.value = q.valor
-
-                        sim_tipo = ui.select(
-                            ["carro", "moto", "caminhao"], label="Tipo", value="carro",
-                            on_change=_load_brands_sim,
-                        ).classes("w-full")
-                        sim_marca = ui.select({}, label="Marca", on_change=_load_models_sim).classes("w-full")
-                        sim_modelo = ui.select({}, label="Modelo", on_change=_load_years_sim).classes("w-full")
-                        sim_ano = ui.select({}, label="Ano", on_change=_get_price_sim).classes("w-full")
-
-                        with ui.column().classes("w-full gap-2") as sim_result_box:
-                            sim_result_box.set_visibility(False)
-                            sim_result_label = ui.label("").classes("text-xs font-medium text-slate-700")
-                            sim_cor_inp = ui.input(label="Cor").classes("w-full")
-                            sim_placa_inp = ui.input(label="Placa").classes("w-full")
-                            sim_km_inp = ui.number(label="Odômetro (km)", min=0).classes("w-full")
-                            sim_ref_inp = CurrencyInput("Valor de referência (R$)", Decimal("0"))
-
-                            def _cadastrar_e_usar() -> None:
-                                q = sim_quote["q"]
-                                if q is None:
-                                    return
-                                with SessionLocal() as session:
-                                    svc = VehicleService(session)
-                                    try:
-                                        v = svc.create_from_fipe(
-                                            quote=q,
-                                            cor=sim_cor_inp.value or None,
-                                            placa=sim_placa_inp.value or None,
-                                            odometro_km=int(sim_km_inp.value) if sim_km_inp.value else None,
-                                            valor_referencia=sim_ref_inp.value,
-                                            criado_por=user_id,
-                                        )
-                                        selected_vehicle_id["id"] = v.id
-                                        valor_veiculo.value = v.valor_referencia
-                                        fipe_panel.set_visibility(False)
-                                        _build_picker()
-                                        _show_chips(v.id)
-                                        ui.notify("Veículo cadastrado e selecionado!", type="positive")
-                                    except VehicleServiceError as e:
-                                        ui.notify(str(e), type="negative")
-                                    except Exception as exc:
-                                        handle_unexpected(exc, "cadastrar_e_usar")
-
-                            ui.button("+ Cadastrar e usar este veículo",
-                                      on_click=_cadastrar_e_usar).props("color=primary").classes("w-full")
+                    ui.button(
+                        "🔍 Buscar na FIPE e cadastrar",
+                        on_click=_toggle_fipe_panel,
+                    ).props("flat dense no-caps size=sm").classes("text-blue-600 text-xs self-start")
 
                     ui.separator().classes("my-1")
                     # ── fim seção Veículo ─────────────────────────────────────
@@ -561,12 +465,11 @@ def build_simulacao_page(engine) -> None:
                 if last_sim_id["id"] is None:
                     ui.notify("Simule antes de gerar PDF", type="warning")
                     return
-                from app.main import _platform_data_dir
                 from app.ui.pages._proposal_helper import generate_and_open_pdf
                 try:
                     with SessionLocal() as session:
                         pid = generate_and_open_pdf(
-                            session, last_sim_id["id"], user_id, _platform_data_dir()
+                            session, last_sim_id["id"], user_id, data_dir
                         )
                     last_proposal_id["id"] = pid
                     btn_carne.enable()
@@ -578,12 +481,11 @@ def build_simulacao_page(engine) -> None:
                 if last_proposal_id["id"] is None:
                     ui.notify("Gere o PDF da proposta antes de gerar o carnê", type="warning")
                     return
-                from app.main import _platform_data_dir
                 from app.ui.pages._proposal_helper import generate_and_open_carne
                 try:
                     with SessionLocal() as session:
                         generate_and_open_carne(
-                            session, last_proposal_id["id"], _platform_data_dir()
+                            session, last_proposal_id["id"], data_dir
                         )
                 except Exception as exc:
                     logger.exception("Carne generation failed")
@@ -599,36 +501,8 @@ def build_simulacao_page(engine) -> None:
                 )
 
             def abrir_sim() -> None:
-                from app.data.models import Client as _Cli
-                from app.data.models import Simulation as _Sim
                 with SessionLocal() as _s:
-                    sims = (
-                        _s.query(_Sim)
-                        .order_by(_Sim.criado_em.desc())
-                        .limit(100)
-                        .all()
-                    )
-                    rows = []
-                    for s in sims:
-                        v = _s.get(Vehicle, s.veiculo_id)
-                        c = _s.get(_Cli, s.cliente_id) if s.cliente_id else None
-                        rows.append({
-                            "codigo": s.codigo,
-                            "veiculo": f"{v.marca} {v.modelo} {v.ano_modelo}" if v else "—",
-                            "cliente": c.nome if c else "—",
-                            "valor": format_brl(s.valor_veiculo),
-                            "prazo": f"{s.prazo_meses}x",
-                            "data": s.criado_em.strftime("%d/%m/%Y"),
-                            "_valor_veiculo": s.valor_veiculo,
-                            "_valor_entrada": s.valor_entrada,
-                            "_prazo": s.prazo_meses,
-                            "_taxa": s.taxa_juros_mes,
-                            "_incluir_iof": s.incluir_iof,
-                            "_data_lib": s.data_liberacao.isoformat(),
-                            "_data_venc": s.data_primeiro_venc.isoformat(),
-                            "_veiculo_id": s.veiculo_id,
-                            "_cliente_id": s.cliente_id,
-                        })
+                    summaries = SimulationService(_s).find_recent()
 
                 dlg = ui.dialog()
                 with dlg, ui.card().classes("w-full max-w-3xl"):
@@ -645,42 +519,42 @@ def build_simulacao_page(engine) -> None:
                         ui.label("Prazo").classes("w-16 text-right")
                         ui.label("Data").classes("w-24")
 
-                    def _do_load(r: dict) -> None:
-                        valor_veiculo.value = r["_valor_veiculo"]
-                        valor_entrada.value = r["_valor_entrada"]
-                        prazo.set_value(r["_prazo"])
-                        taxa.value = r["_taxa"]
-                        incluir_iof.set_value(r["_incluir_iof"])
-                        inp_lib.set_value(r["_data_lib"])
-                        inp_venc.set_value(r["_data_venc"])
-                        selected_vehicle_id["id"] = r["_veiculo_id"]
-                        if r["_veiculo_id"]:
+                    def _do_load(s: SimulationSummary) -> None:
+                        valor_veiculo.value = s.valor_veiculo
+                        valor_entrada.value = s.valor_entrada
+                        prazo.set_value(s.prazo_meses)
+                        taxa.value = s.taxa_juros_mes
+                        incluir_iof.set_value(s.incluir_iof)
+                        inp_lib.set_value(s.data_liberacao.isoformat())
+                        inp_venc.set_value(s.data_primeiro_venc.isoformat())
+                        selected_vehicle_id["id"] = s.veiculo_id
+                        if s.veiculo_id:
                             _build_picker()
-                            _show_chips(r["_veiculo_id"])
-                        cliente_sel.value = r["_cliente_id"] or 0
+                            _show_chips(s.veiculo_id)
+                        cliente_sel.value = s.cliente_id or 0
                         last_sim_id["id"] = None
                         last_proposal_id["id"] = None
                         btn_carne.disable()
                         loaded_row.set_visibility(False)
                         btn_simular.set_visibility(True)
                         dlg.close()
-                        ui.notify(f"Simulação {r['codigo']} carregada", type="positive")
+                        ui.notify(f"Simulação {s.codigo} carregada", type="positive")
 
                     with ui.scroll_area().classes("h-96 w-full"):
-                        if not rows:
+                        if not summaries:
                             ui.label("Nenhuma simulação encontrada.").classes(
                                 "text-sm text-slate-400 p-4"
                             )
-                        for r in rows:
+                        for s in summaries:
                             with ui.row().classes(
                                 "w-full border-b py-2 cursor-pointer hover:bg-slate-50 items-center"
-                            ).on("click", lambda r=r: _do_load(r)):
-                                ui.label(r["codigo"]).classes("w-32 text-sm font-mono")
-                                ui.label(r["veiculo"]).classes("flex-1 text-sm")
-                                ui.label(r["cliente"]).classes("w-40 text-sm")
-                                ui.label(r["valor"]).classes("w-28 text-sm text-right")
-                                ui.label(r["prazo"]).classes("w-16 text-sm text-right")
-                                ui.label(r["data"]).classes("w-24 text-sm text-slate-400")
+                            ).on("click", lambda s=s: _do_load(s)):
+                                ui.label(s.codigo).classes("w-32 text-sm font-mono")
+                                ui.label(s.veiculo_label).classes("flex-1 text-sm")
+                                ui.label(s.cliente_nome).classes("w-40 text-sm")
+                                ui.label(format_brl(s.valor_veiculo)).classes("w-28 text-sm text-right")
+                                ui.label(f"{s.prazo_meses}x").classes("w-16 text-sm text-right")
+                                ui.label(s.criado_em.strftime("%d/%m/%Y")).classes("w-24 text-sm text-slate-400")
                     ui.button("Fechar", on_click=dlg.close).props("flat").classes("mt-2")
                 dlg.open()
 
