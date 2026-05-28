@@ -3,6 +3,8 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+| 10:45 | Created initial README.md at project root | README.md | done — covers setup, run, tests, build, architecture, stack table | ~200 tok |
+
 | 2026-05-27 | applied three lint cleanups: split long column dicts in cadastro.py (E501), restored TypeError in _safe_int (configuracoes.py), fixed W292 in login.py and charts.py | app/ui/pages/cadastro.py app/ui/pages/configuracoes.py app/ui/pages/login.py app/ui/components/charts.py | committed 7f508a5; ruff clean | ~400 tok |
 
 | 2026-05-27 | fix(configuracoes): narrow widgets type to Any; remove unreachable ValueError/TypeError catches | app/ui/pages/configuracoes.py | committed 1382971 | ~800 tok |
@@ -1131,3 +1133,10 @@
 | 10:33 | Edited app/services/simulation_service.py | modified find_recent() | ~356 |
 | 10:33 | Edited app/ui/pages/simulacao.py | 5→6 lines | ~42 |
 | 10:33 | Edited app/ui/pages/simulacao.py | modified abrir_sim() | ~980 |
+
+## Session: 2026-05-28 10:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:18 | Created README.md | — | ~1367 |
+| 11:25 | Edited README.md | modified SQLite() | ~1142 |

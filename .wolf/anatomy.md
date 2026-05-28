@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T13:33:56.546Z
-> Files: 44 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T14:25:03.102Z
+> Files: 45 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../AppData/Local/Temp/
 
@@ -9,6 +9,7 @@
 
 ## ./
 
+- `README.md` — Project documentation (~2247 tok)
 
 ## .claude/
 
