@@ -1169,3 +1169,48 @@
 | 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | "services/carne_service.py" → "proposal_service.generate" | ~47 |
 | 12:54 | Edited docs/superpowers/specs/2026-05-23-finacialsim-design.md | 1→2 lines | ~46 |
 | 12:54 | Updated 2026-05-23-finacialsim-design.md to reflect codebase state: vehicles→inventory model, carnê implemented, Veículos tab, carne_path on proposals | docs/superpowers/specs/2026-05-23-finacialsim-design.md | done | ~800 |
+
+## Session: 2026-05-28 12:56
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:23 | Created docs/superpowers/specs/2026-05-28-saas-roadmap.md | — | ~3677 |
+| 13:24 | Created docs/superpowers/specs/2026-05-28-saas-phase-0-foundations.md | — | ~1187 |
+| 13:25 | Created docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md | — | ~1394 |
+| 13:26 | Created docs/superpowers/specs/2026-05-28-saas-phase-2-simulacao.md | — | ~1620 |
+| 13:27 | Created docs/superpowers/specs/2026-05-28-saas-phase-3-cadastros.md | — | ~1157 |
+| 13:30 | Created docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | — | ~1428 |
+| 13:31 | Created docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | — | ~1448 |
+| 13:32 | Created docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md | — | ~1739 |
+| 13:33 | Created docs/superpowers/specs/2026-05-28-saas-phase-7-notificacoes.md | — | ~1518 |
+| 14:37 | Edited docs/superpowers/specs/2026-05-28-saas-roadmap.md | 14→16 lines | ~158 |
+| 14:37 | Edited docs/superpowers/specs/2026-05-28-saas-roadmap.md | expanded (+6 lines) | ~325 |
+| 14:37 | Edited docs/superpowers/specs/2026-05-28-saas-roadmap.md | inline fix | ~15 |
+| 14:37 | Edited docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md | modified roles() | ~127 |
+| 14:37 | Edited docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md | 3→1 lines | ~32 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md | inline fix | ~64 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md | inline fix | ~34 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-2-simulacao.md | 1→2 lines | ~37 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-2-simulacao.md | 1→2 lines | ~57 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-3-cadastros.md | inline fix | ~68 |
+| 14:38 | Edited docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | 3→2 lines | ~48 |
+| 14:39 | Edited docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | 3→2 lines | ~50 |
+| 14:39 | Edited docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | 4→2 lines | ~39 |
+| 14:39 | Edited docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | inline fix | ~49 |
+| 14:39 | Edited docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md | 2→1 lines | ~25 |
+| 14:39 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | 1→3 lines | ~166 |
+| 14:40 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | 4→6 lines | ~327 |
+| 14:40 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | 7→9 lines | ~204 |
+| 14:40 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | inline fix | ~49 |
+| 14:40 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | 5→7 lines | ~191 |
+| 14:40 | Edited docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md | 8→12 lines | ~284 |
+| 14:41 | Edited docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md | 2→2 lines | ~82 |
+| 14:41 | Edited docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md | inline fix | ~81 |
+| 14:41 | Edited docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md | inline fix | ~63 |
+| 14:41 | Edited docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md | 2→3 lines | ~64 |
+| 14:49 | Created docs/superpowers/plans/2026-05-28-saas-phase-0-foundations.md | — | ~11191 |
+
+## Session: 2026-05-28 14:51
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

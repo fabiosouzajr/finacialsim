@@ -9,6 +9,24 @@ The spec in the file "2026-05-23-finacialsim-design.md" has proven not to meet t
 
 ### General Requirements
 
+#### Architecture
+
+Frontend
+    ↓
+API Gateway
+    ↓
+Auth Service
+    ↓
+Financial Service
+    ↓
+Pix Service
+    ↓
+Notification Service
+    ↓
+Queue Workers
+
+#### Tech Stack
+
 - FastAPI or similar Python web framework
 - React or similar JS framework
 - Postgres or similar SQL database
@@ -16,9 +34,9 @@ The spec in the file "2026-05-23-finacialsim-design.md" has proven not to meet t
 
 ### Business Requirements
 
-- Implement RBAC
+- Implement RBAC (admin, manager, user)
 - Implement multi-tenancy
-- Implement payment gateway integration using pix (scaffold only)
+- Provision payment gateway integration using pix (scaffold only)
 - The application should be accessible via a web browser.
 - The application should be accessible via a mobile device.
 - The application should be accessible via a tablet device.

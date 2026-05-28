@@ -1288,6 +1288,118 @@
       "related_bugs": [],
       "occurrences": 3,
       "last_seen": "2026-05-28T15:54:24.307Z"
+    },
+    {
+      "id": "bug-080",
+      "timestamp": "2026-05-28T17:37:04.345Z",
+      "error_message": "Significant refactor of ",
+      "file": "docs/superpowers/specs/2026-05-28-saas-roadmap.md",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 14→16 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-28T17:37:04.345Z"
+    },
+    {
+      "id": "bug-081",
+      "timestamp": "2026-05-28T17:37:39.851Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-1-auth-rbac.md",
+      "root_cause": "Had `(tenant_id, email)`",
+      "fix": "Changed to `admin`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-28T17:37:51.367Z"
+    },
+    {
+      "id": "bug-082",
+      "timestamp": "2026-05-28T17:38:45.401Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-3-cadastros.md",
+      "root_cause": "Had `(id, tenant_id, tipo, acao, marca_id, modelo_id, ",
+      "fix": "Changed to `tenant_id`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-28T17:38:45.401Z"
+    },
+    {
+      "id": "bug-083",
+      "timestamp": "2026-05-28T17:38:58.981Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-4-indicadores-rules.md",
+      "root_cause": "Had `indicator_overrides`",
+      "fix": "Changed to `audit_log`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-28T17:39:35.353Z"
+    },
+    {
+      "id": "bug-084",
+      "timestamp": "2026-05-28T17:39:53.980Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md",
+      "root_cause": "Had `(id, tenant_id, codigo, simulation_id, cliente_id",
+      "fix": "Changed to `(id, tenant_id, codigo, simulation_id, cliente_id",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-28T17:39:53.981Z"
+    },
+    {
+      "id": "bug-085",
+      "timestamp": "2026-05-28T17:40:07.999Z",
+      "error_message": "Significant refactor of ",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-5-propostas-pdf.md",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 4→6 lines (3 removed) | Also: GET    /api/v1/proposals/{id}                     ; POST   /api/v1/proposals/{id}/render-carne         | Also: - Ready: \"Baixar proposta (PDF)\" → opens signed UR; - Carnê button appears after proposta ready. | Also: - [ ] Download signed URL serves the PDF; text ext; - [ ] Carnê first-parcela page matches desktop car",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-05-28T17:40:59.610Z"
+    },
+    {
+      "id": "bug-086",
+      "timestamp": "2026-05-28T17:41:13.365Z",
+      "error_message": "Incorrect value in code",
+      "file": "docs/superpowers/specs/2026-05-28-saas-phase-6-portal-cliente-pix.md",
+      "root_cause": "Had `POST /portal/users`",
+      "fix": "Changed to `proposal_service.approve`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-28T17:41:13.365Z"
     }
   ]
 }

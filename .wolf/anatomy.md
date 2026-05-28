@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T15:54:29.692Z
-> Files: 47 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-28T17:49:04.111Z
+> Files: 57 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../AppData/Local/Temp/
 
@@ -117,6 +117,7 @@
 - `2026-05-26-ui-error-feedback.md` — UI Error Feedback Implementation Plan (~4295 tok)
 - `2026-05-26-veiculos.md` — Vehicle Registry Implementation Plan (~19614 tok)
 - `2026-05-27-ui-polish.md` — UI Polish Implementation Plan (~3826 tok)
+- `2026-05-28-saas-phase-0-foundations.md` — Phase 0 — Foundations Implementation Plan (~10492 tok)
 
 ## docs/superpowers/specs/
 
@@ -127,6 +128,15 @@
 - `2026-05-27-carne-design.md` — Design Spec — Geração de Carnê PDF (~995 tok)
 - `2026-05-27-ui-polish-design.md` — Design Spec — UI Polish: Login, Cadastro, Simulação, Configurações (~2273 tok)
 - `2026-05-28-ipva-emplacamento-auto-calc-design.md` — Design Spec — IPVA & Emplacamento Auto-Calculation (~1117 tok)
+- `2026-05-28-saas-phase-0-foundations.md` — Phase 0 — Foundations (~1113 tok)
+- `2026-05-28-saas-phase-1-auth-rbac.md` — Phase 1 — Auth + RBAC + Tenant management (~1398 tok)
+- `2026-05-28-saas-phase-2-simulacao.md` — Phase 2 — Core domain port + Simulação (~1571 tok)
+- `2026-05-28-saas-phase-3-cadastros.md` — Phase 3 — Cadastros (Clientes + Veículos + FIPE) (~1091 tok)
+- `2026-05-28-saas-phase-4-indicadores-rules.md` — Phase 4 — Indicadores + Business Rules UI + Scheduler + Audit log (~1195 tok)
+- `2026-05-28-saas-phase-5-propostas-pdf.md` — Phase 5 — Propostas + PDF/Carnê (worker-rendered) (~1921 tok)
+- `2026-05-28-saas-phase-6-portal-cliente-pix.md` — Phase 6 — Portal do cliente + Pix scaffold (~1730 tok)
+- `2026-05-28-saas-phase-7-notificacoes.md` — Phase 7 — Notificações (email) + polish (~1423 tok)
+- `2026-05-28-saas-roadmap.md` — FinacialSim SaaS — Master Roadmap (~3687 tok)
 
 ## scripts/
 
